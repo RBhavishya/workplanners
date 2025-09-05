@@ -9,38 +9,143 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LayoutTasksIndexRouteImport } from './routes/_layout/tasks/index'
+import { Route as LayoutProjectsIndexRouteImport } from './routes/_layout/projects/index'
+import { Route as LayoutDashboardIndexRouteImport } from './routes/_layout/dashboard/index'
+import { Route as LayoutProjectsTableIndexRouteImport } from './routes/_layout/projects/table/index'
+import { Route as LayoutProjectsAddIndexRouteImport } from './routes/_layout/projects/add/index'
+import { Route as LayoutProjectsIdIndexRouteImport } from './routes/_layout/projects/$id/index'
+import { Route as LayoutProjectsEditIdIndexRouteImport } from './routes/_layout/projects/edit/$id/index'
 
+const LayoutRoute = LayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LayoutTasksIndexRoute = LayoutTasksIndexRouteImport.update({
+  id: '/tasks/',
+  path: '/tasks/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutProjectsIndexRoute = LayoutProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutDashboardIndexRoute = LayoutDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutProjectsTableIndexRoute =
+  LayoutProjectsTableIndexRouteImport.update({
+    id: '/projects/table/',
+    path: '/projects/table/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutProjectsAddIndexRoute = LayoutProjectsAddIndexRouteImport.update({
+  id: '/projects/add/',
+  path: '/projects/add/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutProjectsIdIndexRoute = LayoutProjectsIdIndexRouteImport.update({
+  id: '/projects/$id/',
+  path: '/projects/$id/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutProjectsEditIdIndexRoute =
+  LayoutProjectsEditIdIndexRouteImport.update({
+    id: '/projects/edit/$id/',
+    path: '/projects/edit/$id/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof LayoutDashboardIndexRoute
+  '/projects': typeof LayoutProjectsIndexRoute
+  '/tasks': typeof LayoutTasksIndexRoute
+  '/projects/$id': typeof LayoutProjectsIdIndexRoute
+  '/projects/add': typeof LayoutProjectsAddIndexRoute
+  '/projects/table': typeof LayoutProjectsTableIndexRoute
+  '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof LayoutDashboardIndexRoute
+  '/projects': typeof LayoutProjectsIndexRoute
+  '/tasks': typeof LayoutTasksIndexRoute
+  '/projects/$id': typeof LayoutProjectsIdIndexRoute
+  '/projects/add': typeof LayoutProjectsAddIndexRoute
+  '/projects/table': typeof LayoutProjectsTableIndexRoute
+  '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/dashboard/': typeof LayoutDashboardIndexRoute
+  '/_layout/projects/': typeof LayoutProjectsIndexRoute
+  '/_layout/tasks/': typeof LayoutTasksIndexRoute
+  '/_layout/projects/$id/': typeof LayoutProjectsIdIndexRoute
+  '/_layout/projects/add/': typeof LayoutProjectsAddIndexRoute
+  '/_layout/projects/table/': typeof LayoutProjectsTableIndexRoute
+  '/_layout/projects/edit/$id/': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/projects'
+    | '/tasks'
+    | '/projects/$id'
+    | '/projects/add'
+    | '/projects/table'
+    | '/projects/edit/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/projects'
+    | '/tasks'
+    | '/projects/$id'
+    | '/projects/add'
+    | '/projects/table'
+    | '/projects/edit/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_layout'
+    | '/_layout/dashboard/'
+    | '/_layout/projects/'
+    | '/_layout/tasks/'
+    | '/_layout/projects/$id/'
+    | '/_layout/projects/add/'
+    | '/_layout/projects/table/'
+    | '/_layout/projects/edit/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +153,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_layout/tasks/': {
+      id: '/_layout/tasks/'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof LayoutTasksIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/projects/': {
+      id: '/_layout/projects/'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof LayoutProjectsIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/dashboard/': {
+      id: '/_layout/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof LayoutDashboardIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/projects/table/': {
+      id: '/_layout/projects/table/'
+      path: '/projects/table'
+      fullPath: '/projects/table'
+      preLoaderRoute: typeof LayoutProjectsTableIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/projects/add/': {
+      id: '/_layout/projects/add/'
+      path: '/projects/add'
+      fullPath: '/projects/add'
+      preLoaderRoute: typeof LayoutProjectsAddIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/projects/$id/': {
+      id: '/_layout/projects/$id/'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof LayoutProjectsIdIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/projects/edit/$id/': {
+      id: '/_layout/projects/edit/$id/'
+      path: '/projects/edit/$id'
+      fullPath: '/projects/edit/$id'
+      preLoaderRoute: typeof LayoutProjectsEditIdIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
+interface LayoutRouteChildren {
+  LayoutDashboardIndexRoute: typeof LayoutDashboardIndexRoute
+  LayoutProjectsIndexRoute: typeof LayoutProjectsIndexRoute
+  LayoutTasksIndexRoute: typeof LayoutTasksIndexRoute
+  LayoutProjectsIdIndexRoute: typeof LayoutProjectsIdIndexRoute
+  LayoutProjectsAddIndexRoute: typeof LayoutProjectsAddIndexRoute
+  LayoutProjectsTableIndexRoute: typeof LayoutProjectsTableIndexRoute
+  LayoutProjectsEditIdIndexRoute: typeof LayoutProjectsEditIdIndexRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutDashboardIndexRoute: LayoutDashboardIndexRoute,
+  LayoutProjectsIndexRoute: LayoutProjectsIndexRoute,
+  LayoutTasksIndexRoute: LayoutTasksIndexRoute,
+  LayoutProjectsIdIndexRoute: LayoutProjectsIdIndexRoute,
+  LayoutProjectsAddIndexRoute: LayoutProjectsAddIndexRoute,
+  LayoutProjectsTableIndexRoute: LayoutProjectsTableIndexRoute,
+  LayoutProjectsEditIdIndexRoute: LayoutProjectsEditIdIndexRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LayoutRoute: LayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
