@@ -12,6 +12,7 @@ import { $fetch } from "../fetch";
 interface GetAllPaginatedUsersPropTypes {
   pageIndex: number;
   pageSize: number;
+  viewMode: any;
   order_by: any;
   search_string: any;
 }
@@ -19,6 +20,7 @@ interface GetAllPaginatedUsersPropTypes {
 export const getAllPaginatedProjects = async ({
   pageIndex,
   pageSize,
+  viewMode,
   order_by,
   search_string,
 }: GetAllPaginatedUsersPropTypes) => {
@@ -26,6 +28,7 @@ export const getAllPaginatedProjects = async ({
     const queryParams = {
       page: pageIndex,
       page_size: pageSize,
+      view_mode: viewMode,
       project_status: order_by,
       search_string: search_string,
     };

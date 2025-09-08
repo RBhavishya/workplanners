@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { useLocation, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { Pagination } from "../core/Pagination";
 import {
   DropdownMenu,
@@ -29,7 +29,6 @@ const sortOptions: Record<string, string> = {
 
 const Projects = () => {
   const [time, setTime] = useState(new Date());
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
     null
   );
@@ -42,6 +41,7 @@ const Projects = () => {
   const router = useRouter();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+  const search = useSearch({ strict: false }) as { viewMode?: 'table' | 'grid' }
 
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 12;
@@ -49,6 +49,7 @@ const Projects = () => {
   const initialSearch = searchParams.get("search") || "";
 
   const [pageIndex, setPageIndex] = useState(pageIndexParam);
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>(search?.viewMode || 'grid')
   const [pageSize, setPageSize] = useState(pageSizeParam);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [search_string, setSearchString] = useState(initialSearch);
@@ -85,11 +86,12 @@ const Projects = () => {
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["projects", page, pageSize, debouncedSearch, selectedSort],
+    queryKey: ["projects", page, pageSize,viewMode, debouncedSearch, selectedSort],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
         pageIndex: page,
         pageSize: pageSize,
+        viewMode,
         order_by: selectedSort,
         search_string: debouncedSearch,
       });
@@ -100,6 +102,7 @@ const Projects = () => {
         search: {
           page,
           page_size: pageSize,
+          viewMode,
           order_by: selectedSort || undefined,
           search: debouncedSearch || undefined,
         },
