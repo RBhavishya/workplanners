@@ -129,7 +129,7 @@ const Projects = () => {
       {/* Title & Controls */}
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
-        <div className="flex items-center gap-3 flex-1 justify-end">
+         <div className="flex items-center gap-3 flex-1 justify-end">
           {/* Search */}
           <input
             type="text"

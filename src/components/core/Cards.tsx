@@ -3,7 +3,7 @@ import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react"; /
 
 interface BigCardProps {
   title: string;
-  value?: number | string;
+  value?: any;
   icon?: React.ReactNode; // allow custom icon later
 }
 
