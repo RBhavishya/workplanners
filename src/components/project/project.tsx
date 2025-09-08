@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { Pagination } from "../core/Pagination";
 import {
   DropdownMenu,
@@ -12,14 +12,23 @@ import {
 } from "../ui/dropdown-menu";
 import { MoreVertical, Filter, LayoutGrid, List } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
-import { getAllProjectsAPI, getProjectByIdAPI } from "@/https/services/project";
+import {
+  getAllPaginatedProjects,
+  getProjectByIdAPI,
+} from "@/https/services/project";
 import ProjectsTable from "./projectTable";
 import DeleteProject from "./DeleteProject";
 
+const sortOptions: Record<string, string> = {
+  New: "created_at",
+  Inprogress: "project_status",
+  Review: "project_status",
+  Overdue: "due_date",
+  Done: "project_status",
+};
+
 const Projects = () => {
   const [time, setTime] = useState(new Date());
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("New");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
     null
@@ -27,17 +36,31 @@ const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const [showDetails, setShowDetails] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const router = useRouter();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
+  const pageIndexParam = Number(searchParams.get("page")) || 1;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 12;
+  const orderBY = searchParams.get("project_status") || "";
+  const initialSearch = searchParams.get("search") || "";
+
+  const [pageIndex, setPageIndex] = useState(pageIndexParam);
+  const [pageSize, setPageSize] = useState(pageSizeParam);
+  const [selectedSort, setSelectedSort] = useState(orderBY);
+  const [search_string, setSearchString] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(search_string);
+
+
+
+  // live clock
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
-
   const formattedTime = time.toLocaleTimeString("en-GB");
   const formattedDate = time.toLocaleDateString("en-GB", {
     weekday: "long",
@@ -45,38 +68,48 @@ const Projects = () => {
     month: "short",
   });
 
-  //  Fetch all projects
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["projects", page, pageSize, search, sortBy],
-    queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      if (page) queryParams.append("page", page.toString());
-      if (pageSize) queryParams.append("page_size", pageSize.toString());
-      if (search) queryParams.append("search_string", search);
-      if (sortBy) queryParams.append("sort_by", sortBy.toLowerCase());
+  // debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search_string);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search_string,]);
 
-      const result = await getAllProjectsAPI(queryParams.toString());
-      return result;
-    },
-    retry: 3,
-    refetchOnMount: true,
-  });
-
-  //  Fetch single project
+  // 🔹 Fetch all projects (paginated)
   const {
-    data: selectedProjectData,
-    isLoading: loadingProject,
-    isError: errorProject,
-    error: projectError,
+    data,
+    isLoading,
+    isError,
+    error,
+    isFetching,
   } = useQuery({
-    queryKey: ["project", selectedProjectId],
+    queryKey: ["projects", page, pageSize, debouncedSearch, selectedSort],
     queryFn: async () => {
-      const result = await getProjectByIdAPI(selectedProjectId!);
-      return result;
+      const response = await getAllPaginatedProjects({
+        pageIndex: page,
+        pageSize: pageSize,
+        order_by: selectedSort,
+        search_string: debouncedSearch,
+      });
+
+      // sync with URL
+      router.navigate({
+        to: "/projects",
+        search: {
+          page,
+          page_size: pageSize,
+          order_by: selectedSort || undefined,
+          search: debouncedSearch || undefined,
+        },
+      });
+
+      return response;
     },
-    enabled: !!selectedProjectId,
   });
 
+  // 🔹 Extract records & pagination
   const existingProjects: ProjectData[] =
     data?.data?.data?.records && Array.isArray(data.data.data.records)
       ? data.data.data.records
@@ -91,6 +124,24 @@ const Projects = () => {
     prev_page: data?.data?.data?.pagination_info?.prev_page || null,
   };
 
+  // 🔹 Fetch selected project details
+  const {
+    data: selectedProjectData,
+    isLoading: loadingProject,
+    isError: errorProject,
+    error: projectError,
+  } = useQuery({
+    queryKey: ["project", selectedProjectId],
+    queryFn: async () => {
+      if (!selectedProjectId) return null;
+      return await getProjectByIdAPI(selectedProjectId);
+    },
+    enabled: !!selectedProjectId,
+  });
+
+  const handleNavigation = () => navigate({ to: `/projects/add` });
+  const handleView = (id: number) => navigate({ to: `/projects/${id}` });
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
@@ -102,16 +153,12 @@ const Projects = () => {
   }
 
   if (isError) {
-    console.error("Query Error:", error);
     return (
       <p className="text-red-500">
         Error fetching projects: {error?.message || "Unknown error"}
       </p>
     );
   }
-
-  const handleNavigation = () => navigate({ to: `/projects/add` });
-  const handleView = (id: number) => navigate({ to: `/projects/${id}` });
 
   return (
     <div className="w-full p-4">
@@ -124,46 +171,40 @@ const Projects = () => {
         </div>
       </div>
 
-      <div className="w-full h-7 border-t border-gray-200"></div>
-
       {/* Title & Controls */}
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
-         <div className="flex items-center gap-3 flex-1 justify-end">
+        <div className="flex items-center gap-3 flex-1 justify-end">
           {/* Search */}
           <input
             type="text"
             placeholder="Search project..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
+            value={search_string}
+            onChange={(e) => setSearchString(e.target.value)}
             className="border px-3 py-2 rounded-lg w-1/4"
           />
 
-          {/* Sort By Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
-                <Filter className="text-purple-500" size={18} />
-                Sort by
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {["New", "In Progress", "Review", "Overdue", "Done"].map(
-                (option) => (
-                  <DropdownMenuItem
-                    key={option}
-                    onClick={() => setSortBy(option)}
-                  >
-                    {option}
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          {/* Sort Dropdown */}
+        <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
+      <Filter className="text-purple-500" size={18} />
+      {selectedSort || "Sort by"} {/* Display the selected label */}
+    </button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    {["New", "In_Progress", "Review", "Overdue", "Done"].map((option) => (
+      <DropdownMenuItem
+        key={option}
+        onClick={() => {
+          setSelectedSort(option); // Update selected sort
+        }}
+      >
+        {option}
+      </DropdownMenuItem>
+    ))}
+  </DropdownMenuContent>
+</DropdownMenu>
           {/* View Toggle */}
           <div className="flex items-center gap-2 px-1 py-1">
             <button
@@ -176,7 +217,7 @@ const Projects = () => {
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-2 rounded-lg  cursor-pointer${
+              className={`p-2 rounded-lg cursor-pointer ${
                 viewMode === "table" ? "bg-purple-100 text-purple-600" : ""
               }`}
             >
@@ -184,7 +225,7 @@ const Projects = () => {
             </button>
           </div>
 
-          {/* New Project Button */}
+          {/* New Project */}
           <button
             onClick={handleNavigation}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
@@ -211,10 +252,7 @@ const Projects = () => {
                   <Card
                     key={project.id}
                     className="w-[180px] h-[180px] shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
-                    onClick={() => {
-                      setSelectedProjectId(project.id ?? null);
-                      setShowDetails(false);
-                    }}
+                    onClick={() => setSelectedProjectId(project.id ?? null)}
                   >
                     {/* 3-dots menu */}
                     <div className="absolute top-3 right-3">
@@ -235,7 +273,7 @@ const Projects = () => {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation(); // prevent card click
+                              e.stopPropagation();
                               setDeleteTarget(project);
                               setShowDeleteDialog(true);
                             }}
@@ -260,6 +298,7 @@ const Projects = () => {
               )}
             </div>
 
+            {/* Right side - Selected Project Details */}
             <div className="w-1/3 flex justify-center items-start">
               {!selectedProjectId ? (
                 <p className="text-gray-500 mt-10">
@@ -269,12 +308,10 @@ const Projects = () => {
                 <p className="mt-10">Loading project details...</p>
               ) : errorProject ? (
                 <p className="text-red-500 mt-10">
-                  Error loading project:{" "}
-                  {projectError?.message || "Unknown error"}
+                  Error loading project: {projectError?.message || "Unknown"}
                 </p>
               ) : (
                 <div className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-2xl p-6 text-center">
-                  {/* Project Logo / Icon */}
                   <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="text-3xl text-blue-500 font-bold">
                       {selectedProjectData?.data?.data?.title
@@ -282,21 +319,15 @@ const Projects = () => {
                         .toUpperCase() || ""}
                     </span>
                   </div>
-
-                  {/* Title */}
                   <h2 className="text-xl font-semibold text-gray-800 break-words">
                     {selectedProjectData?.data?.data?.title || "Unknown"}
                   </h2>
-
-                  {/* View Button */}
                   <button
                     onClick={() => handleView(selectedProjectId!)}
                     className="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition my-4 cursor-pointer"
                   >
                     View
                   </button>
-
-                  {/* About Project */}
                   <div className="text-left">
                     <h3 className="font-semibold text-lg text-gray-800 mb-2">
                       About Project
@@ -309,6 +340,7 @@ const Projects = () => {
                 </div>
               )}
             </div>
+
             {/* Pagination */}
             <div
               className="pb-4 px-4 cursor-pointer"
@@ -328,10 +360,12 @@ const Projects = () => {
           </>
         ) : (
           <div className="w-full">
-            <ProjectsTable/>
+            <ProjectsTable />
           </div>
         )}
       </div>
+
+      {/* Delete Dialog */}
       {showDeleteDialog && deleteTarget && (
         <DeleteProject
           data={deleteTarget}

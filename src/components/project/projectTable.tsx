@@ -59,11 +59,9 @@ const ProjectsTable: React.FC = () => {
           const p = row.original;
           return (
             <div className="flex items-center gap-2">
-              
-                <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
-                  {p.project_name?.charAt(0).toUpperCase()}
-                </div>
-              
+              <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
+                {p.project_name?.charAt(0).toUpperCase()}
+              </div>
               <span className="font-medium">{p.project_name}</span>
             </div>
           );
@@ -143,8 +141,17 @@ const ProjectsTable: React.FC = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <p>Loading projects...</p>;
-  if (isError) return <p className="text-red-500">Failed to fetch projects</p>;
+  // 🔹 Loading spinner
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (isError)
+    return <p className="text-red-500 text-center py-4">Failed to fetch projects</p>;
 
   return (
     <div className="overflow-x-auto border rounded-xl">
@@ -154,10 +161,7 @@ const ProjectsTable: React.FC = () => {
             <tr key={hg.id}>
               {hg.headers.map((header) => (
                 <th key={header.id} className="px-4 py-3">
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
+                  {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
             </tr>
@@ -182,9 +186,7 @@ const ProjectsTable: React.FC = () => {
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
 
-          {/* Pagination numbers */}
           <div className="flex items-center gap-2">
-            {/* Prev Button */}
             <button
               disabled={!pagination.prev_page}
               onClick={() => setPage(pagination.prev_page)}
@@ -197,25 +199,18 @@ const ProjectsTable: React.FC = () => {
               Prev
             </button>
 
-            {/* Page Numbers */}
             {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
               .filter((p) => {
                 const current = pagination.current_page;
                 const total = pagination.total_pages;
-
-                // Always show first and last
                 if (p === 1 || p === total) return true;
-
-                // Show current ± 1
                 if (p >= current - 1 && p <= current + 1) return true;
-
                 return false;
               })
               .map((p, i, arr) => {
                 const prev = arr[i - 1];
                 return (
                   <React.Fragment key={p}>
-                    {/* Ellipsis before skipped numbers */}
                     {prev && p - prev > 1 && <span className="px-2">...</span>}
 
                     <button
@@ -232,7 +227,6 @@ const ProjectsTable: React.FC = () => {
                 );
               })}
 
-            {/* Next Button */}
             <button
               disabled={!pagination.next_page}
               onClick={() => setPage(pagination.next_page)}
