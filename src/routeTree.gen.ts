@@ -8,7 +8,8 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
+import { createRootRoute } from '@tanstack/react-router'
+
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutTasksIndexRouteImport } from './routes/_layout/tasks/index'
@@ -18,6 +19,8 @@ import { Route as LayoutProjectsTableIndexRouteImport } from './routes/_layout/p
 import { Route as LayoutProjectsAddIndexRouteImport } from './routes/_layout/projects/add/index'
 import { Route as LayoutProjectsIdIndexRouteImport } from './routes/_layout/projects/$id/index'
 import { Route as LayoutProjectsEditIdIndexRouteImport } from './routes/_layout/projects/edit/$id/index'
+
+const rootRouteImport = createRootRoute()
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',

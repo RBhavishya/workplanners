@@ -7,8 +7,8 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { Eye, Edit, Trash2 } from "lucide-react";
+import { Task, TaskResponse } from "@/lib/interfaces/project";
 import { getTasksByProjectId } from "@/https/services/project";
-import { Task, TaskResponse } from "@/interfaces/project";
 
 interface TasksTableProps {
   projectId: number;
@@ -84,6 +84,15 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       },
     },
     {
+      header: "StartDate",
+      accessorFn: (row) => formatDate(row.start_date),
+      cell: ({ getValue }) => (
+        <span className="px-3 py-1 rounded-md bg-blue-100 text-blue-600 text-xs font-medium">
+          {getValue() as string}
+        </span>
+      ),
+    },
+    {
       header: "Due Date",
       accessorFn: (row) => formatDate(row.end_date),
       cell: ({ getValue }) => (
@@ -97,13 +106,13 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       id: "actions",
       cell: () => (
         <div className="flex gap-3 justify-center text-gray-500">
-          <button className="hover:text-indigo-600">
+          <button className="hover:text-indigo-600 cursor-pointer">
             <Eye size={16} />
           </button>
-          <button className="hover:text-green-600">
+          <button className="hover:text-green-600 cursor-pointer">
             <Edit size={16} />
           </button>
-          <button className="hover:text-red-600">
+          <button className="hover:text-red-600 cursor-pointer">
             <Trash2 size={16} />
           </button>
         </div>

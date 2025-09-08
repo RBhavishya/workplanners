@@ -1,5 +1,5 @@
-import { $fetch } from "@/https/fetch";
-import { SlackAuthResponse, SlackCallbackResponse } from "@/interfaces/auth";
+import { $fetch } from "../fetch";
+import { SlackAuthResponse, SlackCallbackResponse } from "@/lib/interfaces/auth";
 
 export const slackAuthAPI = async (): Promise<SlackAuthResponse> => {
   try {

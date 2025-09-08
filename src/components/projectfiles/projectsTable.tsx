@@ -8,7 +8,10 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, Edit, Trash } from "lucide-react";
-import { deleteProjectAPI, getAllProjectsWithUsersAPI } from "@/https/services/project";
+import {
+  deleteProjectAPI,
+  getAllProjectsWithUsersAPI,
+} from "@/https/services/project";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -59,11 +62,10 @@ const ProjectsTable: React.FC = () => {
           const p = row.original;
           return (
             <div className="flex items-center gap-2">
-              
-                <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
-                  {p.project_name?.charAt(0).toUpperCase()}
-                </div>
-              
+              <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
+                {p.project_name?.charAt(0).toUpperCase()}
+              </div>
+
               <span className="font-medium">{p.project_name}</span>
             </div>
           );
@@ -112,19 +114,19 @@ const ProjectsTable: React.FC = () => {
           return (
             <div className="flex gap-2">
               <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600"
-                onClick={() => navigate({ to: `/projects/view/${p.id}` })}
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                onClick={() => navigate({ to: `/projects/${p.id}` })}
               >
                 <Eye size={16} />
               </button>
               <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600"
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
                 onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
               >
                 <Edit size={16} />
               </button>
               <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600"
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
                 onClick={() => deleteMutation.mutate(p.id)}
               >
                 <Trash size={16} />

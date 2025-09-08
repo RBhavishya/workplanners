@@ -7,15 +7,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  CalendarIcon,
-  ChevronDown,
-  X,
-  CheckCircle,
-  MoveLeft,
-  Check,
-} from "lucide-react";
+import { CalendarIcon, ChevronDown, X, MoveLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  createProjectAPI,
+  getAllUsersAPI,
+  getProjectByIdAPI,
+  updateProjectAPI,
+} from "@/https/services/project";
+import { ProjectData, UsersDropdownResponse } from "@/lib/interfaces/project";
 import {
   Command,
   CommandEmpty,
@@ -25,8 +25,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { useNavigate } from "@tanstack/react-router";
-import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
-import { createProjectAPI, getAllUsersAPI, getProjectByIdAPI, updateProjectAPI } from "@/https/services/project";
+import { toast } from "sonner";
 
 export interface AddProjectFormProps {
   mode: "create" | "edit";
@@ -60,7 +59,6 @@ const AddProjectForm = ({
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const { data: projectResp, isLoading: loadingProject } = useQuery({
@@ -88,24 +86,22 @@ const AddProjectForm = ({
   });
 
   const mutation = useMutation({
-    mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      navigate({ to: "/projects" });
-      onSave?.(data.data);
-      setSuccessMessage(data.message || "Project created successfully");
-      setTimeout(() => setSuccessMessage(null), 2000);
-    },
-    onError: (error: any) => {
-      setErrors({});
-      setFormError(null);
-      if (error?.status === 422 && error?.data?.errData) {
-        setErrors(error.data.errData);
-      } else {
-        setFormError(error?.data?.message || "Failed to save project");
-      }
-    },
-  });
+  mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
+  onSuccess: (res) => {
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    onSave?.(res.data);
+    toast.success(res?.data?.message); // backend message
+    navigate({ to: "/projects" });
+  },
+  onError: (error: any) => {
+    setErrors({});
+    setFormError(null);
+    if (error?.status === 422 && error?.data?.errData) {
+      setErrors(error.data.errData);
+    }
+    toast.error(error?.data?.message);
+  },
+});
 
   const updateMutation = useMutation({
     mutationFn: (updatedProject: ProjectData) =>
@@ -114,8 +110,7 @@ const AddProjectForm = ({
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
       onSave?.(data.data);
-      setSuccessMessage("Project updated successfully");
-      setTimeout(() => setSuccessMessage(null), 2000);
+      toast.success(data?.message || "Project updated successfully");
       navigate({ to: "/projects" });
     },
     onError: (error: any) => {
@@ -124,7 +119,7 @@ const AddProjectForm = ({
       if (error?.status === 422 && error?.data?.errData) {
         setErrors(error.data.errData);
       } else {
-        setFormError(error?.data?.message || "Failed to save project");
+        toast.error(error?.data?.message || "Failed to save project ❌");
       }
     },
   });
@@ -171,7 +166,7 @@ const AddProjectForm = ({
       title,
       description,
       links: links.length ? links : [],
-      created_by: String(user.name),
+      created_by: String(user.display_name),
       start_date: formatDate(startDate),
       due_date: formatDate(dueDate),
       assigned_users: assignedUsers,
@@ -222,12 +217,7 @@ const AddProjectForm = ({
           {formError}
         </div>
       )}
-      {successMessage && (
-        <div className="mb-4 flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 animate-fade-in">
-          <CheckCircle className="w-5 h-5 text-green-500" />
-          <span>{successMessage}</span>
-        </div>
-      )}
+
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">Project Title</label>
         <input

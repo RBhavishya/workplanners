@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAllProjectsAPI, getProjectByIdAPI } from "@/https/services/project";
+import { ProjectData } from "@/lib/interfaces/project";
 import { useNavigate } from "@tanstack/react-router";
 import { Pagination } from "../core/Pagination";
 import {
@@ -11,10 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { MoreVertical, Filter, LayoutGrid, List } from "lucide-react";
-import { ProjectData } from "@/interfaces/project";
-import { getAllProjectsAPI, getProjectByIdAPI } from "@/https/services/project";
-import ProjectsTable from "./projectTable";
 import DeleteProject from "./DeleteProject";
+import ProjectsTable from "./projectsTable";
 
 const Projects = () => {
   const [time, setTime] = useState(new Date());
@@ -24,8 +24,8 @@ const Projects = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
     null
   );
-  const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const [showDetails, setShowDetails] = useState(false);
   const [page, setPage] = useState(1);
@@ -235,9 +235,9 @@ const Projects = () => {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation(); // prevent card click
+                              e.stopPropagation();
                               setDeleteTarget(project);
-                              setShowDeleteDialog(true);
+                              setIsDeleteOpen(true);
                             }}
                           >
                             Delete
@@ -328,17 +328,15 @@ const Projects = () => {
           </>
         ) : (
           <div className="w-full">
-            <ProjectsTable/>
+            <ProjectsTable />
           </div>
         )}
       </div>
-      {showDeleteDialog && deleteTarget && (
+      {deleteTarget && (
         <DeleteProject
+        open={isDeleteOpen}
           data={deleteTarget}
-          onClose={() => {
-            setShowDeleteDialog(false);
-            setDeleteTarget(null);
-          }}
+          onOpenChange={(open) => setDeleteTarget(open?deleteTarget:null)}
         />
       )}
     </div>

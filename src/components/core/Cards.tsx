@@ -1,10 +1,10 @@
 import * as React from "react";
-import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react"; // default icons
+import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react"; 
 
 interface BigCardProps {
   title: string;
   value?: number | string;
-  icon?: React.ReactNode; // allow custom icon later
+  icon?: React.ReactNode; 
 }
 
 const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
@@ -23,6 +23,10 @@ const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   "Pending Tasks": {
     bg: "bg-green-100",
     icon: <RefreshCw className="text-green-500" size={28} />,
+  },
+  "Review Tasks": {
+    bg: "bg-yellow-100",
+    icon: <ClipboardList className="text-yellow-500" size={28} />,
   },
 };
 

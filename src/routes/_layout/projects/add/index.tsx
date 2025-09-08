@@ -1,4 +1,4 @@
-import AddProjectForm from "@/components/project/AddProject";
+import AddProjectForm from "@/components/projectfiles/AddProjectForm";
 import { createFileRoute } from "@tanstack/react-router";
 
 const AddProjectFormWrapper = () => {

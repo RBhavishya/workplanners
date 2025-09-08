@@ -18,7 +18,7 @@ export interface SlackCallbackResponse {
       email?: string;
     
     };
-    token: {
+    jwt_token: {
       access_token: string;
       refresh_token: string;
       expires_at: number;

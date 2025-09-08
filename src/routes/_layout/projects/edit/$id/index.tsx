@@ -1,5 +1,5 @@
 // routes/projects/edit/$id.tsx
-import AddProjectForm from "@/components/project/AddProject";
+import AddProjectForm from "@/components/projectfiles/AddProjectForm";
 import { useParams, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_layout/projects/edit/$id/")({

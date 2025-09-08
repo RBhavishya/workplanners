@@ -6,7 +6,7 @@ import {
   NotebookPen,
   Bell,
 } from "lucide-react";
-import UserDetails from "./login/UserDetails";
+import UserDetails from "./loginfiles/UserDetails";
 
 const Sidebar = () => {
   return (
