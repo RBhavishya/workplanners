@@ -39,7 +39,11 @@ const Viewdetails = () => {
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   // --- Queries ---
-  const { data: projectResponse, isLoading, error } = useQuery({
+  const {
+    data: projectResponse,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectByIdAPI(Number(id)),
   });
@@ -121,15 +125,15 @@ const Viewdetails = () => {
   };
 
   const toggleUserSelect = (user: any) => {
-    if (selectedUsers.find(u => u.id === user.id)) {
-      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+    if (selectedUsers.find((u) => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
     } else {
       setSelectedUsers([...selectedUsers, user]);
     }
   };
 
   const handleAssignUsers = () => {
-    selectedUsers.forEach(user => {
+    selectedUsers.forEach((user) => {
       assignUserMutation.mutate(user.id);
     });
     setSelectedUsers([]);
@@ -165,7 +169,10 @@ const Viewdetails = () => {
           cards={[
             { title: "Total Tasks", value: status?.data?.total_count },
             { title: "Completed Tasks", value: status?.data?.completed_count },
-            { title: "In Progress Task", value: status?.data?.inProgress_count },
+            {
+              title: "In Progress Task",
+              value: status?.data?.inProgress_count,
+            },
             { title: "New Tasks", value: status?.data?.new_count },
             { title: "Review Tasks", value: status?.data?.review_count },
             { title: "Pending Tasks", value: status?.data?.pending_count },
@@ -183,14 +190,17 @@ const Viewdetails = () => {
             <span>{projectdata.title}</span>
             <span
               className={`ml-2 text-sm px-2 py-1 rounded ${
-                statusColors[projectdata.project_status] || "bg-gray-200 text-gray-800"
+                statusColors[projectdata.project_status] ||
+                "bg-gray-200 text-gray-800"
               }`}
             >
               {projectdata.project_status}
             </span>
           </div>
         </div>
-        <p className="text-gray-700 mt-2">{projectdata.description || "No description available"}</p>
+        <p className="text-gray-700 mt-2">
+          {projectdata.description || "No description available"}
+        </p>
       </div>
 
       {/* Main Layout */}
@@ -218,7 +228,9 @@ const Viewdetails = () => {
               </div>
             )}
             <div>
-              <p className="font-medium">{projectdata.createdByUser?.display_name || "Unknown"}</p>
+              <p className="font-medium">
+                {projectdata.createdByUser?.display_name || "Unknown"}
+              </p>
               <p className="text-xs text-gray-500">Created By</p>
             </div>
           </div>
@@ -251,11 +263,19 @@ const Viewdetails = () => {
           <div className="mt-6">
             <strong>Assigned Users:</strong>
             <ul className="mt-2">
-              {assignedUsers.length === 0 && <li className="text-gray-500">No users assigned.</li>}
-              {assignedUsers.map(user => (
-                <li key={user.id} className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border">
+              {assignedUsers.length === 0 && (
+                <li className="text-gray-500">No users assigned.</li>
+              )}
+              {assignedUsers.map((user) => (
+                <li
+                  key={user.id}
+                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border"
+                >
                   <span>{user.display_name}</span>
-                  <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveUser(user.id)}>
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => handleRemoveUser(user.id)}
+                  >
                     ✕
                   </button>
                 </li>
@@ -266,27 +286,54 @@ const Viewdetails = () => {
             <div className="flex items-center gap-2 mt-3">
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <div ref={triggerRef} className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1">
+                  <div
+                    ref={triggerRef}
+                    className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1"
+                  >
                     <span className="text-gray-500">
-                      {selectedUsers.length > 0 ? selectedUsers.map(u => u.display_name).join(", ") : "Select users..."}
+                      {selectedUsers.length > 0
+                        ? selectedUsers.map((u) => u.display_name).join(", ")
+                        : "Select users..."}
                     </span>
                     <ChevronDown />
                   </div>
                 </PopoverTrigger>
-                <PopoverContent style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }} className="p-0">
+                <PopoverContent
+                  style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+                  className="p-0"
+                >
                   <Command>
-                    <CommandInput placeholder="Search users..." value={search} onValueChange={setSearch} />
                     <CommandList className="max-h-60 overflow-y-auto">
                       {availableUsers
-                        .filter(u => !assignedUsers.find(au => au.id === u.id))
-                        .filter(u => u.display_name.toLowerCase().includes(search.toLowerCase()))
-                        .map(user => (
-                          <CommandItem key={user.id} onSelect={() => toggleUserSelect(user)}>
-                            <span>{user.display_name}</span>
-                            <Check className={cn("h-4 w-4 ml-auto", selectedUsers.find(u => u.id === user.id) ? "opacity-100" : "opacity-0")} />
+                        .filter(
+                          (u) => !assignedUsers.find((au) => au.id === u.id)
+                        )
+                        .filter((u) =>
+                          (u.display_name || "")
+                            .toLowerCase()
+                            .includes((search || "").toLowerCase())
+                        )
+                        .map((user) => (
+                          <CommandItem
+                            key={user.id}
+                            onSelect={() => toggleUserSelect(user)}
+                          >
+                            <span>{user.display_name || "Unnamed User"}</span>
+                            <Check
+                              className={cn(
+                                "h-4 w-4 ml-auto",
+                                selectedUsers.find((u) => u.id === user.id)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
                           </CommandItem>
                         ))}
-                      {availableUsers.filter(u => !assignedUsers.find(au => au.id === u.id)).length === 0 && <CommandEmpty>No users found</CommandEmpty>}
+                      {availableUsers.filter(
+                        (u) => !assignedUsers.find((au) => au.id === u.id)
+                      ).length === 0 && (
+                        <CommandEmpty>No users found</CommandEmpty>
+                      )}
                     </CommandList>
                   </Command>
                 </PopoverContent>

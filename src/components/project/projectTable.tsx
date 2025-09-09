@@ -27,6 +27,7 @@ interface ProjectsTableProps {
   pageSize: number;
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
+  onDelete: (project: any) => void;
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({
@@ -37,6 +38,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   pageSize,
   setPage,
   setPageSize,
+  onDelete,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -90,14 +92,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         cell: ({ row }) => row.index + 1 + (page - 1) * pageSize,
       },
       {
-        header: () => (
-          <button
-            onClick={() => handleSort("project_name")}
-            className="flex items-center gap-1"
-          >
-            Project Name <ArrowUpDown size={14} />
-          </button>
-        ),
+        header: "Project Name",
         accessorKey: "project_name",
         cell: ({ row }) => {
           const p = row.original;
@@ -111,107 +106,79 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           );
         },
       },
-  {
-  header: "Assigned Users",
-  accessorKey: "users",
-  cell: ({ row }) => {
-    const users = row.original.users || [];
-
-    if (users.length === 0) {
-      return <span className="text-gray-400 text-sm">No users</span>;
-    }
-
-    const visibleUsers = users.slice(0, 3);
-    const remainingUsers = users.slice(3);
-
-    return (
-      <div className="flex -space-x-2 items-center">
-        {/* Show first 3 users */}
-        {visibleUsers.map((u: any) => (
-          <div
-            key={u.user_id}
-            className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
-          >
-            {u.display_name.charAt(0).toUpperCase()}
-          </div>
-        ))}
-
-        {/* If more than 3 users, show +X with dropdown tooltip */}
-        {remainingUsers.length > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
-                  +{remainingUsers.length}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="p-2 bg-white shadow-lg rounded-lg text-sm text-gray-700">
-                <div className="flex flex-col gap-1">
-                  {remainingUsers.map((u: any) => (
-                    <span key={u.user_id} className="whitespace-nowrap">
-                      {u.display_name}
-                    </span>
-                  ))}
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-    );
-  },
-},
       {
-        header: () => (
-          <button
-            onClick={() => handleSort("project_status")}
-            className="flex items-center gap-1"
-          >
-            Status <ArrowUpDown size={14} />
-          </button>
-        ),
-        accessorKey: "project_status",
+        header: "Assigned Users",
+        accessorKey: "users",
         cell: ({ row }) => {
-          const status = row.original.project_status;
-          const cls = statusColors[status] || "bg-gray-100 text-gray-600";
+          const users = row.original.users || [];
+          if (users.length === 0) {
+            return <span className="text-gray-400 text-sm">No users</span>;
+          }
+          const visibleUsers = users.slice(0, 3);
+          const remainingUsers = users.slice(3);
           return (
-            <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
-              {status}
-            </span>
+            <div className="flex -space-x-2 items-center">
+              {visibleUsers.map((u: any) => (
+                <div
+                  key={u.user_id}
+                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
+                  title={u.display_name}
+                >
+                  {u.display_name.charAt(0).toUpperCase()}
+                </div>
+              ))}
+              {remainingUsers.length > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
+                        +{remainingUsers.length}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="flex flex-col gap-1">
+                        {remainingUsers.map((u: any) => (
+                          <span key={u.user_id}>{u.display_name}</span>
+                        ))}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           );
         },
       },
-     {
-  header: "Actions",
-  cell: ({ row }) => {
-    const p = row.original;
-    return (
-      <div className="flex gap-2">
-        <button
-          className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
-          onClick={() => handleView(p.id)}
-        >
-          <Eye size={16} />
-        </button>
-        <button
-          className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
-          onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
-        >
-          <Edit size={16} />
-        </button>
-        <button
-          className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
-          onClick={() => deleteMutation.mutate(p.id)}
-        >
-          <Trash size={16} />
-        </button>
-      </div>
-    );
-  },
-},
+      {
+        header: "Actions",
+        cell: ({ row }) => {
+          const p = row.original;
+          return (
+            <div className="flex gap-2">
+              <button
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                onClick={() => navigate({ to: `/projects/${p.id}` })}
+              >
+                <Eye size={16} />
+              </button>
+              <button
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
+              >
+                <Edit size={16} />
+              </button>
+              <button
+                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                onClick={() => onDelete(p)}
+              >
+                <Trash size={16} />
+              </button>
+            </div>
+          );
+        },
+      },
     ];
-  }, [navigate, deleteMutation, page, pageSize, selectedSort]);
-
+  }, [navigate, page, pageSize, selectedSort, onDelete]);
   const table = useReactTable({
     data: projects,
     columns,
