@@ -92,11 +92,36 @@ export const deleteProjectAPI = async (id: number) => {
   }
 };
 
-export const getAllProjectsWithUsersAPI = async (queryParam: string) => {
+// export const getAllProjectsWithUsersAPI = async (queryParam: string) => {
+//   try {
+//     const response = await $fetch.get(`/projects/users?${queryParam}`);
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+
+
+export const getAllUsersProjects = async ({
+  pageIndex,
+  pageSize,
+  viewMode,
+  order_by,
+  search_string,
+  
+}: GetAllPaginatedUsersPropTypes) => {
   try {
-    const response = await $fetch.get(`/projects/users?${queryParam}`);
-    return response;
-  } catch (error) {
-    throw error;
+    const queryParams = {
+      page: pageIndex,
+      page_size: pageSize,
+      view_mode: viewMode,
+      project_status: order_by,
+      search_string: search_string,
+    
+    };
+    return await $fetch.get("/projects/users", queryParams);
+  } catch (err) {
+    throw err;
   }
 };

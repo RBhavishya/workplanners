@@ -7,8 +7,9 @@ import {
 } from "@tanstack/react-table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Eye, Edit, Trash } from "lucide-react";
-import { deleteProjectAPI, getAllProjectsWithUsersAPI } from "@/https/services/project";
+import { Eye, Edit, Trash, ArrowUpDown } from "lucide-react";
+import { deleteProjectAPI, getAllUsersProjects } from "@/https/services/project";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -18,42 +19,85 @@ const statusColors: Record<string, string> = {
   COMPLETED: "bg-green-100 text-green-600",
 };
 
-const ProjectsTable: React.FC = () => {
+interface ProjectsTableProps {
+  debouncedSearch: string;
+  selectedSort: string;
+  setSelectedSort: (val: string) => void; // ✅ added setter
+  page: number;
+  pageSize: number;
+  setPage: (page: number) => void;
+  setPageSize: (size: number) => void;
+}
+
+const ProjectsTable: React.FC<ProjectsTableProps> = ({
+  debouncedSearch,
+  selectedSort,
+  setSelectedSort,
+  page,
+  pageSize,
+  setPage,
+  setPageSize,
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // pagination state
-  const [page, setPage] = React.useState(1);
-  const pageSize = 10;
-  const queryParam = `page=${page}&page_size=${pageSize}&order_by=id:asc`;
+  // View Project Handler
+  const handleView = (id: number) => {
+    navigate({ to: `/projects/${id}` });
+  };
 
-  // fetch projects
+  // Fetch projects with filters
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["projects-with-users", queryParam],
-    queryFn: () => getAllProjectsWithUsersAPI(queryParam),
+    queryKey: ["projectsTable", page, pageSize, debouncedSearch, selectedSort],
+    queryFn: () =>
+      getAllUsersProjects({
+        pageIndex: page,
+        pageSize,
+        viewMode: "table",
+        order_by: selectedSort,
+        search_string: debouncedSearch,
+      }),
   });
 
-  // response mapping
+  // API Response
   const projects = data?.data?.data?.records || [];
   const pagination = data?.data?.data?.pagination_info;
 
-  // delete mutation
+  // Delete project
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteProjectAPI(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects-with-users"] });
+      queryClient.invalidateQueries({ queryKey: ["projectsTable"] });
     },
   });
 
-  // table columns
-  const columns = React.useMemo<ColumnDef<any>[]>(
-    () => [
+  // Sort toggle helper
+  const handleSort = (column: string) => {
+    if (selectedSort === column) {
+      setSelectedSort(`${column}_desc`);
+    } else if (selectedSort === `${column}_desc`) {
+      setSelectedSort(""); // clear sort
+    } else {
+      setSelectedSort(column);
+    }
+  };
+
+  // Table Columns
+  const columns = React.useMemo<ColumnDef<any>[]>(() => {
+    return [
       {
         header: "S. No",
         cell: ({ row }) => row.index + 1 + (page - 1) * pageSize,
       },
       {
-        header: "Project Name",
+        header: () => (
+          <button
+            onClick={() => handleSort("project_name")}
+            className="flex items-center gap-1"
+          >
+            Project Name <ArrowUpDown size={14} />
+          </button>
+        ),
         accessorKey: "project_name",
         cell: ({ row }) => {
           const p = row.original;
@@ -67,31 +111,65 @@ const ProjectsTable: React.FC = () => {
           );
         },
       },
-      {
-        header: "Assigned Users",
-        accessorKey: "users",
-        cell: ({ row }) => {
-          const users = row.original.users || [];
-          if (users.length === 0) {
-            return <span className="text-gray-400 text-sm">No users</span>;
-          }
-          return (
-            <div className="flex -space-x-2">
-              {users.map((u: any) => (
-                <div
-                  key={u.user_id}
-                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
-                  title={u.display_name}
-                >
-                  {u.display_name.charAt(0).toUpperCase()}
+  {
+  header: "Assigned Users",
+  accessorKey: "users",
+  cell: ({ row }) => {
+    const users = row.original.users || [];
+
+    if (users.length === 0) {
+      return <span className="text-gray-400 text-sm">No users</span>;
+    }
+
+    const visibleUsers = users.slice(0, 3);
+    const remainingUsers = users.slice(3);
+
+    return (
+      <div className="flex -space-x-2 items-center">
+        {/* Show first 3 users */}
+        {visibleUsers.map((u: any) => (
+          <div
+            key={u.user_id}
+            className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
+          >
+            {u.display_name.charAt(0).toUpperCase()}
+          </div>
+        ))}
+
+        {/* If more than 3 users, show +X with dropdown tooltip */}
+        {remainingUsers.length > 0 && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
+                  +{remainingUsers.length}
                 </div>
-              ))}
-            </div>
-          );
-        },
-      },
+              </TooltipTrigger>
+              <TooltipContent className="p-2 bg-white shadow-lg rounded-lg text-sm text-gray-700">
+                <div className="flex flex-col gap-1">
+                  {remainingUsers.map((u: any) => (
+                    <span key={u.user_id} className="whitespace-nowrap">
+                      {u.display_name}
+                    </span>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
+    );
+  },
+},
       {
-        header: "Status",
+        header: () => (
+          <button
+            onClick={() => handleSort("project_status")}
+            className="flex items-center gap-1"
+          >
+            Status <ArrowUpDown size={14} />
+          </button>
+        ),
         accessorKey: "project_status",
         cell: ({ row }) => {
           const status = row.original.project_status;
@@ -111,7 +189,7 @@ const ProjectsTable: React.FC = () => {
             <div className="flex gap-2">
               <button
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600"
-                onClick={() => navigate({ to: `/projects/view/${p.id}` })}
+                onClick={() => handleView(p.id)}
               >
                 <Eye size={16} />
               </button>
@@ -131,9 +209,8 @@ const ProjectsTable: React.FC = () => {
           );
         },
       },
-    ],
-    [navigate, deleteMutation, page]
-  );
+    ];
+  }, [navigate, deleteMutation, page, pageSize, selectedSort]);
 
   const table = useReactTable({
     data: projects,
@@ -141,7 +218,7 @@ const ProjectsTable: React.FC = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  // 🔹 Loading spinner
+  // Loading
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -150,8 +227,11 @@ const ProjectsTable: React.FC = () => {
     );
   }
 
-  if (isError)
-    return <p className="text-red-500 text-center py-4">Failed to fetch projects</p>;
+  if (isError) {
+    return (
+      <p className="text-red-500 text-center py-4">Failed to fetch projects</p>
+    );
+  }
 
   return (
     <div className="overflow-x-auto border rounded-xl">
@@ -160,7 +240,7 @@ const ProjectsTable: React.FC = () => {
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3">
+                <th key={header.id} className="px-4 py-3 cursor-pointer">
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
@@ -186,6 +266,7 @@ const ProjectsTable: React.FC = () => {
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
 
+          {/* Pagination */}
           <div className="flex items-center gap-2">
             <button
               disabled={!pagination.prev_page}
@@ -212,7 +293,6 @@ const ProjectsTable: React.FC = () => {
                 return (
                   <React.Fragment key={p}>
                     {prev && p - prev > 1 && <span className="px-2">...</span>}
-
                     <button
                       onClick={() => setPage(p)}
                       className={`px-3 py-1 rounded border ${

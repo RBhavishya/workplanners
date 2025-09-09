@@ -16,24 +16,18 @@ import {
   getAllPaginatedProjects,
   getProjectByIdAPI,
 } from "@/https/services/project";
-import ProjectsTable from "./projectTable";
-import DeleteProject from "./DeleteProject";
 
-const sortOptions: Record<string, string> = {
-  New: "created_at",
-  Inprogress: "project_status",
-  Review: "project_status",
-  Overdue: "due_date",
-  Done: "project_status",
-};
+import DeleteProject from "./DeleteProject";
+import ProjectsTable from "./projectTable";
+import { Input } from "../ui/input";
+import { SearchIcon } from "../icons/SearchIcon";
 
 const Projects = () => {
   const [time, setTime] = useState(new Date());
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
-    null
-  );
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
 
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
@@ -41,21 +35,19 @@ const Projects = () => {
   const router = useRouter();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const search = useSearch({ strict: false }) as { viewMode?: 'table' | 'grid' }
+  const search = useSearch({ strict: false }) as { viewMode?: "table" | "grid" };
 
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 12;
-  const orderBY = searchParams.get("project_status") || "";
+  const orderBY = searchParams.get("order_by") || "";
   const initialSearch = searchParams.get("search") || "";
 
   const [pageIndex, setPageIndex] = useState(pageIndexParam);
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>(search?.viewMode || 'grid')
+  const [viewMode, setViewMode] = useState<"table" | "grid">(search?.viewMode || "grid");
   const [pageSize, setPageSize] = useState(pageSizeParam);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [search_string, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(search_string);
-
-
 
   // live clock
   useEffect(() => {
@@ -76,17 +68,11 @@ const Projects = () => {
       setPage(1);
     }, 500);
     return () => clearTimeout(handler);
-  }, [search_string,]);
+  }, [search_string]);
 
   // 🔹 Fetch all projects (paginated)
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    isFetching,
-  } = useQuery({
-    queryKey: ["projects", page, pageSize,viewMode, debouncedSearch, selectedSort],
+  const { data, isLoading, isError, error, isFetching } = useQuery({
+    queryKey: ["projects", page, pageSize, viewMode, debouncedSearch, selectedSort],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
         pageIndex: page,
@@ -111,6 +97,7 @@ const Projects = () => {
       return response;
     },
   });
+  console.log(selectedSort, "selectedSort");
 
   // 🔹 Extract records & pagination
   const existingProjects: ProjectData[] =
@@ -177,37 +164,41 @@ const Projects = () => {
       {/* Title & Controls */}
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
-        <div className="flex items-center gap-3 flex-1 justify-end">
+        <div className="flex items-center gap-4">
           {/* Search */}
-          <input
-            type="text"
-            placeholder="Search project..."
-            value={search_string}
-            onChange={(e) => setSearchString(e.target.value)}
-            className="border px-3 py-2 rounded-lg w-1/4"
-          />
+          <div className="relative w-64 h-10 border border-[#D1D1D1] bg-[#F6F6F6] rounded-sm shadow-none flex items-center px-2">
+            <Input
+              type="search"
+              value={search_string}
+              onChange={(e) => setSearchString(e.target.value)}
+              placeholder="Search by Title"
+              className="pl-3 pr-8 h-full w-full border-none rounded text-black font-normal text-sm 3xl:!text-base shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-sm"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2">
+              <SearchIcon className="w-5 h-5 text-gray-500" />
+            </span>
+          </div>
 
           {/* Sort Dropdown */}
-        <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
-      <Filter className="text-purple-500" size={18} />
-      {selectedSort || "Sort by"} {/* Display the selected label */}
-    </button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent>
-    {["New", "In_Progress", "Review", "Overdue", "Done"].map((option) => (
-      <DropdownMenuItem
-        key={option}
-        onClick={() => {
-          setSelectedSort(option); // Update selected sort
-        }}
-      >
-        {option}
-      </DropdownMenuItem>
-    ))}
-  </DropdownMenuContent>
-</DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
+                <Filter className="text-purple-500" size={18} />
+                {selectedSort || "Sort by"}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {["New", "In_Progress", "Review", "Overdue", "Done"].map((option) => (
+                <DropdownMenuItem
+                  key={option}
+                  onClick={() => setSelectedSort(option)}
+                >
+                  {option}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* View Toggle */}
           <div className="flex items-center gap-2 px-1 py-1">
             <button
@@ -363,7 +354,15 @@ const Projects = () => {
           </>
         ) : (
           <div className="w-full">
-            <ProjectsTable />
+            <ProjectsTable
+              debouncedSearch={debouncedSearch}
+              setSelectedSort={setSelectedSort}
+              selectedSort={selectedSort}
+              page={page}
+              pageSize={pageSize}
+              setPage={setPage}
+              setPageSize={setPageSize}
+            />
           </div>
         )}
       </div>
