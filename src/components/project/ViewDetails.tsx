@@ -1,77 +1,83 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import TasksInProjectTable from "../core/Sampletable";
 import {
-    assignUserAPI,
-    deleteAssignedUserAPI,
-    getAssignedUsersAPI,
+  assignUserAPI,
+  deleteAssignedUserAPI,
+  getAssignedUsersAPI,
   getAvailableUsersAPI,
   getProjectByIdAPI,
   getTaskStatusCountsAPI,
   patchProjectStatusAPI,
-
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
-
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Check, ChevronDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import { cn } from "@/lib/utils";
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
-  const [selectedUser, setSelectedUser] = useState<number | "">("");
-
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  // Fetch project details
-  const {
-    data: projectResponse,
-    isLoading,
-    error,
-  } = useQuery({
+  // --- State ---
+  const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
+
+  // --- Queries ---
+  const { data: projectResponse, isLoading, error } = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectByIdAPI(Number(id)),
   });
 
-  // Fetch assigned users
   const { data: assignedUsersData } = useQuery({
     queryKey: ["assignedUsers", id],
     queryFn: () => getAssignedUsersAPI(Number(id)),
   });
 
-  // Fetch available users
   const { data: availableUsersData } = useQuery({
     queryKey: ["availableUsers", id],
     queryFn: () => getAvailableUsersAPI(Number(id)),
   });
 
-  const statusColors: Record<string, string> = {
-    NEW: "bg-blue-100 text-blue-800",
-    PENDING: "bg-yellow-100 text-yellow-800",
-    IN_PROGRESS: "bg-purple-100 text-purple-800",
-    REVIEW: "bg-orange-100 text-orange-800",
-    COMPLETED: "bg-green-100 text-green-800",
-  };
   const { data: status } = useQuery({
     queryKey: ["taskStatusCounts", id],
     queryFn: () => getTaskStatusCountsAPI(Number(id)),
-  }) as {
-    data: {
-      data: {
-        total_count: number;
-        completed_count: number;
-        inProgress_count: number;
-        new_count: number;
-        review_count: number;
-        pending_count: number;
-      };
-    };
-  };
-  // Mutations
+  });
+
+  // --- Initialize assigned users ---
+  useEffect(() => {
+    if (assignedUsersData?.data?.data) {
+      setAssignedUsers(assignedUsersData.data.data); // full objects
+    }
+  }, [assignedUsersData]);
+
+  // --- Get trigger width for popover ---
+  useEffect(() => {
+    if (triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
+    }
+  }, [triggerRef.current]);
+
+  // --- Mutations ---
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
       patchProjectStatusAPI(Number(id), { project_status: newStatus }),
-    onSuccess: (res: any) => {
+    onSuccess: () => {
       toast.success("Status updated successfully");
       queryClient.invalidateQueries({ queryKey: ["project", id] });
     },
@@ -96,7 +102,7 @@ const Viewdetails = () => {
     mutationFn: (userId: number) => assignUserAPI(Number(id), userId),
     onSuccess: () => {
       toast.success("User assigned successfully");
-      setSelectedUser("");
+      setSelectedUsers([]);
       queryClient.invalidateQueries({ queryKey: ["assignedUsers", id] });
       queryClient.invalidateQueries({ queryKey: ["availableUsers", id] });
     },
@@ -105,19 +111,7 @@ const Viewdetails = () => {
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading project</p>;
-
-  const projectdata = projectResponse?.data?.data;
-  if (!projectdata) return <p>No project found</p>;
-
-  const assignedUsers = assignedUsersData?.data?.data || [];
-  const availableUsers = availableUsersData?.data?.data || [];
-
-  // Helpers
-  const formatDate = (dateStr: string | null) =>
-    dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
-
+  // --- Handlers ---
   const handleStatusChange = (newStatus: string) => {
     patchStatusMutation.mutate(newStatus);
   };
@@ -126,23 +120,52 @@ const Viewdetails = () => {
     deleteUserMutation.mutate(userId);
   };
 
-  const handleAssignUser = () => {
-    if (selectedUser) {
-      assignUserMutation.mutate(Number(selectedUser));
+  const toggleUserSelect = (user: any) => {
+    if (selectedUsers.find(u => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+    } else {
+      setSelectedUsers([...selectedUsers, user]);
     }
   };
 
+  const handleAssignUsers = () => {
+    selectedUsers.forEach(user => {
+      assignUserMutation.mutate(user.id);
+    });
+    setSelectedUsers([]);
+    setOpen(false);
+  };
+
+  // --- Render checks ---
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading project</p>;
+
+  const projectdata = projectResponse?.data?.data;
+  if (!projectdata) return <p>No project found</p>;
+
+  const availableUsers = availableUsersData?.data?.data || [];
+
+  const statusColors: Record<string, string> = {
+    NEW: "bg-blue-100 text-blue-800",
+    PENDING: "bg-yellow-100 text-yellow-800",
+    IN_PROGRESS: "bg-purple-100 text-purple-800",
+    REVIEW: "bg-orange-100 text-orange-800",
+    COMPLETED: "bg-green-100 text-green-800",
+  };
+
+  const formatDate = (dateStr: string | null) =>
+    dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
+
+  // --- JSX ---
   return (
     <div className="p-4">
+      {/* Status Cards */}
       <div className="flex items-center mb-6 w-full">
         <SmallCard
           cards={[
             { title: "Total Tasks", value: status?.data?.total_count },
             { title: "Completed Tasks", value: status?.data?.completed_count },
-            {
-              title: "In Progress Task",
-              value: status?.data?.inProgress_count,
-            },
+            { title: "In Progress Task", value: status?.data?.inProgress_count },
             { title: "New Tasks", value: status?.data?.new_count },
             { title: "Review Tasks", value: status?.data?.review_count },
             { title: "Pending Tasks", value: status?.data?.pending_count },
@@ -150,7 +173,7 @@ const Viewdetails = () => {
         />
       </div>
 
-      {/* Title + Description */}
+      {/* Project Info */}
       <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold">
@@ -159,25 +182,25 @@ const Viewdetails = () => {
           <div className="flex items-center gap-[3px] text-xl font-semibold">
             <span>{projectdata.title}</span>
             <span
-              className={`ml-2 text-sm px-2 py-1 rounded ${statusColors[projectdata.project_status] || "bg-gray-200 text-gray-800"}`}
+              className={`ml-2 text-sm px-2 py-1 rounded ${
+                statusColors[projectdata.project_status] || "bg-gray-200 text-gray-800"
+              }`}
             >
               {projectdata.project_status}
             </span>
           </div>
         </div>
-        <p className="text-gray-700 mt-2">
-          {projectdata.description || "No description available"}
-        </p>
+        <p className="text-gray-700 mt-2">{projectdata.description || "No description available"}</p>
       </div>
 
       {/* Main Layout */}
       <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-6 flex gap-6 min-h-[600px]">
-        {/* Left: Tasks Table */}
+        {/* Tasks Table */}
         <div className="w-2/3">
           <TasksInProjectTable projectId={Number(id)} />
         </div>
 
-        {/* Right: Details */}
+        {/* Project Details */}
         <div className="w-1/3 border border-gray-200 rounded-3xl p-4">
           <div className="text-2xl font-bold mb-4">Details</div>
 
@@ -195,14 +218,12 @@ const Viewdetails = () => {
               </div>
             )}
             <div>
-              <p className="font-medium">
-                {projectdata.createdByUser?.display_name || "Unknown"}
-              </p>
+              <p className="font-medium">{projectdata.createdByUser?.display_name || "Unknown"}</p>
               <p className="text-xs text-gray-500">Created By</p>
             </div>
           </div>
 
-          {/* Status */}
+          {/* Status Selector */}
           <div className="mb-4">
             <strong>Status:</strong>{" "}
             <select
@@ -230,42 +251,50 @@ const Viewdetails = () => {
           <div className="mt-6">
             <strong>Assigned Users:</strong>
             <ul className="mt-2">
-              {assignedUsers.length === 0 && (
-                <li className="text-gray-500">No users assigned.</li>
-              )}
-              {assignedUsers.map((user: any) => (
-                <li
-                  key={user.id}
-                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border"
-                >
+              {assignedUsers.length === 0 && <li className="text-gray-500">No users assigned.</li>}
+              {assignedUsers.map(user => (
+                <li key={user.id} className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border">
                   <span>{user.display_name}</span>
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleRemoveUser(user.id)}
-                  >
+                  <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveUser(user.id)}>
                     ✕
                   </button>
                 </li>
               ))}
             </ul>
 
-            {/* Assign New User */}
+            {/* Assign Users with Multi-select Popover */}
             <div className="flex items-center gap-2 mt-3">
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(Number(e.target.value))}
-                className="border rounded p-1 flex-1"
-              >
-                <option value="">Select user...</option>
-                {availableUsers.map((user: any) => (
-                  <option key={user.id} value={user.id}>
-                    {user.display_name}
-                  </option>
-                ))}
-              </select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <div ref={triggerRef} className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1">
+                    <span className="text-gray-500">
+                      {selectedUsers.length > 0 ? selectedUsers.map(u => u.display_name).join(", ") : "Select users..."}
+                    </span>
+                    <ChevronDown />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }} className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Search users..." value={search} onValueChange={setSearch} />
+                    <CommandList className="max-h-60 overflow-y-auto">
+                      {availableUsers
+                        .filter(u => !assignedUsers.find(au => au.id === u.id))
+                        .filter(u => u.display_name.toLowerCase().includes(search.toLowerCase()))
+                        .map(user => (
+                          <CommandItem key={user.id} onSelect={() => toggleUserSelect(user)}>
+                            <span>{user.display_name}</span>
+                            <Check className={cn("h-4 w-4 ml-auto", selectedUsers.find(u => u.id === user.id) ? "opacity-100" : "opacity-0")} />
+                          </CommandItem>
+                        ))}
+                      {availableUsers.filter(u => !assignedUsers.find(au => au.id === u.id)).length === 0 && <CommandEmpty>No users found</CommandEmpty>}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
               <button
-                onClick={handleAssignUser}
-                disabled={!selectedUser}
+                onClick={handleAssignUsers}
+                disabled={selectedUsers.length === 0}
                 className="px-3 py-1 bg-purple-600 text-white rounded disabled:opacity-50"
               >
                 Add
