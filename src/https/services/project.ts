@@ -92,17 +92,6 @@ export const deleteProjectAPI = async (id: number) => {
   }
 };
 
-// export const getAllProjectsWithUsersAPI = async (queryParam: string) => {
-//   try {
-//     const response = await $fetch.get(`/projects/users?${queryParam}`);
-//     return response;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
-
-
 export const getAllUsersProjects = async ({
   pageIndex,
   pageSize,
@@ -125,3 +114,72 @@ export const getAllUsersProjects = async ({
     throw err;
   }
 };
+
+export const patchProjectStatusAPI = async(id: number, data: { project_status: string }) => {
+  try{
+    const response= await $fetch.patch(`/projects/${id}/status`, data);
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+
+// GET /projects/:id/users/assigned
+export const getAssignedUsersAPI = async(id: number) =>{
+  try{
+    const response = await $fetch.get(`/projects/${id}/users/assigned`);
+    return response;
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+// DELETE 
+export const deleteAssignedUserAPI = async (projectId: number, userId: number) => {
+  try {
+    const payload = { user_ids: [userId] };
+    const response = await $fetch.delete(`/projects/${projectId}/users`,  payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
+
+// GET /projects/:id/users/available
+export const getAvailableUsersAPI = async(id: number) =>{
+  try{
+    const response=await $fetch.get(`/projects/${id}/users/available`);
+    return response;
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+// POST /projects/:id/users/:userId
+export const assignUserAPI = async (projectId: number, userId: number) => {
+  try {
+    const payload = {
+      project_id: projectId,
+      user_ids: [userId], 
+    };
+    const response = await $fetch.post(`/projects/${projectId}/users`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getTaskStatusCountsAPI=async(id:number)=>{
+  try{
+    const response=await $fetch.get( `/projects/${id}/tasks/status`);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
+}

@@ -2,49 +2,22 @@ import * as React from "react";
 
 interface StatusCardProps {
   title: string;
-  value: number;
+  value?: number; // optional → defaults to 0
   bg: string;
   circleBg: string;
   circleText: string;
 }
 
-const statusConfig: Record<
-  string,
-  { bg: string; circleBg: string; circleText: string }
-> = {
-  TODAY: {
-    bg: "bg-yellow-200",
-    circleBg: "bg-yellow-600",
-    circleText: "text-white",
-  },
-  OVERDUE: {
-    bg: "bg-blue-200",
-    circleBg: "bg-blue-600",
-    circleText: "text-white",
-  },
-  CLOSED: {
-    bg: "bg-red-300",
-    circleBg: "bg-red-700",
-    circleText: "text-white",
-  },
-};
-
-const statusCards: { title: string; value: number }[] = [
-  { title: "TODAY", value: 5 },
-  { title: "OVERDUE", value: 3 },
-  { title: "CLOSED", value: 3 },
-];
-
 const StatusCard = ({
   title,
-  value,
+  value = 0,
   bg,
   circleBg,
   circleText,
 }: StatusCardProps) => {
   return (
     <div
-      className={`flex items-center justify-between w-[120px] h-[50px] rounded-xl px-4 ${bg}`}
+      className={`flex items-center justify-between w-[150px] h-[60px] rounded-xl px-4 ${bg}`}
     >
       <span className="text-sm font-semibold text-gray-700">{title}</span>
       <div
@@ -56,16 +29,67 @@ const StatusCard = ({
   );
 };
 
-const SmallCard = () => {
+// Config for all card types
+const statusConfig: Record<
+  string,
+  { bg: string; circleBg: string; circleText: string }
+> = {
+  "Total Tasks": {
+    bg: "bg-purple-200",
+    circleBg: "bg-purple-600",
+    circleText: "text-white",
+  },
+  "Completed Tasks": {
+    bg: "bg-green-200",
+    circleBg: "bg-green-600",
+    circleText: "text-white",
+  },
+  "In Progress Task": {
+    bg: "bg-blue-200",
+    circleBg: "bg-blue-600",
+    circleText: "text-white",
+  },
+  "Pending Tasks": {
+    bg: "bg-yellow-200",
+    circleBg: "bg-yellow-600",
+    circleText: "text-white",
+  },
+  "Review Tasks": {
+    bg: "bg-orange-200",
+    circleBg: "bg-orange-600",
+    circleText: "text-white",
+  },
+
+  TODAY: {
+    bg: "bg-pink-200",
+    circleBg: "bg-pink-600",
+    circleText: "text-white",
+  },
+  OVERDUE: {
+    bg: "bg-red-200",
+    circleBg: "bg-red-600",
+    circleText: "text-white",
+  },
+  CLOSED: {
+    bg: "bg-gray-300",
+    circleBg: "bg-gray-700",
+    circleText: "text-white",
+  },
+};
+
+interface SmallCardProps {
+  cards: { title: string; value?: number }[];
+}
+
+const SmallCard = ({ cards }: SmallCardProps) => {
   return (
     <div className="flex gap-4 flex-wrap">
-      {statusCards.map((card, index) => {
+      {cards.map((card, index) => {
         const config = statusConfig[card.title] || {
           bg: "bg-gray-200",
           circleBg: "bg-gray-500",
           circleText: "text-white",
         };
-
         return <StatusCard key={index} {...card} {...config} />;
       })}
     </div>
