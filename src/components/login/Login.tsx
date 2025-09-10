@@ -45,8 +45,9 @@ const Loginpage = () => {
       const user = data?.data?.data.user;
       const jwt_token = data?.data?.data.jwt_token;
       Cookies.set("user", JSON.stringify(user));
-        Cookies.set("token", jwt_token.access_token);
-        Cookies.set("refreshToken", jwt_token.refresh_token);
+      localStorage.setItem("user", JSON.stringify(user));
+      Cookies.set("token", jwt_token.access_token);
+      Cookies.set("refreshToken", jwt_token.refresh_token);
 
       navigate({ to: "/dashboard" });
     }
