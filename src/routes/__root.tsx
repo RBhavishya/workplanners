@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import appCss from '@/styles/app.css?url'
+import { Toaster } from 'sonner'
 
 const queryClient = new QueryClient()
 
@@ -28,6 +29,7 @@ function RootComponent() {
     <RootDocument>
       <QueryClientProvider client={queryClient}>
         <Outlet />
+        <Toaster position='top-right'/>
       </QueryClientProvider>
     </RootDocument>
   )

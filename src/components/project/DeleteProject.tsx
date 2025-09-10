@@ -22,24 +22,33 @@ const DeleteProject = ({
   const [open, setOpen] = useState(true);
   const queryClient = useQueryClient();
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await deleteProjectAPI(id);
-    },
-    onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success(
-        res?.data?.message || "The project was deleted successfully."
-      );
-      setOpen(false);
-      onClose();
-    },
-    onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to delete project."
-      );
-    },
-  });
+ const deleteMutation = useMutation({
+  mutationFn: async (id: number) => {
+    return await deleteProjectAPI(id);
+  },
+  onSuccess: (res) => {
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    toast.success(
+      res?.data?.message || "The project was deleted successfully."
+    );
+    setOpen(false);
+    onClose();
+  },
+  onError: (error: any) => {
+    let message = "Failed to delete project.";
+    if (error?.status === 409) {
+      message = error?.message || "Conflict: Project cannot be deleted.";
+    } else if (error?.response?.data?.message) {
+      message = error.response.data.message;
+    }
+
+    toast.error(message);
+
+    // ✅ Close dialog even on error
+    setOpen(false);
+    onClose();
+  },
+});
 
   const handleDelete = async () => {
     try {

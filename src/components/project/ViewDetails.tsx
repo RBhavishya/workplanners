@@ -37,7 +37,7 @@ const Viewdetails = () => {
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   // --- Queries ---
-  const { data: projectResponse, isLoading, error } = useQuery({
+  const { data: projectResponse, isLoading, error ,isFetching} = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectByIdAPI(Number(id)),
   });
@@ -150,7 +150,7 @@ const Viewdetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
       </div>
     );
   }
