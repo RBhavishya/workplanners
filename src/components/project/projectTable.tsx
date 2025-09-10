@@ -10,6 +10,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Eye, Edit, Trash, ArrowUpDown } from "lucide-react";
 import { deleteProjectAPI, getAllUsersProjects } from "@/https/services/project";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
+import dayjs from "dayjs";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -146,6 +147,45 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 </TooltipProvider>
               )}
             </div>
+          );
+        },
+      },
+      {
+      accessorFn: (row: any) => row.start_date,
+      id: "start_date",
+      cell: (info: any) => {
+        const date: string = info.getValue();
+        return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+      },
+      width: "90px",
+      maxWidth: "90px",
+      minWidth: "90px",
+      header: () => <span>Start Date</span>,
+      footer: (props: any) => props.column.id,
+    },
+       {
+      accessorFn: (row: any) => row.due_date,
+      id: "end_date",
+      cell: (info: any) => {
+        const date: string = info.getValue();
+        return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+      },
+      width: "90px",
+      maxWidth: "90px",
+      minWidth: "90px",
+      header: () => <span>End Date</span>,
+      footer: (props: any) => props.column.id,
+    },
+      {
+        header: "Status",
+        accessorKey: "project_status",
+        cell: ({ row }) => {
+          const status = row.original.project_status;
+          const cls = statusColors[status] || "bg-gray-100 text-gray-600";
+          return (
+            <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
+              {status}
+            </span>
           );
         },
       },
