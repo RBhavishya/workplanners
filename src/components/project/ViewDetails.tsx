@@ -14,7 +14,7 @@ import {
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -177,6 +177,13 @@ const Viewdetails = () => {
 
       {/* Project Info */}
       <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
+        <button
+        onClick={() => window.history.back()}
+        className="text-gray-600 hover:text-blue-600"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
+
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold">
             {projectdata.title?.charAt(0) || "P"}

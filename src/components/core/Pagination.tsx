@@ -92,7 +92,7 @@ export const Pagination = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[25, 50, 75, 100].map((size) => (
+              {[10,25, 50, 75, 100].map((size) => (
                 <SelectItem
                   key={size}
                   value={size.toString()}
