@@ -8,8 +8,16 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, Edit, Trash, ArrowUpDown } from "lucide-react";
-import { deleteProjectAPI, getAllUsersProjects } from "@/https/services/project";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
+import {
+  deleteProjectAPI,
+  getAllUsersProjects,
+} from "@/https/services/project";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 import dayjs from "dayjs";
 
 const statusColors: Record<string, string> = {
@@ -151,31 +159,31 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         },
       },
       {
-      accessorFn: (row: any) => row.start_date,
-      id: "start_date",
-      cell: (info: any) => {
-        const date: string = info.getValue();
-        return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+        accessorFn: (row: any) => row.start_date,
+        id: "start_date",
+        cell: (info: any) => {
+          const date: string = info.getValue();
+          return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+        },
+        width: "90px",
+        maxWidth: "90px",
+        minWidth: "90px",
+        header: () => <span>Start Date</span>,
+        footer: (props: any) => props.column.id,
       },
-      width: "90px",
-      maxWidth: "90px",
-      minWidth: "90px",
-      header: () => <span>Start Date</span>,
-      footer: (props: any) => props.column.id,
-    },
-       {
-      accessorFn: (row: any) => row.due_date,
-      id: "end_date",
-      cell: (info: any) => {
-        const date: string = info.getValue();
-        return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+      {
+        accessorFn: (row: any) => row.due_date,
+        id: "end_date",
+        cell: (info: any) => {
+          const date: string = info.getValue();
+          return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+        },
+        width: "90px",
+        maxWidth: "90px",
+        minWidth: "90px",
+        header: () => <span>End Date</span>,
+        footer: (props: any) => props.column.id,
       },
-      width: "90px",
-      maxWidth: "90px",
-      minWidth: "90px",
-      header: () => <span>End Date</span>,
-      footer: (props: any) => props.column.id,
-    },
       {
         header: "Status",
         accessorKey: "project_status",
@@ -248,22 +256,36 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             <tr key={hg.id}>
               {hg.headers.map((header) => (
                 <th key={header.id} className="px-4 py-3 cursor-pointer">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
                 </th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+          {projects.length === 0 ? (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="text-gray-500 col-span-3 text-center py-6"
+              >
+                No projects found
+              </td>
             </tr>
-          ))}
+          ) : (
+            table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-3">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
