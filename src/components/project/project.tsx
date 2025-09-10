@@ -58,6 +58,7 @@ const Projects = () => {
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [search_string, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(search_string);
+  
 
   // live clock
   useEffect(() => {

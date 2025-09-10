@@ -21,8 +21,14 @@ export interface SlackCallbackResponse {
     token: {
       access_token: string;
       refresh_token: string;
-      expires_at: number;
+      expires_at: string;
+      
     };
+    jwt_token: {
+            expires_at(arg0: string, expires_at: any): unknown;
+            access_token: string,
+            refresh_token: string
+        };
   };
 };
   message?: string;

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import loginimage from "src/assets/loginimage.png";
 import slackicon from "src/assets/slackicon.svg";
 import { slackAuthAPI, slackCallbackAPI } from "@/https/services/auth";
+import Cookies from "js-cookie";
+
 
 
 const Loginpage = () => {
@@ -35,26 +37,24 @@ const Loginpage = () => {
   });
 
   const slackCallbackMutation = useMutation({
-    mutationFn: slackCallbackAPI,
-    onSuccess: (data) => {
-      console.log(data);
-      if (data?.status === 200) {
-        const user = data?.data?.data.user;
-        const token = data?.data?.data.token;
+  mutationFn: slackCallbackAPI,
+  onSuccess: (data) => {
+    console.log(data);
 
-        if (user && token) {
-          localStorage.setItem("user", JSON.stringify(user));
-          localStorage.setItem("access_token", token.access_token);
-          localStorage.setItem("refresh_token", token.refresh_token);
-          localStorage.setItem("expires_at", String(token.expires_at));
-        }
-        navigate({ to: "/dashboard" });
-      }
-    },
-    onError: () => {
-      navigate({ to: "/" });
-    },
-  });
+    if (data?.status === 200) {
+      const user = data?.data?.data.user;
+      const jwt_token = data?.data?.data.jwt_token;
+      Cookies.set("user", JSON.stringify(user));
+        Cookies.set("token", jwt_token.access_token);
+        Cookies.set("refreshToken", jwt_token.refresh_token);
+
+      navigate({ to: "/dashboard" });
+    }
+  },
+  onError: () => {
+    navigate({ to: "/" });
+  },
+});
 
   useEffect(() => {
     if (code2) {
