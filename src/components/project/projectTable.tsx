@@ -113,7 +113,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         cell: ({ row }) => {
           const users = row.original.users || [];
           if (users.length === 0) {
-            return <span className="text-gray-400 text-sm">No users</span>;
+            return <span className="text-black-400 text-sm">-</span>;
           }
           const visibleUsers = users.slice(0, 3);
           const remainingUsers = users.slice(3);
