@@ -58,7 +58,6 @@ const Projects = () => {
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [search_string, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(search_string);
-  
 
   // live clock
   useEffect(() => {
@@ -115,7 +114,6 @@ const Projects = () => {
       return response;
     },
   });
-  console.log(selectedSort, "selectedSort");
 
   // 🔹 Extract records & pagination
   const existingProjects: ProjectData[] =
@@ -149,16 +147,6 @@ const Projects = () => {
 
   const handleNavigation = () => navigate({ to: `/projects/add` });
   const handleView = (id: number) => navigate({ to: `/projects/${id}` });
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-40 w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
 
   if (isError) {
     return (
@@ -256,8 +244,15 @@ const Projects = () => {
         {viewMode === "grid" ? (
           <>
             {/* Left side - Project Cards */}
-            <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2">
-              {existingProjects.length === 0 ? (
+            <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
+              {/* 🔹 Show loader overlay only in grid/cards view */}
+              {(isLoading || isFetching) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-20 rounded-lg">
+                  <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
+                </div>
+              )}
+
+              {existingProjects.length === 0 && !isLoading ? (
                 <p className="text-gray-500 col-span-3 text-center py-6">
                   No projects available.
                 </p>
@@ -313,13 +308,16 @@ const Projects = () => {
             </div>
 
             {/* Right side - Selected Project Details */}
+
             <div className="w-1/3 flex justify-center items-start">
               {!selectedProjectId ? (
                 <p className="text-gray-500 mt-10">
                   Select a project to view details
                 </p>
               ) : loadingProject ? (
-                <p className="mt-10">Loading project details...</p>
+                <div className="flex items-center justify-center h-[400px] w-full">
+                  <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
+                </div>
               ) : errorProject ? (
                 <p className="text-red-500 mt-10">
                   Error loading project: {projectError?.message || "Unknown"}
@@ -358,11 +356,7 @@ const Projects = () => {
             {/* Pagination */}
             <div
               className="pb-4 px-4 cursor-pointer"
-              style={{
-                position: "fixed",
-                bottom: 0,
-                overflow: "hidden",
-              }}
+              style={{ position: "fixed", bottom: 0, overflow: "hidden" }}
             >
               <Pagination
                 paginationDetails={paginationDetails}
