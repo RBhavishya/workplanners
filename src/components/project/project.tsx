@@ -308,11 +308,16 @@ const Projects = () => {
             </div>
 
             {/* Right side - Selected Project Details */}
+
             <div className="w-1/3 flex justify-center items-start">
               {!selectedProjectId ? (
-                <p className="text-gray-500 mt-10">Select a project to view details</p>
+                <p className="text-gray-500 mt-10">
+                  Select a project to view details
+                </p>
               ) : loadingProject ? (
-                <p className="mt-10">Loading project details...</p>
+                <div className="flex items-center justify-center h-[400px] w-full">
+                  <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
+                </div>
               ) : errorProject ? (
                 <p className="text-red-500 mt-10">
                   Error loading project: {projectError?.message || "Unknown"}
@@ -321,7 +326,9 @@ const Projects = () => {
                 <div className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-2xl p-6 text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="text-3xl text-blue-500 font-bold">
-                      {selectedProjectData?.data?.data?.title?.charAt(0).toUpperCase() || ""}
+                      {selectedProjectData?.data?.data?.title
+                        ?.charAt(0)
+                        .toUpperCase() || ""}
                     </span>
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800 break-words">
@@ -334,9 +341,12 @@ const Projects = () => {
                     View
                   </button>
                   <div className="text-left">
-                    <h3 className="font-semibold text-lg text-gray-800 mb-2">About Project</h3>
+                    <h3 className="font-semibold text-lg text-gray-800 mb-2">
+                      About Project
+                    </h3>
                     <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap max-h-60 overflow-y-auto">
-                      {selectedProjectData?.data?.data?.description || "No description available."}
+                      {selectedProjectData?.data?.data?.description ||
+                        "No description available."}
                     </p>
                   </div>
                 </div>

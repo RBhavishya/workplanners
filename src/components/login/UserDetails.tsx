@@ -57,9 +57,9 @@ const UserDetails: React.FC = () => {
               />
               <div className="text-left">
                 <p className="font-semibold">{user.display_name}</p>
-                <p className="text-sm text-gray-500">
+                {/* <p className="text-sm text-gray-500">
                   {getGreeting()}, {user.display_name}
-                </p>
+                </p> */}
               </div>
             </div>
           </AccordionTrigger>
