@@ -47,7 +47,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   page,
   pageSize,
   setPage,
-  setPageSize,
   onDelete,
 }) => {
   const navigate = useNavigate();
