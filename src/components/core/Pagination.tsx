@@ -92,7 +92,7 @@ export const Pagination = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[10,25, 50, 75, 100].map((size) => (
+              {[10, 25, 50, 75, 100].map((size) => (
                 <SelectItem
                   key={size}
                   value={size.toString()}
@@ -111,7 +111,7 @@ export const Pagination = ({
       </div>
 
       {/* Right Section: Pagination Controls */}
-      <div className="ml-190 bg-white rounded flex justify-end ">
+      <div className="bg-white rounded flex justify-start">
         <div className="flex items-center gap-1">
           {/* Prev */}
           <button
