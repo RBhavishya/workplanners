@@ -194,7 +194,7 @@ const Projects = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {[ "All","New", "In_Progress", "Review", "Overdue", "Done"].map(
+              {["All", "New", "In_Progress", "Review", "Overdue", "Done"].map(
                 (option) => (
                   <DropdownMenuItem
                     key={option}
@@ -240,12 +240,11 @@ const Projects = () => {
       <hr className="mb-4" />
 
       {/* Projects Section */}
-      <div className="flex gap-6 pb-24">
+      <div className="flex gap-6">
         {viewMode === "grid" ? (
           <>
             {/* Left side - Project Cards */}
             <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-              {/* 🔹 Show loader overlay only in grid/cards view */}
               {(isLoading || isFetching) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-20 rounded-lg">
                   <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
@@ -308,7 +307,6 @@ const Projects = () => {
             </div>
 
             {/* Right side - Selected Project Details */}
-
             <div className="w-1/3 flex justify-center items-start">
               {!selectedProjectId ? (
                 <p className="text-gray-500 mt-10">
@@ -352,19 +350,6 @@ const Projects = () => {
                 </div>
               )}
             </div>
-
-            {/* Pagination */}
-            <div
-              className="pb-4 px-4 cursor-pointer"
-              style={{ position: "fixed", bottom: 0, overflow: "hidden" }}
-            >
-              <Pagination
-                paginationDetails={paginationDetails}
-                pageSize={pageSize}
-                setPage={setPage}
-                setPageSize={setPageSize}
-              />
-            </div>
           </>
         ) : (
           <div className="w-full">
@@ -384,6 +369,18 @@ const Projects = () => {
           </div>
         )}
       </div>
+
+      {/* ✅ Pagination below grid view */}
+      {viewMode === "grid" && (
+        <div className="w-full flex justify-center mt-6">
+          <Pagination
+            paginationDetails={paginationDetails}
+            pageSize={pageSize}
+            setPage={setPage}
+            setPageSize={setPageSize}
+          />
+        </div>
+      )}
 
       {/* Delete Dialog */}
       {showDeleteDialog && deleteTarget && (
