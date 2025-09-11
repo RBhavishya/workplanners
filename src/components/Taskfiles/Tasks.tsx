@@ -6,7 +6,10 @@ import {
   ClipboardList,
   ClipboardPenLine,
   Columns,
+  Edit,
+  Eye,
   FileClock,
+  Trash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -112,6 +115,42 @@ const Tasks = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
+    const taskActions = [
+  {
+    id: "actions",
+    header: () => <span>Actions</span>,
+    footer: (props: any) => props.column.id,
+    size: 120,
+    cell: (info: any) => {
+      const rowData = info.row.original;
+
+      return (
+        <div className="flex gap-2">
+          <button
+            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
+            // onClick={() => navigate({ to: `/projects/${rowData.id}` })}
+          >
+            <Eye size={16} />
+          </button>
+
+          <button
+            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
+            // onClick={() => navigate({ to: `/projects/edit/${rowData.id}` })}
+          >
+            <Edit size={16} />
+          </button>
+
+          <button
+            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
+            // onClick={() => onDelete(rowData)}
+          >
+            <Trash size={16} />
+          </button>
+        </div>
+      );
+    },
+  },
+];
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -198,7 +237,7 @@ const Tasks = () => {
           </div>
           <TanStackTable
             data={taksDataAfterSerial}
-            columns={taskColumns}
+           columns={[...taskColumns, ...taskActions]}
             paginationDetails={pagination}
             getData={getAllTasks}
             loading={isLoading}
@@ -210,6 +249,7 @@ const Tasks = () => {
               "task_brief",
               "status",
               "end_date",
+              "actions",
             ]}
           />
         </div>
