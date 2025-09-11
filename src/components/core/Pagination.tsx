@@ -88,7 +88,7 @@ export const Pagination = ({
               setPage?.(1); // reset to page 1
             }}
           >
-            <SelectTrigger className="w-16 h-8 text-sm border border-gray-300 rounded">
+            <SelectTrigger className="w-40 h-8 text-sm border border-gray-300 rounded">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
