@@ -472,27 +472,51 @@ const updateMutation = useMutation({
           <p className="text-red-500 text-xs mt-1">{errors.links.join(", ")}</p>
         )}
       </div>
-      <div className="flex justify-end gap-2 mt-4">
-        <button
-          onClick={handleNavigation}
-          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
-          disabled={mutation.isPending || updateMutation.isPending}
-        >
-          {mode === "edit"
-            ? updateMutation.isPending
-              ? "Updating..."
-              : "Update"
-            : mutation.isPending
-              ? "Saving..."
-              : "Save"}
-        </button>
-      </div>
+     <div className="flex justify-end gap-2 mt-4">
+  <button
+    onClick={handleNavigation}
+    className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
+    disabled={mutation.isPending || updateMutation.isPending}
+  >
+    Cancel
+  </button>
+
+  <button
+    onClick={handleSave}
+    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
+    disabled={mutation.isPending || updateMutation.isPending}
+  >
+    {(mutation.isPending || updateMutation.isPending) && (
+      <svg
+        className="animate-spin h-4 w-4 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+    )}
+    {mode === "edit"
+      ? updateMutation.isPending
+        ? "Updating..."
+        : "Update"
+      : mutation.isPending
+      ? "Saving..."
+      : "Save"}
+  </button>
+</div>
     </div>
   );
 };
