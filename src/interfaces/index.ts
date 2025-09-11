@@ -67,3 +67,8 @@ export interface deleteProps {
   project: any;
   getAllProjects: any;
 }
+export interface IReportsFilters {
+  searchString: string;
+  setSearchString: any;
+  title?: string;
+}

@@ -18,6 +18,7 @@ import { getAllPaginatedTasks } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
+import TaskSearchFilter from "../core/TasksSearchFilter";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -124,29 +125,28 @@ const Tasks = () => {
   });
 
   return (
-    
-<div className="flex flex-col bg-gray-100 h-screen">
+    <div className="flex flex-col bg-gray-100 h-screen">
       <hr />
       <div className="p-4">
         {/* 🔹 Top Stats Row */}
-    <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
-  {/* 🔹 Right Side - Cards */}
-  <div className="flex gap-4">
-    <SmallCard
-      cards={[
-        { title: "TODAY", value: 0 },
-        { title: "OVERDUE", value: 0 },
-        { title: "CLOSED", value: 0 },
-      ]}
-    />
-  </div>
+        <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
+          {/* 🔹 Right Side - Cards */}
+          <div className="flex gap-4">
+            <SmallCard
+              cards={[
+                { title: "TODAY", value: 0 },
+                { title: "OVERDUE", value: 0 },
+                { title: "CLOSED", value: 0 },
+              ]}
+            />
+          </div>
 
-  {/* 🔹 Right Side - Time & Date */}
-  <div className="flex flex-col items-end">
-    <span className="text-lg font-semibold">{formattedTime}</span>
-    <span className="text-sm text-gray-500">{formattedDate}</span>
-  </div>
-</div>
+          {/* 🔹 Right Side - Time & Date */}
+          <div className="flex flex-col items-end">
+            <span className="text-lg font-semibold">{formattedTime}</span>
+            <span className="text-sm text-gray-500">{formattedDate}</span>
+          </div>
+        </div>
 
         <hr />
 
@@ -169,9 +169,9 @@ const Tasks = () => {
                 <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
               </div>
               <div
-              className="bg-gray rounded-xl shadow-md p-4 w-110 h-30 mt-7"
-              style={{ border: "1px solid  #ddb8ffff" }}
-            ></div>
+                className="bg-gray rounded-xl shadow-md p-4 w-110 h-30 mt-7"
+                style={{ border: "1px solid  #ddb8ffff" }}
+              ></div>
             </div>
           </div>
         </div>
@@ -182,14 +182,20 @@ const Tasks = () => {
 
         {/* 🔹 Task Table */}
         <div className="bg-white">
-          <div className="flex justify-end my-2">
-          <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-            onClick={() => setOpen(true)}
-          >
-            + New Task
-          </Button>
-        </div>
+          <div className="flex justify-end items-center my-2 gap-3">
+            <TaskSearchFilter
+              searchString={debouncedSearch}
+              setSearchString={setSearchString}
+              title="Find your Task"
+            />
+
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={() => setOpen(true)}
+            >
+              + New Task
+            </Button>
+          </div>
           <TanStackTable
             data={taksDataAfterSerial}
             columns={taskColumns}
