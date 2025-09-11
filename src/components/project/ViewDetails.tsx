@@ -14,7 +14,7 @@ import {
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Move, MoveLeft } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -37,7 +37,12 @@ const Viewdetails = () => {
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   // --- Queries ---
-  const { data: projectResponse, isLoading, error } = useQuery({
+  const {
+    data: projectResponse,
+    isLoading,
+    error,
+    isFetching,
+  } = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectByIdAPI(Number(id)),
   });
@@ -119,15 +124,15 @@ const Viewdetails = () => {
   };
 
   const toggleUserSelect = (user: any) => {
-    if (selectedUsers.find(u => u.id === user.id)) {
-      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+    if (selectedUsers.find((u) => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
     } else {
       setSelectedUsers([...selectedUsers, user]);
     }
   };
 
   const handleAssignUsers = () => {
-    selectedUsers.forEach(user => assignUserMutation.mutate(user.id));
+    selectedUsers.forEach((user) => assignUserMutation.mutate(user.id));
     setSelectedUsers([]);
     setOpen(false);
   };
@@ -150,12 +155,13 @@ const Viewdetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (error) return <p className="text-center text-red-500">Error loading project</p>;
+  if (error)
+    return <p className="text-center text-red-500">Error loading project</p>;
   if (!projectdata) return <p className="text-center">No project found</p>;
 
   // --- JSX ---
@@ -167,7 +173,10 @@ const Viewdetails = () => {
           cards={[
             { title: "Total Tasks", value: status?.data?.total_count },
             { title: "Completed Tasks", value: status?.data?.completed_count },
-            { title: "In Progress Task", value: status?.data?.inProgress_count },
+            {
+              title: "In Progress Task",
+              value: status?.data?.inProgress_count,
+            },
             { title: "New Tasks", value: status?.data?.new_count },
             { title: "Review Tasks", value: status?.data?.review_count },
             { title: "Pending Tasks", value: status?.data?.pending_count },
@@ -177,6 +186,13 @@ const Viewdetails = () => {
 
       {/* Project Info */}
       <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
+        <button
+          onClick={() => window.history.back()}
+          className="text-gray-600 hover:text-blue-600 cursor-pointer"
+        >
+          <MoveLeft className="w-5 h-5" />
+        </button>
+
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold">
             {projectdata.title?.charAt(0) || "P"}
@@ -185,14 +201,17 @@ const Viewdetails = () => {
             <span>{projectdata.title}</span>
             <span
               className={`ml-2 text-sm px-2 py-1 rounded ${
-                statusColors[projectdata.project_status] || "bg-gray-200 text-gray-800"
+                statusColors[projectdata.project_status] ||
+                "bg-gray-200 text-gray-800"
               }`}
             >
               {projectdata.project_status}
             </span>
           </div>
         </div>
-        <p className="text-gray-700 mt-2">{projectdata.description || "No description available"}</p>
+        <p className="text-gray-700 mt-2">
+          {projectdata.description || "No description available"}
+        </p>
       </div>
 
       {/* Main Layout */}
@@ -220,7 +239,9 @@ const Viewdetails = () => {
               </div>
             )}
             <div>
-              <p className="font-medium">{projectdata.createdByUser?.display_name || "Unknown"}</p>
+              <p className="font-medium">
+                {projectdata.createdByUser?.display_name || "Unknown"}
+              </p>
               <p className="text-xs text-gray-500">Created By</p>
             </div>
           </div>
@@ -253,9 +274,14 @@ const Viewdetails = () => {
           <div className="mt-6">
             <strong>Assigned Users:</strong>
             <ul className="mt-2">
-              {assignedUsers.length === 0 && <li className="text-gray-500">No users assigned.</li>}
-              {assignedUsers.map(user => (
-                <li key={user.id} className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border">
+              {assignedUsers.length === 0 && (
+                <li className="text-gray-500">No users assigned.</li>
+              )}
+              {assignedUsers.map((user) => (
+                <li
+                  key={user.id}
+                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border"
+                >
                   <span>{user.display_name || "Unnamed"}</span>
                   <button
                     className="text-red-500 hover:text-red-700"
@@ -271,34 +297,61 @@ const Viewdetails = () => {
             <div className="flex items-center gap-2 mt-3">
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <div ref={triggerRef} className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1">
+                  <div
+                    ref={triggerRef}
+                    className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1"
+                  >
                     <span className="text-gray-500">
                       {selectedUsers.length > 0
-                        ? selectedUsers.map(u => u.display_name || "Unnamed").join(", ")
+                        ? selectedUsers
+                            .map((u) => u.display_name || "Unnamed")
+                            .join(", ")
                         : "Select users..."}
                     </span>
                     <ChevronDown />
                   </div>
                 </PopoverTrigger>
-                <PopoverContent style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }} className="p-0">
+                <PopoverContent
+                  style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+                  className="p-0"
+                >
                   <Command>
-                    <CommandInput placeholder="Search users..." value={search} onValueChange={setSearch} />
+                    <CommandInput
+                      placeholder="Search users..."
+                      value={search}
+                      onValueChange={setSearch}
+                    />
                     <CommandList className="max-h-60 overflow-y-auto">
                       {availableUsers
-                        .filter(u => !assignedUsers.find(au => au.id === u.id))
-                        .filter(u => (u.display_name || "").toLowerCase().includes(search.toLowerCase()))
-                        .map(user => (
-                          <CommandItem key={user.id} onSelect={() => toggleUserSelect(user)}>
+                        .filter(
+                          (u) => !assignedUsers.find((au) => au.id === u.id)
+                        )
+                        .filter((u) =>
+                          (u.display_name || "")
+                            .toLowerCase()
+                            .includes(search.toLowerCase())
+                        )
+                        .map((user) => (
+                          <CommandItem
+                            key={user.id}
+                            onSelect={() => toggleUserSelect(user)}
+                          >
                             <span>{user.display_name || "Unnamed"}</span>
                             <Check
                               className={cn(
                                 "h-4 w-4 ml-auto",
-                                selectedUsers.find(u => u.id === user.id) ? "opacity-100" : "opacity-0"
+                                selectedUsers.find((u) => u.id === user.id)
+                                  ? "opacity-100"
+                                  : "opacity-0"
                               )}
                             />
                           </CommandItem>
                         ))}
-                      {availableUsers.filter(u => !assignedUsers.find(au => au.id === u.id)).length === 0 && <CommandEmpty>No users found</CommandEmpty>}
+                      {availableUsers.filter(
+                        (u) => !assignedUsers.find((au) => au.id === u.id)
+                      ).length === 0 && (
+                        <CommandEmpty>No users found</CommandEmpty>
+                      )}
                     </CommandList>
                   </Command>
                 </PopoverContent>

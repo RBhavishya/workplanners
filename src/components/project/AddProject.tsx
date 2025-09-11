@@ -26,7 +26,9 @@ import {
 } from "../ui/command";
 import { useNavigate } from "@tanstack/react-router";
 import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
+
 import { createProjectAPI, getAllUsersAPI, getProjectByIdAPI, updateProjectAPI } from "@/https/services/project";
+import { toast } from "sonner";
 
 export interface AddProjectFormProps {
   mode: "create" | "edit";
@@ -88,47 +90,53 @@ const AddProjectForm = ({
   });
 
   const mutation = useMutation({
-    mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      navigate({ to: "/projects" });
-      onSave?.(data.data);
-      setSuccessMessage(data.message || "Project created successfully");
-      setTimeout(() => setSuccessMessage(null), 2000);
-    },
-    onError: (error: any) => {
-      setErrors({});
-      setFormError(null);
-      if (error?.status === 422 && error?.data?.errData) {
-        setErrors(error.data.errData);
-      } else {
-        setFormError(error?.data?.message || "Failed to save project");
-      }
-    },
-  });
+  mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
+  onSuccess: (data) => {
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
 
-  const updateMutation = useMutation({
-    mutationFn: (updatedProject: ProjectData) =>
-      updateProjectAPI(projectId!, updatedProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
-      onSave?.(data.data);
-      setSuccessMessage("Project updated successfully");
-      setTimeout(() => setSuccessMessage(null), 2000);
-      navigate({ to: "/projects" });
-    },
-    onError: (error: any) => {
-      setErrors({});
-      setFormError(null);
-      if (error?.status === 422 && error?.data?.errData) {
-        setErrors(error.data.errData);
-      } else {
-        setFormError(error?.data?.message || "Failed to save project");
-      }
-    },
-  });
+    // ✅ Success toast
+    toast.success(data.message || "Project created successfully");
 
+    navigate({ to: "/projects" });
+    onSave?.(data.data);
+  },
+  onError: (error: any) => {
+    setErrors({});
+    setFormError(null);
+
+    if (error?.status === 422 && error?.data?.errData) {
+      setErrors(error.data.errData);
+    } else {
+      const message = error?.data?.message || "Failed to save project";
+      toast.error(message);
+      setFormError(message);
+    }
+  },
+});
+
+const updateMutation = useMutation({
+  mutationFn: (updatedProject: ProjectData) =>
+    updateProjectAPI(projectId!, updatedProject),
+  onSuccess: (data) => {
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    toast.success(data.message || "Project updated successfully");
+    onSave?.(data.data);
+    navigate({ to: "/projects" });
+  },
+  onError: (error: any) => {
+    setErrors({});
+    setFormError(null);
+
+    if (error?.status === 422 && error?.data?.errData) {
+      setErrors(error.data.errData);
+    } else {
+      const message = error?.data?.message || "Failed to update project";
+      toast.error(message);
+      setFormError(message);
+    }
+  },
+});
   useEffect(() => {
     if (triggerRef.current) {
       setTriggerWidth(triggerRef.current.offsetWidth);

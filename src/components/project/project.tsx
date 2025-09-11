@@ -46,7 +46,7 @@ const Projects = () => {
   };
 
   const pageIndexParam = Number(searchParams.get("page")) || 1;
-  const pageSizeParam = Number(searchParams.get("page_size")) || 12;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
   const orderBY = searchParams.get("order_by") || "";
   const initialSearch = searchParams.get("search") || "";
 
@@ -194,7 +194,7 @@ const Projects = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Done"].map(
+              {[ "All","New", "In_Progress", "Review", "Overdue", "Done"].map(
                 (option) => (
                   <DropdownMenuItem
                     key={option}
