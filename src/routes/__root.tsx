@@ -29,7 +29,7 @@ function RootComponent() {
     <RootDocument>
       <QueryClientProvider client={queryClient}>
         <Outlet />
-        <Toaster position='top-right'/>
+       <Toaster richColors closeButton position="top-right" />
       </QueryClientProvider>
     </RootDocument>
   )
