@@ -184,7 +184,7 @@ const Projects = () => {
           {/* Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
+              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg cursor-pointer">
                 <Filter className="text-purple-500" size={18} />
                 {selectedSort || "Sort by"}
               </button>
@@ -194,6 +194,7 @@ const Projects = () => {
                 (option) => (
                   <DropdownMenuItem
                     key={option}
+                    className="cursor-pointer"
                     onClick={() => setSelectedSort(option)}
                   >
                     {option}
@@ -207,7 +208,7 @@ const Projects = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg cursor-pointer ${
                 viewMode === "grid" ? "bg-purple-100 text-purple-600" : ""
               }`}
             >
@@ -215,7 +216,7 @@ const Projects = () => {
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg cursor-pointer ${
                 viewMode === "table" ? "bg-purple-100 text-purple-600" : ""
               }`}
             >
@@ -226,7 +227,7 @@ const Projects = () => {
           {/* New Project */}
           <button
             onClick={handleNavigation}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg"
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
           >
             + New Project
           </button>
@@ -262,12 +263,13 @@ const Projects = () => {
                     <div className="absolute top-3 right-3">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full hover:bg-gray-100">
+                          <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
                             <MoreVertical size={18} />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate({ to: `/projects/edit/${project.id}` });
@@ -276,6 +278,7 @@ const Projects = () => {
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteTarget(project);
@@ -303,7 +306,7 @@ const Projects = () => {
             </div>
 
             {/* Right side - Project Details */}
-            <div className="w-1/3 flex justify-center items-start">
+            <div className="w-1/3 flex justify-center items-start ">
               {!selectedProjectId ? (
                 <p className="text-gray-500 mt-10">
                   Select a project to view details
@@ -330,7 +333,7 @@ const Projects = () => {
                   </h2>
                   <button
                     onClick={() => handleView(selectedProjectId!)}
-                    className="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition my-4"
+                    className="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition my-4 cursor-pointer"
                   >
                     View
                   </button>
