@@ -16,55 +16,34 @@ export const taskColumns = [
   id: "serial",
   header: () => <span>S.No</span>,
   footer: (props: any) => props.column.id,
-  width: "50px",
-  maxWidth: "50px",
-  minWidth: "50px",
+  width: "10px",
+  maxWidth: "10px",
+  minWidth: "10px",
   cell: (props: any) => (
     <div style={{ textAlign: "center" }}>{props.getValue()}</div>
   ),
 },
   {
-    accessorFn: (row: any) => row.task_title,
-    id: "task_name",
-    cell: (info: any) => {
-      const title = info.getValue();
-      const profilePicUrl = info.row.original.profile_pic_url;
-      return (
-        <div
-          style={{ display: "flex", alignItems: "center", textAlign: "left" }}
-        >
-          {profilePicUrl ? (
-            <img
-              src={profilePicUrl}
-              alt="Profile"
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                marginRight: 8,
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                backgroundColor: "#ccc",
-                marginRight: 8,
-              }}
-            />
-          )}
-          <span className="capitalize">{title ? title : "-"}</span>
-        </div>
-      );
-    },
-    width: "150px",
-    maxWidth: "150px",
-    minWidth: "150px",
-    header: () => <span>Task Name</span>,
-    footer: (props: any) => props.column.id,
+  accessorFn: (row: any) => row.task_title,
+  id: "task_name",
+  cell: (info: any) => {
+    const title = info.getValue();
+    return (
+      <div className="flex items-center justify-center">
+        <span className="capitalize text-center">{title || "-"}</span>
+      </div>
+    );
   },
+  width: "40px",
+  maxWidth: "40px",
+  minWidth: "40px",
+  header: () => (
+     <div className="flex items-center justify-end pr-2">
+    <span>Task Name</span>
+  </div>
+  ),
+  footer: (props: any) => props.column.id,
+},
 {
   accessorFn: (row: any) => row.description,
   id: "task_brief",
@@ -79,29 +58,33 @@ export const taskColumns = [
       </span>
     );
   },
-  width: "200px",
-  maxWidth: "200px",
-  minWidth: "200px",
+  width: "20px",
+  maxWidth: "20px",
+  minWidth: "20px",
   header: () => <span>Task Brief</span>,
   footer: (props: any) => props.column.id,
 },
   {
-    accessorFn: (row: any) => row.designation,
-    id: "project_name",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return (
-        <div style={{ textAlign: "left" }}>
-          <span className="capitalize">{title ? title : "-"}</span>
-        </div>
-      );
-    },
-    width: "120px",
-    maxWidth: "120px",
-    minWidth: "120px",
-    header: () => <span>Project Name</span>,
-    footer: (props: any) => props.column.id,
+  accessorFn: (row: any) => row.designation,
+  id: "project_name",
+  cell: (info: any) => {
+    const title = info.getValue();
+    return (
+      <div style={{ textAlign: "left" }}>
+        <span className="capitalize">{title || "-"}</span>
+      </div>
+    );
   },
+  width: "30px",
+  maxWidth: "30px",
+  minWidth: "30px",
+  header: () => (
+    <div className="flex justify-center">
+      <span>Project Name</span>
+    </div>
+  ),
+  footer: (props: any) => props.column.id,
+},
 {
   accessorFn: (row: any) => row.task_status,
   id: "status",
@@ -119,9 +102,9 @@ export const taskColumns = [
       </div>
     );
   },
-  width: "120px",
-  maxWidth: "120px",
-  minWidth: "120px",
+  width: "50px",
+  maxWidth: "50px",
+  minWidth: "50px",
   header: () => <span>Status</span>,
   footer: (props: any) => props.column.id,
 },
@@ -132,9 +115,9 @@ export const taskColumns = [
           const date: string = info.getValue();
           return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
         },
-        width: "90px",
-        maxWidth: "90px",
-        minWidth: "90px",
+        width: "50px",
+        maxWidth: "50px",
+        minWidth: "50px",
         header: () => <span>Due Date</span>,
         footer: (props: any) => props.column.id,
       },

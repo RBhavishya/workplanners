@@ -114,7 +114,7 @@ const Tasks = () => {
       id: "actions",
       header: () => <span>Actions</span>,
       footer: (props: any) => props.column.id,
-      size: 120,
+      size: 90,
       cell: (info: any) => {
         const rowData = info.row.original;
 
