@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Bell } from 'lucide-react';
+import UserDetails from '../login/UserDetails';
 
-const Header = ({ renderCenter }) => {
-  const [time, setTime] = useState(new Date('2025-09-11T14:35:00+05:30')); 
+type HeaderProps = {
+  renderCenter?: (() => React.ReactNode) | null;
+};
 
+const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
+  const [time, setTime] = useState(new Date('2025-09-12T13:43:00+05:30'));
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -39,10 +43,19 @@ const Header = ({ renderCenter }) => {
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
   return (
-    <header className="flex items-center justify-between p-4 bg-white border-b border-purple-100 shadow-sm">
+    <header
+      className="
+        flex items-center justify-between
+        px-4 bg-white border-b border-purple-100 shadow-sm
+        h-30                        
+        2xl:h-30
+        3xl:h-32
+        4xl:h-34
+      "
+    >
       {centerContent}
-      <div className="flex items-center space-x-4">
-        <div className="border-l border-purple-100 px-4 text-right">
+      <div className="flex items-center space-x-6">
+        <div className="text-right border-r-2 border-gray-200 pr-4 border-l-2 pl-4">
           <p className="text-lg font-semibold text-gray-800">{formattedTime}</p>
           <p className="text-sm text-gray-500">{formattedDate}</p>
         </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import SmallCard from '../core/StatusCard';
-
 const CustomCenter = ({ cards }) => {
   return (
     <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
@@ -14,5 +13,4 @@ const CustomCenter = ({ cards }) => {
     </div>
   );
 };
-
 export default CustomCenter;
