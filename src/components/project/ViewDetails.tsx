@@ -356,13 +356,18 @@ const Viewdetails = () => {
                   </Command>
                 </PopoverContent>
               </Popover>
-
               <button
                 onClick={handleAssignUsers}
-                disabled={selectedUsers.length === 0}
-                className="px-3 py-1 bg-purple-600 text-white rounded disabled:opacity-50"
+                disabled={
+                  selectedUsers.length === 0 || assignUserMutation.isPending
+                }
+                className="px-3 py-1 bg-purple-600 text-white rounded disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
-                Add
+                {assignUserMutation.isPending ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  "Add"
+                )}
               </button>
             </div>
           </div>

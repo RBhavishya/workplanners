@@ -27,7 +27,12 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
 
-import { createProjectAPI, getAllUsersAPI, getProjectByIdAPI, updateProjectAPI } from "@/https/services/project";
+import {
+  createProjectAPI,
+  getAllUsersAPI,
+  getProjectByIdAPI,
+  updateProjectAPI,
+} from "@/https/services/project";
 import { toast } from "sonner";
 
 export interface AddProjectFormProps {
@@ -90,53 +95,53 @@ const AddProjectForm = ({
   });
 
   const mutation = useMutation({
-  mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
-  onSuccess: (data) => {
-    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
 
-    // ✅ Success toast
-    toast.success(data.message || "Project created successfully");
+      // ✅ Success toast
+      toast.success(data.message || "Project created successfully");
 
-    navigate({ to: "/projects" });
-    onSave?.(data.data);
-  },
-  onError: (error: any) => {
-    setErrors({});
-    setFormError(null);
+      navigate({ to: "/projects" });
+      onSave?.(data.data);
+    },
+    onError: (error: any) => {
+      setErrors({});
+      setFormError(null);
 
-    if (error?.status === 422 && error?.data?.errData) {
-      setErrors(error.data.errData);
-    } else {
-      const message = error?.data?.message || "Failed to save project";
-      toast.error(message);
-      setFormError(message);
-    }
-  },
-});
+      if (error?.status === 422 && error?.data?.errData) {
+        setErrors(error.data.errData);
+      } else {
+        const message = error?.data?.message || "Failed to save project";
+        toast.error(message);
+        setFormError(message);
+      }
+    },
+  });
 
-const updateMutation = useMutation({
-  mutationFn: (updatedProject: ProjectData) =>
-    updateProjectAPI(projectId!, updatedProject),
-  onSuccess: (data) => {
-    queryClient.invalidateQueries({ queryKey: ["projects"] });
-    queryClient.invalidateQueries({ queryKey: ["project", projectId] });
-    toast.success(data.message || "Project updated successfully");
-    onSave?.(data.data);
-    navigate({ to: "/projects" });
-  },
-  onError: (error: any) => {
-    setErrors({});
-    setFormError(null);
+  const updateMutation = useMutation({
+    mutationFn: (updatedProject: ProjectData) =>
+      updateProjectAPI(projectId!, updatedProject),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      toast.success(data.message || "Project updated successfully");
+      onSave?.(data.data);
+      navigate({ to: "/projects" });
+    },
+    onError: (error: any) => {
+      setErrors({});
+      setFormError(null);
 
-    if (error?.status === 422 && error?.data?.errData) {
-      setErrors(error.data.errData);
-    } else {
-      const message = error?.data?.message || "Failed to update project";
-      toast.error(message);
-      setFormError(message);
-    }
-  },
-});
+      if (error?.status === 422 && error?.data?.errData) {
+        setErrors(error.data.errData);
+      } else {
+        const message = error?.data?.message || "Failed to update project";
+        toast.error(message);
+        setFormError(message);
+      }
+    },
+  });
   useEffect(() => {
     if (triggerRef.current) {
       setTriggerWidth(triggerRef.current.offsetWidth);
@@ -237,7 +242,9 @@ const updateMutation = useMutation({
         </div>
       )}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Project Title</label>
+        <label className="text-sm font-medium">
+          Project Title <span className="text-red-500">*</span>
+        </label>
         <input
           type="text"
           placeholder="Enter Project Title"
@@ -250,7 +257,9 @@ const updateMutation = useMutation({
         )}
       </div>
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Project Description</label>
+        <label className="text-sm font-medium">
+          Project Description <span className="text-red-500">*</span>
+        </label>
         <textarea
           placeholder="Enter Project Description"
           value={description}
@@ -266,7 +275,9 @@ const updateMutation = useMutation({
       <div className="flex gap-4 mb-4">
         {/* Start Date Picker */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">Start Date</label>
+          <label className="text-sm font-medium">
+            Start Date <span className="text-red-500">*</span>
+          </label>
           <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
             <PopoverTrigger asChild>
               <div
@@ -305,7 +316,9 @@ const updateMutation = useMutation({
 
         {/* Due Date Picker */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">Due Date</label>
+          <label className="text-sm font-medium">
+            Due Date <span className="text-red-500">*</span>
+          </label>
           <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
             <PopoverTrigger asChild>
               <div
@@ -472,51 +485,51 @@ const updateMutation = useMutation({
           <p className="text-red-500 text-xs mt-1">{errors.links.join(", ")}</p>
         )}
       </div>
-     <div className="flex justify-end gap-2 mt-4">
-  <button
-    onClick={handleNavigation}
-    className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
-    disabled={mutation.isPending || updateMutation.isPending}
-  >
-    Cancel
-  </button>
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          onClick={handleNavigation}
+          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
+          disabled={mutation.isPending || updateMutation.isPending}
+        >
+          Cancel
+        </button>
 
-  <button
-    onClick={handleSave}
-    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
-    disabled={mutation.isPending || updateMutation.isPending}
-  >
-    {(mutation.isPending || updateMutation.isPending) && (
-      <svg
-        className="animate-spin h-4 w-4 text-white"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-      </svg>
-    )}
-    {mode === "edit"
-      ? updateMutation.isPending
-        ? "Updating..."
-        : "Update"
-      : mutation.isPending
-      ? "Saving..."
-      : "Save"}
-  </button>
-</div>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
+          disabled={mutation.isPending || updateMutation.isPending}
+        >
+          {(mutation.isPending || updateMutation.isPending) && (
+            <svg
+              className="animate-spin h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+          )}
+          {mode === "edit"
+            ? updateMutation.isPending
+              ? "Updating..."
+              : "Update"
+            : mutation.isPending
+              ? "Saving..."
+              : "Save"}
+        </button>
+      </div>
     </div>
   );
 };

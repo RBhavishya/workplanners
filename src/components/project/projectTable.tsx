@@ -69,18 +69,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         search_string: debouncedSearch,
       }),
   });
-
-  // API Response
   const projects = data?.data?.data?.records || [];
   const pagination = data?.data?.data?.pagination_info;
-
-  // Delete project
-  // const deleteMutation = useMutation({
-  //   mutationFn: (id: number) => deleteProjectAPI(id),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["projectsTable"] });
-  //   },
-  // });
 
 
   // Sort toggle helper
