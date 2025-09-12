@@ -175,9 +175,33 @@ const Tasks = () => {
   });
 
   return (
-    <div className="flex flex-col bg-gray-100 h-screen">
-        <hr />
+    <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
+    <div className="w-full p-2 bg-white rounded-md">
+        <h1 className="flex text-bold text-2xl">Tasks</h1>
+        <div className="flex gap-6 ">
+          <div className="flex justify-around rounded gap-1 ml-10 mt-5">
+            <div className="flex flex-wrap gap-3">
+              <BigCard
+                title="Total Tasks"
+                value={29}
+                icon={<ClipboardList />}
+              />
 
+              <BigCard
+                title="In Progress Task"
+                value={3}
+                icon={<ClipboardPenLine />}
+              />
+              <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
+            </div>
+          </div>
+          <div
+            className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
+            style={{ border: "1px solid  #ddb8ffff" }}
+          ></div>
+        </div>
+      </div>
+      <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center my-2 gap-3">
           <TaskSearchFilter
             searchString={searchString}
@@ -186,7 +210,7 @@ const Tasks = () => {
           />
 
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3"
             onClick={handleNavigation}
           >
             + New Task
@@ -217,6 +241,7 @@ const Tasks = () => {
             ]}
           />
         </div>
+      </div>
 
         {/* 🔹 Modal */}
         {/* <AddTaskForm open={open} onClose={() => setOpen(true)} /> */}

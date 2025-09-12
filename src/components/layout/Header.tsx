@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Bell } from 'lucide-react';
 import UserDetails from '../login/UserDetails';
+import { useLocation } from '@tanstack/react-router';
+
+
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
@@ -12,6 +15,8 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const location = useLocation();
 
   const formattedTime = time.toLocaleTimeString('en-GB', {
     hour: '2-digit',
@@ -27,9 +32,10 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     timeZone: 'Asia/Kolkata',
   });
 
-  const defaultCenter = (
-    <div className="flex-1 max-w-md mx-4">
-      <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full px-4 py-2">
+  const defaultCenter =
+  location.pathname === "/dashboard" ? (
+    <div className="flex-1 max-w-md mx-2">
+      <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
         <Search className="w-5 h-5 text-purple-500 mr-2" />
         <input
           type="text"
@@ -38,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
         />
       </div>
     </div>
-  );
+  ) : null;
 
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
@@ -47,10 +53,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
       className="
         flex items-center justify-between
         px-4 bg-white border-b border-purple-100 shadow-sm
-        h-30                        
-        2xl:h-30
-        3xl:h-32
-        4xl:h-34
+        h-20 3xl:!h-26                      
       "
     >
       {centerContent}
@@ -59,12 +62,12 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
           <p className="text-lg font-semibold text-gray-800">{formattedTime}</p>
           <p className="text-sm text-gray-500">{formattedDate}</p>
         </div>
-        <div className="relative">
+        {/* <div className="relative">
           <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
           <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">
             33
           </span>
-        </div>
+        </div> */}
       </div>
     </header>
   );

@@ -1,102 +1,148 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
-  Calendar as CalendarPicker,
-  Check,
+  Calendar as CalendarIcon,
   CheckCircle,
   ChevronDown,
   MoveLeft,
   X,
+  Check,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  createTaskAPI,
+  getDropDownForProjectsTasksAPI,
+  // <-- make sure you have this
+} from "@/https/services/tasks";
+import { useNavigate } from "@tanstack/react-router";
+import { Calendar } from "../ui/calendar";
 
 // Utility to format dates
 const formatDate = (date: Date) => dayjs(date).format("DD/MM/YYYY");
 
 const AddTaskForm = () => {
-  // Local states
-  const [mode, setMode] = useState<"create" | "edit">("create");
-  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
+  const [mode] = useState<"create" | "edit">("create");
+
+  // Form states
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [dueDate, setDueDate] = useState<Date | undefined>();
+
+  // Popovers
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [dueDateOpen, setDueDateOpen] = useState(false);
+  const [projectPopoverOpen, setProjectPopoverOpen] = useState(false);
+  const [userPopoverOpen, setUserPopoverOpen] = useState(false);
+
+  // States for Projects & Users
+  const [taskProjects, setTaskProjects] = useState<number[]>([]);
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
-  const [search, setSearch] = useState("");
-  const [links, setLinks] = useState<string[]>([]);
-  const [linkInput, setLinkInput] = useState("");
+  const [searchProjects, setSearchProjects] = useState("");
+  const [searchUsers, setSearchUsers] = useState("");
 
-  // Mock users API response
-  const usersResp = {
-    data: {
-      data: [
-        { id: 1, display_name: "Alice" },
-        { id: 2, display_name: "Bob" },
-        { id: 3, display_name: "Charlie" },
-      ],
-    },
-  };
-  const isLoading = false;
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
-  const triggerRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(false);
-  const triggerWidth = triggerRef.current?.offsetWidth;
-
-  // Error placeholder
-  const errors: Record<string, string[]> = {};
-
-  // Handlers
-  const toggleUser = (id: number) => {
-    setAssignedUsers((prev) =>
-      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
-    );
-  };
-
-  const removeUser = (id: number) => {
-    setAssignedUsers((prev) => prev.filter((u) => u !== id));
-  };
-
-  const removeAll = () => {
-    setAssignedUsers([]);
-  };
-
-  const handleAddLink = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && linkInput.trim() !== "") {
-      e.preventDefault();
-      setLinks((prev) => [...prev, linkInput.trim()]);
-      setLinkInput("");
+  useEffect(() => {
+    if (triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
     }
-  };
+  }, [projectPopoverOpen, userPopoverOpen]);
 
-  const handleRemoveLink = (index: number) => {
-    setLinks((prev) => prev.filter((_, i) => i !== index));
-  };
+  // Fetch Projects
+  const { data: projects, isLoading: loadingProjects } = useQuery({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const response = await getDropDownForProjectsTasksAPI();
+      return response.data?.data;
+    },
+  });
 
-  const handleNavigation = () => {
-    console.log("Back navigation");
-  };
+  // Fetch Users
+  const { data: usersResp, isLoading: loadingUsers } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await getDropDownForProjectsTasksAPI();
+      return response.data?.data;
+    },
+  });
+
+  // --- API integration ---
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (payload: any) => {
+      setFormError("");
+      return await createTaskAPI(payload);
+    },
+    onSuccess: (response: any) => {
+      if (response?.status === 200 || response?.status === 201) {
+        toast.success(response?.data?.message || "Task created successfully");
+        setSuccessMessage("Task created successfully!");
+        setTimeout(() => navigate({ to: "/tasks" }), 1000);
+      } else if (response?.status === 422 || response?.status === 409) {
+        setFormError(response?.data?.message || "Validation failed.");
+      }
+    },
+    onError: () => {
+      toast.error("An error occurred. Please try again.");
+    },
+  });
+
+  // --- Handlers ---
+  const handleNavigation = () => navigate({ to: "/tasks" });
 
   const handleSave = () => {
-    if (!title || !description || !startDate || !dueDate) {
+    if (!title.trim() || !description.trim() || !startDate || !dueDate) {
       setFormError("Please fill in all required fields.");
       return;
     }
-    setFormError("");
-    setSuccessMessage("Project saved successfully!");
-    console.log({
-      title,
+
+    const payload = {
+      task_title: title,
       description,
-      startDate,
-      dueDate,
-      assignedUsers,
-      links,
-    });
+      start_date: dayjs(startDate).format("YYYY-MM-DD"),
+      due_date: dayjs(dueDate).format("YYYY-MM-DD"),
+      projects: taskProjects,
+      assigned_users: assignedUsers,
+    };
+
+    mutate(payload);
   };
+
+  const toggleSelection = (
+    id: number,
+    list: number[],
+    setList: React.Dispatch<React.SetStateAction<number[]>>
+  ) => {
+    setList((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const removeOne = (
+    id: number,
+    setList: React.Dispatch<React.SetStateAction<number[]>>
+  ) => {
+    setList((prev) => prev.filter((i) => i !== id));
+  };
+
+  const removeAll = (setList: React.Dispatch<React.SetStateAction<number[]>>) =>
+    setList([]);
 
   return (
     <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
@@ -109,7 +155,7 @@ const AddTaskForm = () => {
           <MoveLeft size={20} />
         </button>
         <h2 className="text-lg font-semibold">
-          {mode === "edit" ? "Edit Project" : "Add Project"}
+          {mode === "edit" ? "Edit Task" : "Add Task"}
         </h2>
       </div>
 
@@ -129,11 +175,11 @@ const AddTaskForm = () => {
       {/* Title */}
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
-          Project Title <span className="text-red-500">*</span>
+          Task Title <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          placeholder="Enter Project Title"
+          placeholder="Enter Task Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
@@ -143,10 +189,10 @@ const AddTaskForm = () => {
       {/* Description */}
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
-          Project Description <span className="text-red-500">*</span>
+          Task Description <span className="text-red-500">*</span>
         </label>
         <textarea
-          placeholder="Enter Project Description"
+          placeholder="Enter Task Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
@@ -164,27 +210,26 @@ const AddTaskForm = () => {
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50",
+                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
                   !startDate && "text-muted-foreground"
                 )}
-                onClick={() => setStartDateOpen(true)}
               >
-                <CalendarPicker className="h-4 w-4 text-gray-500" />
+                <CalendarIcon className="h-4 w-4 text-gray-500" />
                 {startDate ? formatDate(startDate) : "Pick a date"}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarPicker
+              <Calendar
                 mode="single"
-                // selected={startDate}
-                // onSelect={(date: Date | undefined) => {
-                //   setStartDate(date);
-                //   setStartDateOpen(false);
-                //   if (date && dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
-                //     setDueDate(undefined);
-                //   }
-                // }}
-                className="rounded-md border bg-white shadow-sm"
+                selected={startDate}
+                onSelect={(date) => {
+                  setStartDate(date);
+                  setStartDateOpen(false);
+                  if (date && dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
+                    setDueDate(undefined);
+                  }
+                }}
+                disabled={(date) => dayjs(date).isBefore(dayjs(), "day")}
               />
             </PopoverContent>
           </Popover>
@@ -199,141 +244,197 @@ const AddTaskForm = () => {
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50",
+                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
                   !dueDate && "text-muted-foreground",
                   !startDate && "opacity-50 cursor-not-allowed"
                 )}
-                onClick={() => startDate && setDueDateOpen(true)}
               >
-                <CalendarPicker className="h-4 w-4 text-gray-500" />
+                <CalendarIcon className="h-4 w-4 text-gray-500" />
                 {dueDate ? formatDate(dueDate) : "Pick a due date"}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarPicker
+              <Calendar
                 mode="single"
-                // selected={dueDate}
-                // onSelect={(date: Date | undefined) => {
-                //   setDueDate(date);
-                //   setDueDateOpen(false);
-                // }}
-                className="rounded-md border bg-white shadow-sm"
+                selected={dueDate}
+                onSelect={(date) => {
+                  setDueDate(date);
+                  setDueDateOpen(false);
+                }}
+                disabled={(date) =>
+                  !startDate || dayjs(date).isBefore(dayjs(startDate), "day")
+                }
               />
             </PopoverContent>
           </Popover>
         </div>
       </div>
 
-      {/* Assign Users (only create mode) */}
-      {mode === "create" && (
-        <div className="flex flex-col gap-2 mb-4">
-          <label className="text-sm font-medium">Select Projects</label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <div
-                ref={triggerRef}
-                className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
-              >
-                <div className="flex flex-wrap gap-1">
-                  {assignedUsers.length === 0 ? (
-                    <span className="text-gray-400">Select Projects...</span>
-                  ) : (
-                    assignedUsers.map((id) => {
-                      const user = usersResp.data.data.find((u) => u.id === id);
-                      return (
-                        <div
-                          key={id}
-                          className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1"
-                        >
-                          <span>{user?.display_name ?? `User ${id}`}</span>
-                          <button onClick={() => removeUser(id)}>
-                            <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
-                          </button>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {assignedUsers.length > 0 && (
-                    <button type="button" onClick={removeAll}>
-                      <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
-                    </button>
-                  )}
-                  <ChevronDown />
-                </div>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent
-              style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
-              className="p-0"
-            >
-              <Command>
-                <CommandInput
-                  placeholder="Search users..."
-                  value={search}
-                  onValueChange={setSearch}
-                />
-                <CommandList className="max-h-60 overflow-y-auto">
-                  {isLoading ? (
-                    <div className="p-2 text-gray-500">Loading...</div>
-                  ) : usersResp.data.data.length === 0 ? (
-                    <CommandEmpty>No users found.</CommandEmpty>
-                  ) : (
-                    <CommandGroup>
-                      {usersResp.data.data.map((u) => (
-                        <CommandItem
-                          key={u.id}
-                          onSelect={() => toggleUser(u.id)}
-                        >
-                          <span>{u.display_name}</span>
-                          <Check
-                            className={cn(
-                              "h-4 w-4 ml-auto",
-                              assignedUsers.includes(u.id)
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-      )}
-
-      {/* Reference Links */}
+      {/* Select Projects */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Project Reference Links</label>
-        <div className="border rounded-lg p-2 flex flex-wrap gap-2 min-h-[48px]">
-          {links.map((link, index) => (
-            <span
-              key={index}
-              className="flex items-center gap-2 bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-sm"
+        <label className="text-sm font-medium">Select Projects</label>
+        <Popover open={projectPopoverOpen} onOpenChange={setProjectPopoverOpen}>
+          <PopoverTrigger asChild>
+            <div
+              ref={triggerRef}
+              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
             >
-              {link}
-              <button
-                type="button"
-                className="text-xs text-purple-500 hover:text-purple-700"
-                onClick={() => handleRemoveLink(index)}
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-          <input
-            type="text"
-            placeholder="Add a link and press Enter"
-            value={linkInput}
-            onChange={(e) => setLinkInput(e.target.value)}
-            onKeyDown={handleAddLink}
-            className="flex-1 outline-none bg-transparent text-sm"
-          />
-        </div>
+              <div className="flex flex-wrap gap-1">
+                {taskProjects.length === 0 ? (
+                  <span className="text-gray-400">Select Projects...</span>
+                ) : (
+                  taskProjects.map((id) => {
+                    const project = Array.isArray(projects)
+                      ? projects.find((p: any) => p.id === id)
+                      : null;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1"
+                      >
+                        <span>{project?.title ?? `Project ${id}`}</span>
+                        <button onClick={() => removeOne(id, setTaskProjects)}>
+                          <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {taskProjects.length > 0 && (
+                  <button onClick={() => removeAll(setTaskProjects)}>
+                    <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                  </button>
+                )}
+                <ChevronDown />
+              </div>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+            className="p-0"
+          >
+            <Command>
+              <CommandInput
+                placeholder="Search projects..."
+                value={searchProjects}
+                onValueChange={setSearchProjects}
+              />
+              <CommandList className="max-h-60 overflow-y-auto">
+                {loadingProjects ? (
+                  <div className="p-2 text-gray-500">Loading...</div>
+                ) : !Array.isArray(projects) || projects.length === 0 ? (
+                  <CommandEmpty>No projects found.</CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {projects.map((p: any) => (
+                      <CommandItem
+                        key={p.id}
+                        onSelect={() =>
+                          toggleSelection(p.id, taskProjects, setTaskProjects)
+                        }
+                      >
+                        <span>{p.title}</span>
+                        <Check
+                          className={cn(
+                            "h-4 w-4 ml-auto",
+                            taskProjects.includes(p.id)
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Assign Users */}
+      <div className="flex flex-col gap-2 mb-4">
+        <label className="text-sm font-medium">Assign Users</label>
+        <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
+          <PopoverTrigger asChild>
+            <div
+              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+            >
+              <div className="flex flex-wrap gap-1">
+                {assignedUsers.length === 0 ? (
+                  <span className="text-gray-400">Select users...</span>
+                ) : (
+                  assignedUsers.map((id) => {
+                    const user = Array.isArray(usersResp)
+                      ? usersResp.find((u: any) => u.id === id)
+                      : null;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1"
+                      >
+                        <span>{user?.display_name ?? `User ${id}`}</span>
+                        <button onClick={() => removeOne(id, setAssignedUsers)}>
+                          <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {assignedUsers.length > 0 && (
+                  <button onClick={() => removeAll(setAssignedUsers)}>
+                    <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                  </button>
+                )}
+                <ChevronDown />
+              </div>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+            className="p-0"
+          >
+            <Command>
+              <CommandInput
+                placeholder="Search users..."
+                value={searchUsers}
+                onValueChange={setSearchUsers}
+              />
+              <CommandList className="max-h-60 overflow-y-auto">
+                {loadingUsers ? (
+                  <div className="p-2 text-gray-500">Loading...</div>
+                ) : !Array.isArray(usersResp) || usersResp.length === 0 ? (
+                  <CommandEmpty>No users found.</CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {usersResp.map((u: any) => (
+                      <CommandItem
+                        key={u.id}
+                        onSelect={() =>
+                          toggleSelection(u.id, assignedUsers, setAssignedUsers)
+                        }
+                      >
+                        <span>{u.display_name}</span>
+                        <Check
+                          className={cn(
+                            "h-4 w-4 ml-auto",
+                            assignedUsers.includes(u.id)
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Buttons */}
@@ -346,9 +447,10 @@ const AddTaskForm = () => {
         </button>
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+          disabled={isPending}
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 disabled:opacity-50"
         >
-          Save
+          {isPending ? "Saving..." : "Save"}
         </button>
       </div>
     </div>
