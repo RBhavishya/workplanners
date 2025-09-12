@@ -2,13 +2,11 @@ import * as React from "react";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  ClipboardCheck,
   ClipboardList,
   ClipboardPenLine,
-  Columns,
-  Edit,
-  Eye,
   FileClock,
+  Eye,
+  Edit,
   Trash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +25,6 @@ const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const router = useRouter();
-  // const dispatch = useDispatch();
 
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
@@ -39,7 +36,8 @@ const Tasks = () => {
   const initialStatus = searchParams.get("status") || "";
   const initialPrioritys = searchParams.get("priority") || "";
   const intialProject = searchParams.get("project_id") || "";
-  const [searchString, setSearchString] = useState<any>(initialSearch);
+
+  const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [selectedDate, setSelectedDate] = useState<any>(new Date());
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
@@ -78,27 +76,23 @@ const Tasks = () => {
         from_date: selectedDate?.length ? selectedDate[0] : null,
         to_date: selectedDate?.length ? selectedDate[1] : null,
       });
-      const queryParams = {
-        current_page: +pagination.pageIndex,
-        page_size: +pagination.pageSize,
-        order_by: pagination.order_by ? pagination.order_by : undefined,
-        search_string: debouncedSearch || undefined,
-        from_date: selectedDate?.length ? selectedDate[0] : undefined,
-        to_date: selectedDate?.length ? selectedDate[1] : undefined,
-        status: selectedStatus || undefined,
-        project_id: selectedProject || undefined,
-        priority: selectedpriority || undefined,
-      };
 
-      {
-        location.pathname == "/dashboard"
-          ? ""
-          : router.navigate({
-              to: "/tasks",
-              search: queryParams,
-            });
+      if (location.pathname !== "/dashboard") {
+        router.navigate({
+          to: "/tasks",
+          search: {
+            page: Number(pagination.pageIndex),
+            page_size: Number(pagination.pageSize),
+            order_by: pagination.order_by || undefined,
+            search: debouncedSearch || undefined,
+            from_date: selectedDate?.length ? selectedDate[0] : undefined,
+            to_date: selectedDate?.length ? selectedDate[1] : undefined,
+            status: selectedStatus || undefined,
+            project_id: selectedProject || undefined,
+            priority: selectedpriority || undefined,
+          },
+        });
       }
-      // dispatch(setRefId(response.data?.data?.records[0]?.ref_id));
 
       return response;
     },
@@ -115,42 +109,56 @@ const Tasks = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-    const taskActions = [
-  {
-    id: "actions",
-    header: () => <span>Actions</span>,
-    footer: (props: any) => props.column.id,
-    size: 120,
-    cell: (info: any) => {
-      const rowData = info.row.original;
+  const taskActions = [
+    {
+      id: "actions",
+      header: () => <span>Actions</span>,
+      footer: (props: any) => props.column.id,
+      size: 90,
+      cell: (info: any) => {
+        const rowData = info.row.original;
 
-      return (
-        <div className="flex gap-2">
-          <button
-            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
-            // onClick={() => navigate({ to: `/projects/${rowData.id}` })}
-          >
-            <Eye size={16} />
-          </button>
+        return (
+          <div className="flex gap-2">
+            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Eye size={16} />
+            </button>
 
-          <button
-            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
-            // onClick={() => navigate({ to: `/projects/edit/${rowData.id}` })}
-          >
-            <Edit size={16} />
-          </button>
+            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Edit size={16} />
+            </button>
 
-          <button
-            className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100"
-            // onClick={() => onDelete(rowData)}
-          >
-            <Trash size={16} />
-          </button>
-        </div>
-      );
+            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Trash size={16} />
+            </button>
+          </div>
+        );
+      },
     },
-  },
-];
+  ];
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString || selectedStatus) {
+        getAllTasks({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllTasks({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchString, selectedStatus]);
+
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -165,58 +173,33 @@ const Tasks = () => {
 
   return (
     <div className="flex flex-col bg-gray-100 h-screen">
-     
-
-        {/* 🔹 Task Summary Cards */}
-        <div className="w-full p-2 bg-white rounded-sm">
-          <h1 className="flex text-bold text-xl">Tasks</h1>
-          <div className="flex gap-6">
-            <div className="flex justify-around rounded gap-7 px-4 py-1">
-              <div className="flex gap-4 mt-10">
-                <BigCard
-                  title="Total Tasks"
-                  value={29}
-                  icon={<ClipboardList />}
-                />
-                <BigCard
-                  title="In Progress Task"
-                  value={3}
-                  icon={<ClipboardPenLine />}
-                />
-                <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
-              </div>
-              <div
-                className="bg-gray rounded-xl shadow-md p-4 w-110 h-30 mt-7"
-                style={{ border: "1px solid  #ddb8ffff" }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
         <hr />
 
-        {/* 🔹 New Task Button aligned right */}
+        <div className="flex justify-end items-center my-2 gap-3">
+          <TaskSearchFilter
+            searchString={searchString}
+            setSearchString={setSearchString}
+            title="Find your Task"
+          />
 
-        {/* 🔹 Task Table */}
-        <div className="bg-white">
-          <div className="flex justify-end items-center my-2 gap-3">
-            <TaskSearchFilter
-              searchString={debouncedSearch}
-              setSearchString={setSearchString}
-              title="Find your Task"
-            />
+          <Button
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+            onClick={() => setOpen(true)}
+          >
+            + New Task
+          </Button>
+        </div>
+        <div className="bg-white relative">
+          {(isLoading || isFetching) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
 
-            <Button
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-              onClick={() => setOpen(true)}
-            >
-              + New Task
-            </Button>
-          </div>
           <TanStackTable
             data={taksDataAfterSerial}
-           columns={[...taskColumns, ...taskActions]}
-            paginationDetails={pagination}
+            columns={[...taskColumns, ...taskActions]}
+            paginationDetails={data?.data?.data?.pagination_info}
             getData={getAllTasks}
             loading={isLoading}
             removeSortingForColumnIds={[
