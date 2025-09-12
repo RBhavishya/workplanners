@@ -10,7 +10,7 @@ interface BigCardProps {
 const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   "Total Tasks": {
     bg: "bg-purple-100",
-    icon: <ClipboardList className="text-purple-500" size={28} />,
+    icon: <ClipboardList className="text-purple-500" size={20} />,
   },
   "Completed Tasks": {
     bg: "bg-blue-100",
@@ -37,7 +37,7 @@ const BigCard = ({ title, value = 0, icon }: BigCardProps) => {
 
   return (
     <div
-      className={`w-[215px] h-[110px] rounded-2xl shadow-sm flex items-center justify-between p-5 ${bg}`}
+      className={`w-50 h-25 rounded-2xl shadow-sm flex items-center justify-between p-4 ${bg}`}
     >
       <div className="flex flex-col">
         <span className="text-sm text-gray-600">{title}</span>

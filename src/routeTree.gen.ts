@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutTasksIndexRouteImport } from './routes/_layout/tasks/index'
 import { Route as LayoutProjectsIndexRouteImport } from './routes/_layout/projects/index'
 import { Route as LayoutDashboardIndexRouteImport } from './routes/_layout/dashboard/index'
+import { Route as LayoutTasksAddIndexRouteImport } from './routes/_layout/tasks/add/index'
 import { Route as LayoutProjectsTableIndexRouteImport } from './routes/_layout/projects/table/index'
 import { Route as LayoutProjectsAddIndexRouteImport } from './routes/_layout/projects/add/index'
 import { Route as LayoutProjectsIdIndexRouteImport } from './routes/_layout/projects/$id/index'
@@ -41,6 +42,11 @@ const LayoutProjectsIndexRoute = LayoutProjectsIndexRouteImport.update({
 const LayoutDashboardIndexRoute = LayoutDashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutTasksAddIndexRoute = LayoutTasksAddIndexRouteImport.update({
+  id: '/tasks/add/',
+  path: '/tasks/add/',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutProjectsTableIndexRoute =
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/projects/$id': typeof LayoutProjectsIdIndexRoute
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
+  '/tasks/add': typeof LayoutTasksAddIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/projects/$id': typeof LayoutProjectsIdIndexRoute
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
+  '/tasks/add': typeof LayoutTasksAddIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRoutesById {
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/_layout/projects/$id/': typeof LayoutProjectsIdIndexRoute
   '/_layout/projects/add/': typeof LayoutProjectsAddIndexRoute
   '/_layout/projects/table/': typeof LayoutProjectsTableIndexRoute
+  '/_layout/tasks/add/': typeof LayoutTasksAddIndexRoute
   '/_layout/projects/edit/$id/': typeof LayoutProjectsEditIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/projects/add'
     | '/projects/table'
+    | '/tasks/add'
     | '/projects/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/projects/add'
     | '/projects/table'
+    | '/tasks/add'
     | '/projects/edit/$id'
   id:
     | '__root__'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/_layout/projects/$id/'
     | '/_layout/projects/add/'
     | '/_layout/projects/table/'
+    | '/_layout/tasks/add/'
     | '/_layout/projects/edit/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -174,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/tasks/add/': {
+      id: '/_layout/tasks/add/'
+      path: '/tasks/add'
+      fullPath: '/tasks/add'
+      preLoaderRoute: typeof LayoutTasksAddIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/projects/table/': {
       id: '/_layout/projects/table/'
       path: '/projects/table'
@@ -212,6 +231,7 @@ interface LayoutRouteChildren {
   LayoutProjectsIdIndexRoute: typeof LayoutProjectsIdIndexRoute
   LayoutProjectsAddIndexRoute: typeof LayoutProjectsAddIndexRoute
   LayoutProjectsTableIndexRoute: typeof LayoutProjectsTableIndexRoute
+  LayoutTasksAddIndexRoute: typeof LayoutTasksAddIndexRoute
   LayoutProjectsEditIdIndexRoute: typeof LayoutProjectsEditIdIndexRoute
 }
 
@@ -222,6 +242,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutProjectsIdIndexRoute: LayoutProjectsIdIndexRoute,
   LayoutProjectsAddIndexRoute: LayoutProjectsAddIndexRoute,
   LayoutProjectsTableIndexRoute: LayoutProjectsTableIndexRoute,
+  LayoutTasksAddIndexRoute: LayoutTasksAddIndexRoute,
   LayoutProjectsEditIdIndexRoute: LayoutProjectsEditIdIndexRoute,
 }
 

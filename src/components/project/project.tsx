@@ -157,14 +157,7 @@ const Projects = () => {
 
   return (
     <div className="w-full p-4">
-      {/* Top Bar (Timer) */}
-      <div className="flex items-center mb-6 w-full">
-        <div className="h-10 w-px bg-gray-300 mx-6"></div>
-        <div className="flex flex-col justify-around w-1/4">
-          <span className="text-lg font-semibold">{formattedTime}</span>
-          <span className="text-sm text-gray-500">{formattedDate}</span>
-        </div>
-      </div>
+      
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
         <div className="flex items-center gap-4">

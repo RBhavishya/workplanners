@@ -39,3 +39,19 @@ export const getAllPaginatedTasks = async ({
     throw err;
   }
 };
+
+export const createTaskAPI = async (payload: any) => {
+  try {
+    return await $fetch.post("/task-assignees", payload);
+  } catch (err: any) {
+    throw err;
+  }
+};
+
+export const getDropDownForProjectsTasksAPI = async () => {
+  try {
+    return await $fetch.get(`/projects/drop-down`);
+  } catch (err: any) {
+    throw err;
+  }
+};

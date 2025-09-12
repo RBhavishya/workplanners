@@ -20,6 +20,7 @@ import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
+import { tr } from "date-fns/locale";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -98,6 +99,8 @@ const Tasks = () => {
     },
   });
 
+  const handleNavigation = () => navigate({ to: `/tasks/add` });
+
   const taksDataAfterSerial =
     addSerial(
       data?.data?.data?.records,
@@ -172,57 +175,33 @@ const Tasks = () => {
   });
 
   return (
-    <div className="flex flex-col bg-gray-100 h-screen">
-      <hr />
-      <div className="p-4">
-        {/* 🔹 Top Stats Row */}
-        <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
-          <div className="flex gap-4">
-            <SmallCard
-              cards={[
-                { title: "TODAY", value: 0 },
-                { title: "OVERDUE", value: 0 },
-                { title: "CLOSED", value: 0 },
-              ]}
-            />
-          </div>
+    <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
+    <div className="w-full p-2 bg-white rounded-md">
+        <h1 className="flex text-bold text-2xl">Tasks</h1>
+        <div className="flex gap-6 ">
+          <div className="flex justify-around rounded gap-1 ml-10 mt-5">
+            <div className="flex flex-wrap gap-3">
+              <BigCard
+                title="Total Tasks"
+                value={29}
+                icon={<ClipboardList />}
+              />
 
-          <div className="flex flex-col items-end">
-            <span className="text-lg font-semibold">{formattedTime}</span>
-            <span className="text-sm text-gray-500">{formattedDate}</span>
-          </div>
-        </div>
-
-        <hr />
-
-        {/* 🔹 Task Summary Cards */}
-        <div className="w-full p-2 bg-white rounded-sm">
-          <h1 className="flex text-bold text-xl">Tasks</h1>
-          <div className="flex gap-6">
-            <div className="flex justify-around rounded gap-7 px-4 py-1">
-              <div className="flex gap-4 mt-10">
-                <BigCard
-                  title="Total Tasks"
-                  value={29}
-                  icon={<ClipboardList />}
-                />
-                <BigCard
-                  title="In Progress Task"
-                  value={3}
-                  icon={<ClipboardPenLine />}
-                />
-                <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
-              </div>
-              <div
-                className="bg-gray rounded-xl shadow-md p-4 w-110 h-30 mt-7"
-                style={{ border: "1px solid  #ddb8ffff" }}
-              ></div>
+              <BigCard
+                title="In Progress Task"
+                value={3}
+                icon={<ClipboardPenLine />}
+              />
+              <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
             </div>
           </div>
+          <div
+            className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
+            style={{ border: "1px solid  #ddb8ffff" }}
+          ></div>
         </div>
-
-        <hr />
-
+      </div>
+      <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center my-2 gap-3">
           <TaskSearchFilter
             searchString={searchString}
@@ -231,8 +210,8 @@ const Tasks = () => {
           />
 
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-            onClick={() => setOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3"
+            onClick={handleNavigation}
           >
             + New Task
           </Button>
@@ -262,11 +241,11 @@ const Tasks = () => {
             ]}
           />
         </div>
+      </div>
 
         {/* 🔹 Modal */}
-        <AddTaskForm open={open} onClose={() => setOpen(false)} />
+        {/* <AddTaskForm open={open} onClose={() => setOpen(true)} /> */}
       </div>
-    </div>
   );
 };
 

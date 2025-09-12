@@ -105,7 +105,7 @@ const TanStackTable: FC<pageProps> = ({
         {/* Scroll container */}
         <div
           className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
-      ${location.pathname.includes("tasks") ? "h-[calc(100vh-420px)]" : "h-[calc(100vh-240px)]"}`}
+      ${location.pathname.includes("tasks") ? "h-[calc(100vh-380px)]" : "h-[calc(100vh-240px)]"}`}
         >
          <Table className="w-full text-sm border-collapse">
   {/* Sticky Header */}
@@ -120,7 +120,7 @@ const TanStackTable: FC<pageProps> = ({
               minWidth: getWidth(header.id),
               width: getWidth(header.id),
             }}
-            className="px-4 py-3 cursor-pointer"
+            className="px-4 py-2 cursor-pointer"
           >
             {header.isPlaceholder ? null : (
               <div
@@ -145,14 +145,14 @@ const TanStackTable: FC<pageProps> = ({
 </Table>
 
 {/* Scrollable body wrapped separately */}
-<div className="overflow-y-auto max-h-[calc(100vh-480px)]">
+<div className="overflow-y-auto h-[calc(100vh-420px)]">
   <Table className="w-full text-sm border-collapse">
     <TableBody className="divide-y divide-gray-200">
       {data?.length ? (
         table?.getRowModel().rows.map((row) => (
           <TableRow key={row.id} className="hover:bg-gray-50">
             {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id} className="px-4 py-3">
+              <TableCell key={cell.id} className="px-4 py-1">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
             ))}
@@ -182,11 +182,13 @@ const TanStackTable: FC<pageProps> = ({
 </div>
         </div>
       </div>
-      <TasksPagination
+     <div>
+       <TasksPagination
         paginationDetails={paginationDetails}
         capturePageNum={capturePageNum}
         captureRowPerItems={captureRowPerItems}
       />
+     </div>
     </div>
   );
 };
