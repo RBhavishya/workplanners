@@ -126,29 +126,7 @@ const Tasks = () => {
 
   return (
     <div className="flex flex-col bg-gray-100 h-screen">
-      <hr />
-      <div className="p-4">
-        {/* 🔹 Top Stats Row */}
-        <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
-          {/* 🔹 Right Side - Cards */}
-          <div className="flex gap-4">
-            <SmallCard
-              cards={[
-                { title: "TODAY", value: 0 },
-                { title: "OVERDUE", value: 0 },
-                { title: "CLOSED", value: 0 },
-              ]}
-            />
-          </div>
-
-          {/* 🔹 Right Side - Time & Date */}
-          <div className="flex flex-col items-end">
-            <span className="text-lg font-semibold">{formattedTime}</span>
-            <span className="text-sm text-gray-500">{formattedDate}</span>
-          </div>
-        </div>
-
-        <hr />
+     
 
         {/* 🔹 Task Summary Cards */}
         <div className="w-full p-2 bg-white rounded-sm">
@@ -217,7 +195,6 @@ const Tasks = () => {
         {/* 🔹 Modal */}
         <AddTaskForm open={open} onClose={() => setOpen(false)} />
       </div>
-    </div>
   );
 };
 
