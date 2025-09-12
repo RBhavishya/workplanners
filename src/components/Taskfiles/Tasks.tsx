@@ -20,6 +20,7 @@ import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
+import { tr } from "date-fns/locale";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -97,6 +98,8 @@ const Tasks = () => {
       return response;
     },
   });
+
+  const handleNavigation = () => navigate({ to: `/tasks/add` });
 
   const taksDataAfterSerial =
     addSerial(
@@ -232,7 +235,7 @@ const Tasks = () => {
 
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white"
-            onClick={() => setOpen(true)}
+            onClick={handleNavigation}
           >
             + New Task
           </Button>
@@ -264,7 +267,7 @@ const Tasks = () => {
         </div>
 
         {/* 🔹 Modal */}
-        <AddTaskForm open={open} onClose={() => setOpen(false)} />
+        {/* <AddTaskForm open={open} onClose={() => setOpen(true)} /> */}
       </div>
     </div>
   );
