@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   useLocation,
   useNavigate,
@@ -26,6 +25,9 @@ import DeleteProject from "./DeleteProject";
 import ProjectsTable from "./projectTable";
 import { Input } from "../ui/input";
 import { SearchIcon } from "../icons/SearchIcon";
+import { addSerial } from "@/lib/helpers/addSerial";
+import TasksPagination from "../core/TasksPagination";
+import TaskSearchFilter from "../core/TasksSearchFilter";
 
 const Projects = () => {
   const [time, setTime] = useState(new Date());
@@ -35,8 +37,6 @@ const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const [page, setPage] = useState(1);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
   const location = useLocation();
@@ -44,18 +44,20 @@ const Projects = () => {
   const search = useSearch({ strict: false }) as {
     viewMode?: "table" | "grid";
   };
-
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 10;
   const orderBY = searchParams.get("order_by") || "";
   const initialSearch = searchParams.get("search") || "";
 
-  const [pageIndex, setPageIndex] = useState(pageIndexParam);
   const [viewMode, setViewMode] = useState<"table" | "grid">(
     search?.viewMode || "grid"
   );
-  const [pageSize, setPageSize] = useState(pageSizeParam);
   const [selectedSort, setSelectedSort] = useState(orderBY);
+  const [pagination, setPagination] = useState({
+    pageIndex: pageIndexParam,
+    pageSize: pageSizeParam,
+    order_by: orderBY,
+  });
   const [search_string, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(search_string);
 
@@ -71,41 +73,39 @@ const Projects = () => {
     month: "short",
   });
 
-  // debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search_string);
-      setPage(1);
+      if (search_string) {
+        setPagination({
+          ...pagination,
+          pageIndex: 1,
+        });
+      }
     }, 500);
-    return () => clearTimeout(handler);
-  }, [search_string]);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [search_string, selectedSort]);
 
-  // 🔹 Fetch all projects (paginated)
-  const { data, isLoading, isError, error, isFetching } = useQuery({
-    queryKey: [
-      "projects",
-      page,
-      pageSize,
-      viewMode,
-      debouncedSearch,
-      selectedSort,
-    ],
+  // ✅ update URL whenever pagination/search/sort changes
+  const { isLoading, isError, error, data, isFetching } = useQuery({
+    queryKey: ["projects", pagination, viewMode, debouncedSearch, selectedSort],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
-        pageIndex: page,
-        pageSize: pageSize,
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
         viewMode,
-        order_by: selectedSort,
         search_string: debouncedSearch,
+        order_by: selectedSort,
       });
 
-      // sync with URL
       router.navigate({
         to: "/projects",
         search: {
-          page,
-          page_size: pageSize,
-          viewMode,
+          page: pagination.pageIndex,
+          page_size: pagination.pageSize,
+          viewMode: viewMode || undefined,
           order_by: selectedSort || undefined,
           search: debouncedSearch || undefined,
         },
@@ -115,22 +115,21 @@ const Projects = () => {
     },
   });
 
-  // 🔹 Extract records & pagination
-  const existingProjects: ProjectData[] =
-    data?.data?.data?.records && Array.isArray(data.data.data.records)
-      ? data.data.data.records
-      : [];
+  const projectsData =
+    addSerial(
+      data?.data?.data?.records,
+      data?.data?.data?.pagination_info?.current_page,
+      data?.data?.data?.pagination_info?.page_size
+    ) || [];
 
-  const paginationDetails = {
-    total_records: data?.data?.data?.pagination_info?.total_records || 0,
-    total_pages: data?.data?.data?.pagination_info?.total_pages || 1,
-    current_page: data?.data?.data?.pagination_info?.current_page || 1,
-    page_size: data?.data?.data?.pagination_info?.page_size || 25,
-    next_page: data?.data?.data?.pagination_info?.next_page || null,
-    prev_page: data?.data?.data?.pagination_info?.prev_page || null,
+  const capturePageNum = (pageIndex: number) => {
+    setPagination((prev) => ({ ...prev, pageIndex }));
   };
 
-  // 🔹 Fetch selected project details
+  const captureRowPerItems = (pageSize: number) => {
+    setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
+  };
+
   const {
     data: selectedProjectData,
     isLoading: loadingProject,
@@ -166,8 +165,6 @@ const Projects = () => {
           <span className="text-sm text-gray-500">{formattedDate}</span>
         </div>
       </div>
-
-      {/* Title & Controls */}
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
         <div className="flex items-center gap-4">
@@ -184,20 +181,20 @@ const Projects = () => {
               <SearchIcon className="w-5 h-5 text-gray-500" />
             </span>
           </div>
-
           {/* Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg">
+              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg cursor-pointer">
                 <Filter className="text-purple-500" size={18} />
                 {selectedSort || "Sort by"}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {[ "All","New", "In_Progress", "Review", "Overdue", "Done"].map(
+              {["All", "New", "In_Progress", "Review", "Overdue", "Done"].map(
                 (option) => (
                   <DropdownMenuItem
                     key={option}
+                    className="cursor-pointer"
                     onClick={() => setSelectedSort(option)}
                   >
                     {option}
@@ -208,7 +205,7 @@ const Projects = () => {
           </DropdownMenu>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2 px-1 py-1">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded-lg cursor-pointer ${
@@ -240,30 +237,29 @@ const Projects = () => {
       <hr className="mb-4" />
 
       {/* Projects Section */}
-      <div className="flex gap-6 pb-24">
+      <div className="flex gap-6">
         {viewMode === "grid" ? (
           <>
-            {/* Left side - Project Cards */}
+            {/* Grid Cards */}
             <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-              {/* 🔹 Show loader overlay only in grid/cards view */}
               {(isLoading || isFetching) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-20 rounded-lg">
                   <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
                 </div>
               )}
 
-              {existingProjects.length === 0 && !isLoading ? (
+              {projectsData.length === 0 && !isLoading ? (
                 <p className="text-gray-500 col-span-3 text-center py-6">
                   No projects available.
                 </p>
               ) : (
-                existingProjects.map((project: ProjectData) => (
+                projectsData.map((project: ProjectData) => (
                   <Card
                     key={project.id}
                     className="w-[180px] h-[180px] shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
                     onClick={() => setSelectedProjectId(project.id ?? null)}
                   >
-                    {/* 3-dots menu */}
+                    {/* Menu */}
                     <div className="absolute top-3 right-3">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -273,6 +269,7 @@ const Projects = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate({ to: `/projects/edit/${project.id}` });
@@ -281,6 +278,7 @@ const Projects = () => {
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteTarget(project);
@@ -307,9 +305,8 @@ const Projects = () => {
               )}
             </div>
 
-            {/* Right side - Selected Project Details */}
-
-            <div className="w-1/3 flex justify-center items-start">
+            {/* Right side - Project Details */}
+            <div className="w-1/3 flex justify-center items-start ">
               {!selectedProjectId ? (
                 <p className="text-gray-500 mt-10">
                   Select a project to view details
@@ -331,7 +328,7 @@ const Projects = () => {
                         .toUpperCase() || ""}
                     </span>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-800 break-words">
+                  <h2 className="text-xl font-semibold text-gray-800">
                     {selectedProjectData?.data?.data?.title || "Unknown"}
                   </h2>
                   <button
@@ -344,7 +341,7 @@ const Projects = () => {
                     <h3 className="font-semibold text-lg text-gray-800 mb-2">
                       About Project
                     </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap max-h-60 overflow-y-auto">
+                    <p className="text-sm text-gray-600 leading-relaxed max-h-60 overflow-y-auto">
                       {selectedProjectData?.data?.data?.description ||
                         "No description available."}
                     </p>
@@ -352,30 +349,17 @@ const Projects = () => {
                 </div>
               )}
             </div>
-
-            {/* Pagination */}
-            <div
-              className="pb-4 px-4 cursor-pointer"
-              style={{ position: "fixed", bottom: 0, overflow: "hidden" }}
-            >
-              <Pagination
-                paginationDetails={paginationDetails}
-                pageSize={pageSize}
-                setPage={setPage}
-                setPageSize={setPageSize}
-              />
-            </div>
           </>
         ) : (
           <div className="w-full">
             <ProjectsTable
               debouncedSearch={debouncedSearch}
-              setSelectedSort={setSelectedSort}
               selectedSort={selectedSort}
-              page={page}
-              pageSize={pageSize}
-              setPage={setPage}
-              setPageSize={setPageSize}
+              setSelectedSort={setSelectedSort}
+              page={pagination.pageIndex}
+              pageSize={pagination.pageSize}
+              setPage={capturePageNum}
+              setPageSize={captureRowPerItems}
               onDelete={(project) => {
                 setDeleteTarget(project);
                 setShowDeleteDialog(true);
@@ -384,6 +368,26 @@ const Projects = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination (only for grid view) */}
+      {viewMode === "grid" && (
+        <div className="w-full flex justify-center mt-6">
+          <TasksPagination
+            paginationDetails={
+              data?.data?.data?.pagination_info || {
+                total_records: 0,
+                total_pages: 1,
+                current_page: pagination.pageIndex,
+                page_size: pagination.pageSize,
+                next_page: null,
+                prev_page: null,
+              }
+            }
+            capturePageNum={capturePageNum}
+            captureRowPerItems={captureRowPerItems}
+          />
+        </div>
+      )}
 
       {/* Delete Dialog */}
       {showDeleteDialog && deleteTarget && (

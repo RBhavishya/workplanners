@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -22,33 +22,35 @@ const DeleteProject = ({
   const [open, setOpen] = useState(true);
   const queryClient = useQueryClient();
 
- const deleteMutation = useMutation({
-  mutationFn: async (id: number) => {
-    return await deleteProjectAPI(id);
-  },
-  onSuccess: (res) => {
-    queryClient.invalidateQueries({ queryKey: ["projects"] });
-    toast.success(
-      res?.data?.message || "The project was deleted successfully."
-    );
-    setOpen(false);
-    onClose();
-  },
-  onError: (error: any) => {
-    let message = "Failed to delete project.";
-    if (error?.status === 409) {
-      message = error?.message || "Conflict: Project cannot be deleted.";
-    } else if (error?.response?.data?.message) {
-      message = error.response.data.message;
-    }
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await deleteProjectAPI(id);
+    },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["projectsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
 
-    toast.error(message);
+      toast.success(
+        res?.data?.message || "The project was deleted successfully."
+      );
+      setOpen(false);
+      onClose();
+    },
+    onError: (error: any) => {
+      let message = "Failed to delete project.";
+      if (error?.status === 409) {
+        message = error?.message || "Conflict: Project cannot be deleted.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
 
-    // ✅ Close dialog even on error
-    setOpen(false);
-    onClose();
-  },
-});
+      toast.error(message);
+
+      // Close dialog even on error
+      setOpen(false);
+      onClose();
+    },
+  });
 
   const handleDelete = async () => {
     try {
@@ -123,3 +125,4 @@ const DeleteProject = ({
 };
 
 export default DeleteProject;
+

@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import dayjs from "dayjs";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -46,7 +47,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   page,
   pageSize,
   setPage,
-  setPageSize,
   onDelete,
 }) => {
   const navigate = useNavigate();
@@ -69,18 +69,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         search_string: debouncedSearch,
       }),
   });
-
-  // API Response
   const projects = data?.data?.data?.records || [];
   const pagination = data?.data?.data?.pagination_info;
 
-  // Delete project
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteProjectAPI(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projectsTable"] });
-    },
-  });
 
   // Sort toggle helper
   const handleSort = (column: string) => {
