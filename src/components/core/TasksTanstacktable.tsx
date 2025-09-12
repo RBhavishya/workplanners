@@ -107,82 +107,79 @@ const TanStackTable: FC<pageProps> = ({
           className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
       ${location.pathname.includes("tasks") ? "h-[calc(100vh-420px)]" : "h-[calc(100vh-240px)]"}`}
         >
-          <Table className="w-full border-collapse">
-            {/* Sticky Header */}
-            <TableHeader className="sticky top-0 z-20 bg-white shadow-sm">
-              {table?.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header: any, index: number) => (
-                    <TableHead
-                      key={index}
-                      colSpan={header.colSpan}
-                      style={{
-                        minWidth: getWidth(header.id),
-                        width: getWidth(header.id),
-                        color: "#000",
-                        fontWeight: "500",
-                        backgroundColor: "white", // Important so background stays solid
-                      }}
-                    >
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className="flex items-center gap-1 cursor-pointer"
-                          onClick={() => sortAndGetData(header)}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          <SortItems
-                            header={header}
-                            removeSortingForColumnIds={
-                              removeSortingForColumnIds
-                            }
-                          />
-                        </div>
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-          </Table>
-          {/* Scrollable body wrapped separately */}
-          <div className="overflow-y-auto max-h-[calc(100vh-480px)]">
-            <Table className="w-full border-collapse">
-              <TableBody>
-                {data?.length ? (
-                  table?.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell className="p-0" key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : !loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="p-5 text-center">
-                      No Data Found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="p-5 text-center"
-                    >
-                      {/* Loading... */}
-                    </TableCell>
-                  </TableRow>
+         <Table className="w-full text-sm border-collapse">
+  {/* Sticky Header */}
+  <TableHeader className="sticky top-0 z-20 bg-gray-50 text-gray-600 text-xs font-semibold">
+    {table?.getHeaderGroups().map((headerGroup) => (
+      <TableRow key={headerGroup.id}>
+        {headerGroup.headers.map((header: any, index: number) => (
+          <TableHead
+            key={index}
+            colSpan={header.colSpan}
+            style={{
+              minWidth: getWidth(header.id),
+              width: getWidth(header.id),
+            }}
+            className="px-4 py-3 cursor-pointer"
+          >
+            {header.isPlaceholder ? null : (
+              <div
+                className="flex items-center gap-1 select-none"
+                onClick={() => sortAndGetData(header)}
+              >
+                {flexRender(
+                  header.column.columnDef.header,
+                  header.getContext()
                 )}
-              </TableBody>
-            </Table>
-          </div>
+                <SortItems
+                  header={header}
+                  removeSortingForColumnIds={removeSortingForColumnIds}
+                />
+              </div>
+            )}
+          </TableHead>
+        ))}
+      </TableRow>
+    ))}
+  </TableHeader>
+</Table>
+
+{/* Scrollable body wrapped separately */}
+<div className="overflow-y-auto max-h-[calc(100vh-480px)]">
+  <Table className="w-full text-sm border-collapse">
+    <TableBody className="divide-y divide-gray-200">
+      {data?.length ? (
+        table?.getRowModel().rows.map((row) => (
+          <TableRow key={row.id} className="hover:bg-gray-50">
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id} className="px-4 py-3">
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))
+      ) : !loading ? (
+        <TableRow>
+          <TableCell
+            colSpan={columns.length}
+            className="text-gray-500 text-center py-6"
+          >
+            No Data Found
+          </TableCell>
+        </TableRow>
+      ) : (
+        <TableRow>
+          <TableCell
+            colSpan={columns.length}
+            className="p-5 text-center"
+          >
+            {/* Loading... */}
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</div>
         </div>
       </div>
       <TasksPagination
