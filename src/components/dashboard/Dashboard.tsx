@@ -48,27 +48,6 @@ const Dashboard = () => {
   });
   return (
     <div className="p-4">
-      {/* Search + Clock */}
-      <div className="flex items-center mb-6 w-full">
-        <div className="flex items-center w-3/4 rounded-full border border-gray-300 bg-gray-50 px-4 py-3 shadow-sm">
-          <Search className="w-5 h-5 text-gray-500 mr-3" />
-          <input
-            type="text"
-            placeholder="Find your Task, Projects.."
-            className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-500"
-          />
-        </div>
-
-        <div className="h-10 w-px bg-gray-300 mx-6"></div>
-
-        <div className="flex flex-col justify-around w-1/4">
-          <span className="text-lg font-semibold">{formattedTime}</span>
-          <span className="text-sm text-gray-500">{formattedDate}</span>
-        </div>
-      </div>
-
-      <div className="w-full h-7 border-t border-gray-200"></div>
-
       {/* Cards + Month Pickers */}
       <div className="w-3/4">
         <div className="bg-white p-2 rounded-xl shadow gap-2">

@@ -176,54 +176,6 @@ const Tasks = () => {
 
   return (
     <div className="flex flex-col bg-gray-100 h-screen">
-      <hr />
-      <div className="p-4">
-        {/* 🔹 Top Stats Row */}
-        <div className="flex items-center mb-1 w-full bg-white p-4 rounded justify-end gap-8">
-          <div className="flex gap-4">
-            <SmallCard
-              cards={[
-                { title: "TODAY", value: 0 },
-                { title: "OVERDUE", value: 0 },
-                { title: "CLOSED", value: 0 },
-              ]}
-            />
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="text-lg font-semibold">{formattedTime}</span>
-            <span className="text-sm text-gray-500">{formattedDate}</span>
-          </div>
-        </div>
-
-        <hr />
-
-        {/* 🔹 Task Summary Cards */}
-        <div className="w-full p-2 bg-white rounded-sm">
-          <h1 className="flex text-bold text-xl">Tasks</h1>
-          <div className="flex gap-6">
-            <div className="flex justify-around rounded gap-7 px-4 py-1">
-              <div className="flex gap-4 mt-10">
-                <BigCard
-                  title="Total Tasks"
-                  value={29}
-                  icon={<ClipboardList />}
-                />
-                <BigCard
-                  title="In Progress Task"
-                  value={3}
-                  icon={<ClipboardPenLine />}
-                />
-                <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
-              </div>
-              <div
-                className="bg-gray rounded-xl shadow-md p-4 w-110 h-30 mt-7"
-                style={{ border: "1px solid  #ddb8ffff" }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
         <hr />
 
         <div className="flex justify-end items-center my-2 gap-3">
@@ -269,7 +221,6 @@ const Tasks = () => {
         {/* 🔹 Modal */}
         {/* <AddTaskForm open={open} onClose={() => setOpen(true)} /> */}
       </div>
-    </div>
   );
 };
 
