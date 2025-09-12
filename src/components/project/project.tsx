@@ -190,7 +190,7 @@ const Projects = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["All", "New", "In_Progress", "Review", "Overdue", "Done"].map(
+              {["New", "In_Progress", "Review", "Overdue", "Done"].map(
                 (option) => (
                   <DropdownMenuItem
                     key={option}
