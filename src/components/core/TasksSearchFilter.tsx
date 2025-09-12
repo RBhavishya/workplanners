@@ -1,8 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { IReportsFilters } from "@/interfaces";
-
-
-import { Search } from "lucide-react";
+import { SearchIcon } from "../icons/SearchIcon";
 
 const TaskSearchFilter: React.FC<IReportsFilters> = ({
   searchString,
@@ -10,15 +8,17 @@ const TaskSearchFilter: React.FC<IReportsFilters> = ({
   title,
 }) => {
   return (
-    <div className="relative h-[35px]">
-      <Search className="absolute left-2 top-1/2 -translate-y-1/2  bg-black text-slate-700 text-white rounded-full w-[20px] h-[20px] p-1" />
+    <div className="relative w-64 h-10 border border-[#D1D1D1] bg-[#F6F6F6] rounded-sm shadow-none flex items-center px-2">
       <Input
-        placeholder={title}
-        value={searchString}
         type="search"
+        value={searchString}
         onChange={(e) => setSearchString(e.target.value)}
-        className="pl-8bg-slate-100 pl-9 bg-[#F4F4F6] border-[#E2E2E2] rounded-[8px] h-[35px] w-[220px] placeholder:text-[#00000099]"
+        placeholder={title}
+        className="pl-3 pr-8 h-full w-full border-none rounded text-black font-normal text-sm 3xl:!text-base shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-sm"
       />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2">
+        <SearchIcon className="w-5 h-5 text-gray-500" />
+      </span>
     </div>
   );
 };

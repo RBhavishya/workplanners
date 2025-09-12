@@ -249,7 +249,6 @@ const TanStackTable: FC<pageProps> = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="p-5 text-center">
-                  Loading...
                 </TableCell>
               </TableRow>
             )}
