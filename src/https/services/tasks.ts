@@ -55,3 +55,11 @@ export const getDropDownForProjectsTasksAPI = async () => {
     throw err;
   }
 };
+
+export const getSingleDropDownForAssignedUsersAPI = async ( project_id:any) => {
+  try {
+    return await $fetch.get(`/projects/${project_id}/users/assigned`);
+  } catch (err: any) {
+    throw err;
+  }
+};
