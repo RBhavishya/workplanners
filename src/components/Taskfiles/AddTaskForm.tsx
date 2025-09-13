@@ -6,6 +6,7 @@ import {
   MoveLeft,
   X,
   Check,
+  Loader2,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -23,7 +24,7 @@ import { toast } from "sonner";
 import {
   createTaskAPI,
   getDropDownForProjectsTasksAPI,
-  // <-- make sure you have this
+  getSingleDropDownForAssignedUsersAPI,
 } from "@/https/services/tasks";
 import { useNavigate } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
@@ -51,7 +52,7 @@ const AddTaskForm = () => {
   const [userPopoverOpen, setUserPopoverOpen] = useState(false);
 
   // States for Projects & Users
-  const [taskProjects, setTaskProjects] = useState<number[]>([]);
+  const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [searchProjects, setSearchProjects] = useState("");
   const [searchUsers, setSearchUsers] = useState("");
@@ -66,64 +67,76 @@ const AddTaskForm = () => {
   }, [projectPopoverOpen, userPopoverOpen]);
 
   // Fetch Projects
-  const { data: projects, isLoading: loadingProjects } = useQuery({
+  const { data: projects = [], isLoading: loadingProjects } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const response = await getDropDownForProjectsTasksAPI();
-      return response.data?.data;
+      return response.data?.data ?? [];
     },
   });
 
-  // Fetch Users
-  const { data: usersResp, isLoading: loadingUsers } = useQuery({
-    queryKey: ["users"],
+  // Fetch Users for selected project
+  const { data: usersResp = [], isLoading: loadingUsers } = useQuery({
+    queryKey: ["assignedUsers", selectedProject],
     queryFn: async () => {
-      const response = await getDropDownForProjectsTasksAPI();
-      return response.data?.data;
+      if (!selectedProject) return [];
+      const response = await getSingleDropDownForAssignedUsersAPI(
+        selectedProject
+      );
+      return response.data?.data ?? [];
     },
+    enabled: !!selectedProject,
   });
 
   // --- API integration ---
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (payload: any) => {
-      setFormError("");
-      return await createTaskAPI(payload);
-    },
-    onSuccess: (response: any) => {
-      if (response?.status === 200 || response?.status === 201) {
-        toast.success(response?.data?.message || "Task created successfully");
-        setSuccessMessage("Task created successfully!");
-        setTimeout(() => navigate({ to: "/tasks" }), 1000);
-      } else if (response?.status === 422 || response?.status === 409) {
-        setFormError(response?.data?.message || "Validation failed.");
-      }
-    },
-    onError: () => {
-      toast.error("An error occurred. Please try again.");
-    },
-  });
+const { mutate, isPending } = useMutation({
+  mutationFn: async (payload: any) => {
+    setFormError("");
+    setErrors({});
+    return await createTaskAPI(payload);
+  },
+  onSuccess: (response: any) => {
+    if (response?.status === 200 || response?.status === 201) {
+      toast.success(response?.data?.message || "Task created successfully");
+      setSuccessMessage("Task created successfully!");
+      setTimeout(() => navigate({ to: "/tasks" }), 1000);
+    } else if (response?.status === 422 || response?.status === 409) {
+      setFormError(response?.data?.message || "Validation failed.");
+      setErrors(response?.data?.errors || {});
+    }
+  },
+  onError: (error: any) => {
+    setErrors({});
+    setFormError(null);
 
-  // --- Handlers ---
+    if (error?.status === 422 && error?.data?.errData) {
+      setErrors(error.data.errData);
+    } else {
+      const message = error?.data?.message || "Failed to save project";
+      toast.error(message);
+      setFormError(message);
+    }
+  },
+});
+
+  
   const handleNavigation = () => navigate({ to: "/tasks" });
 
   const handleSave = () => {
-    if (!title.trim() || !description.trim() || !startDate || !dueDate) {
-      setFormError("Please fill in all required fields.");
-      return;
-    }
-
-    const payload = {
-      task_title: title,
-      description,
-      start_date: dayjs(startDate).format("YYYY-MM-DD"),
-      due_date: dayjs(dueDate).format("YYYY-MM-DD"),
-      projects: taskProjects,
-      assigned_users: assignedUsers,
-    };
-
-    mutate(payload);
+  setFormError(null);
+  setErrors({});
+  setSuccessMessage("");
+  const payload = {
+    task_title: title,
+    description,
+    start_date: dayjs(startDate).format("YYYY-MM-DD"),
+    end_date: dayjs(dueDate).format("YYYY-MM-DD"),
+    project_id: selectedProject,
+    assigned_users: assignedUsers,
   };
 
+  mutate(payload);
+};
   const toggleSelection = (
     id: number,
     list: number[],
@@ -141,8 +154,9 @@ const AddTaskForm = () => {
     setList((prev) => prev.filter((i) => i !== id));
   };
 
-  const removeAll = (setList: React.Dispatch<React.SetStateAction<number[]>>) =>
-    setList([]);
+  const removeAll = (
+    setList: React.Dispatch<React.SetStateAction<number[]>>
+  ) => setList([]);
 
   return (
     <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
@@ -184,6 +198,9 @@ const AddTaskForm = () => {
           onChange={(e) => setTitle(e.target.value)}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
+        {errors.task_title && (
+          <p className="text-red-500 text-xs mt-1">{errors.task_title.join(", ")}</p>
+        )}
       </div>
 
       {/* Description */}
@@ -197,6 +214,11 @@ const AddTaskForm = () => {
           onChange={(e) => setDescription(e.target.value)}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
+        {errors.description && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.description.join(", ")}
+          </p>
+        )}
       </div>
 
       {/* Dates */}
@@ -233,6 +255,11 @@ const AddTaskForm = () => {
               />
             </PopoverContent>
           </Popover>
+          {errors.start_date && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.start_date.join(", ")}
+            </p>
+          )}
         </div>
 
         {/* Due Date */}
@@ -267,48 +294,45 @@ const AddTaskForm = () => {
               />
             </PopoverContent>
           </Popover>
+          {errors.end_date && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.due_date.join(", ")}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Select Projects */}
+      {/* Select Project */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Select Projects</label>
+        <label className="text-sm font-medium">
+          Select Project <span className="text-red-500">*</span>
+        </label>
         <Popover open={projectPopoverOpen} onOpenChange={setProjectPopoverOpen}>
           <PopoverTrigger asChild>
             <div
               ref={triggerRef}
               className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
             >
-              <div className="flex flex-wrap gap-1">
-                {taskProjects.length === 0 ? (
-                  <span className="text-gray-400">Select Projects...</span>
-                ) : (
-                  taskProjects.map((id) => {
-                    const project = Array.isArray(projects)
-                      ? projects.find((p: any) => p.id === id)
-                      : null;
-                    return (
-                      <div
-                        key={id}
-                        className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1"
-                      >
-                        <span>{project?.title ?? `Project ${id}`}</span>
-                        <button onClick={() => removeOne(id, setTaskProjects)}>
-                          <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
-                        </button>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-              <div className="flex items-center gap-1">
-                {taskProjects.length > 0 && (
-                  <button onClick={() => removeAll(setTaskProjects)}>
-                    <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
-                  </button>
-                )}
-                <ChevronDown />
-              </div>
+              {selectedProject ? (
+                (() => {
+                  const project = projects.find(
+                    (p: any) => p.id === selectedProject
+                  );
+                  return (
+                    <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
+                      <span>
+                        {project?.title ?? `Project ${selectedProject}`}
+                      </span>
+                      <button onClick={() => setSelectedProject(null)}>
+                        <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                      </button>
+                    </div>
+                  );
+                })()
+              ) : (
+                <span className="text-gray-400">Select project...</span>
+              )}
+              <ChevronDown />
             </div>
           </PopoverTrigger>
           <PopoverContent
@@ -324,22 +348,20 @@ const AddTaskForm = () => {
               <CommandList className="max-h-60 overflow-y-auto">
                 {loadingProjects ? (
                   <div className="p-2 text-gray-500">Loading...</div>
-                ) : !Array.isArray(projects) || projects.length === 0 ? (
+                ) : projects.length === 0 ? (
                   <CommandEmpty>No projects found.</CommandEmpty>
                 ) : (
                   <CommandGroup>
                     {projects.map((p: any) => (
                       <CommandItem
                         key={p.id}
-                        onSelect={() =>
-                          toggleSelection(p.id, taskProjects, setTaskProjects)
-                        }
+                        onSelect={() => setSelectedProject(p.id)}
                       >
                         <span>{p.title}</span>
                         <Check
                           className={cn(
                             "h-4 w-4 ml-auto",
-                            taskProjects.includes(p.id)
+                            selectedProject === p.id
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -352,24 +374,27 @@ const AddTaskForm = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {errors.project_id && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.project_id.join(", ")}
+          </p>
+        )}
       </div>
 
       {/* Assign Users */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Assign Users</label>
+        <label className="text-sm font-medium">
+          Assign Users
+        </label>
         <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
           <PopoverTrigger asChild>
-            <div
-              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
-            >
+            <div className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer">
               <div className="flex flex-wrap gap-1">
                 {assignedUsers.length === 0 ? (
                   <span className="text-gray-400">Select users...</span>
                 ) : (
                   assignedUsers.map((id) => {
-                    const user = Array.isArray(usersResp)
-                      ? usersResp.find((u: any) => u.id === id)
-                      : null;
+                    const user = usersResp.find((u: any) => u.id === id);
                     return (
                       <div
                         key={id}
@@ -407,7 +432,7 @@ const AddTaskForm = () => {
               <CommandList className="max-h-60 overflow-y-auto">
                 {loadingUsers ? (
                   <div className="p-2 text-gray-500">Loading...</div>
-                ) : !Array.isArray(usersResp) || usersResp.length === 0 ? (
+                ) : usersResp.length === 0 ? (
                   <CommandEmpty>No users found.</CommandEmpty>
                 ) : (
                   <CommandGroup>
@@ -435,6 +460,11 @@ const AddTaskForm = () => {
             </Command>
           </PopoverContent>
         </Popover>
+        {errors.assigned_users && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.assigned_users.join(", ")}
+          </p>
+        )}
       </div>
 
       {/* Buttons */}
@@ -446,12 +476,19 @@ const AddTaskForm = () => {
           Cancel
         </button>
         <button
-          onClick={handleSave}
-          disabled={isPending}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 disabled:opacity-50"
-        >
-          {isPending ? "Saving..." : "Save"}
-        </button>
+  onClick={handleSave}
+  disabled={isPending}
+  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 disabled:opacity-50"
+>
+  {isPending ? (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" />
+      Saving...
+    </>
+  ) : (
+    "Save"
+  )}
+</button>
       </div>
     </div>
   );
