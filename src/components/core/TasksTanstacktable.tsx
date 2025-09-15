@@ -100,16 +100,11 @@ const TanStackTable: FC<pageProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <div className="overflow-x-auto w-full">
-        {/* Scroll container */}
-        <div
-          className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
-      ${location.pathname.includes("tasks") ? "h-[calc(100vh-380px)]" : "h-[calc(100vh-240px)]"}`}
-        >
-         <Table className="w-full text-sm border-collapse">
+    <div className="overflow-auto w-full h-[calc(100vh-100px)]">
+      <div>
+         <Table className="w-full text-sm">
   {/* Sticky Header */}
-  <TableHeader className="sticky top-0 z-20 bg-gray-50 text-gray-600 text-xs font-semibold">
+  <TableHeader className="sticky top-0">
     {table?.getHeaderGroups().map((headerGroup) => (
       <TableRow key={headerGroup.id}>
         {headerGroup.headers.map((header: any, index: number) => (
@@ -120,7 +115,7 @@ const TanStackTable: FC<pageProps> = ({
               minWidth: getWidth(header.id),
               width: getWidth(header.id),
             }}
-            className="px-4 py-2 cursor-pointer"
+            className="h-10 p-2 text-sm font-meduim tracking-wide"
           >
             {header.isPlaceholder ? null : (
               <div
@@ -142,17 +137,14 @@ const TanStackTable: FC<pageProps> = ({
       </TableRow>
     ))}
   </TableHeader>
-</Table>
-
-{/* Scrollable body wrapped separately */}
-<div className="overflow-y-auto h-[calc(100vh-420px)]">
-  <Table className="w-full text-sm border-collapse">
-    <TableBody className="divide-y divide-gray-200">
+  <TableBody>
       {data?.length ? (
         table?.getRowModel().rows.map((row) => (
-          <TableRow key={row.id} className="hover:bg-gray-50">
+          <TableRow key={row.id} className="hover:bg-gray-50 border-none">
             {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id} className="px-4 py-1">
+              <TableCell key={cell.id} className={`rounded-none shadow-none h-10 ${
+                row.index % 2 === 0 ? "bg-slate-50" : "bg-white"
+              }`}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
             ))}
@@ -162,7 +154,7 @@ const TanStackTable: FC<pageProps> = ({
         <TableRow>
           <TableCell
             colSpan={columns.length}
-            className="text-gray-500 text-center py-6"
+            className="text-gray-500  py-6"
           >
             No Data Found
           </TableCell>
@@ -178,11 +170,9 @@ const TanStackTable: FC<pageProps> = ({
         </TableRow>
       )}
     </TableBody>
-  </Table>
-</div>
-        </div>
+</Table>
       </div>
-     <div>
+      <div>
        <TasksPagination
         paginationDetails={paginationDetails}
         capturePageNum={capturePageNum}

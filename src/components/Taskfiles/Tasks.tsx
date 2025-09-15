@@ -1,26 +1,20 @@
-import * as React from "react";
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import {
-  ClipboardList,
-  ClipboardPenLine,
-  FileClock,
-  Eye,
-  Edit,
-  Trash,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  Edit,
+  Eye,
+  Trash2
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
-import BigCard from "../core/Cards";
-import AddTaskForm from "./AddTaskForm";
-import SmallCard from "../core/StatusCard";
-import { useQuery } from "@tanstack/react-query";
 import { getAllPaginatedTasks } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
-import TanStackTable from "../core/TasksTanstacktable";
-import { taskColumns } from "./TaskColumns";
+import { useQuery } from "@tanstack/react-query";
+import BigCard from "../core/Cards";
 import TaskSearchFilter from "../core/TasksSearchFilter";
-import { tr } from "date-fns/locale";
+import TanStackTable from "../core/TasksTanstacktable";
+import { TaskIcon } from "../icons/TaskIcon";
+import { taskColumns } from "./TaskColumns";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -122,17 +116,17 @@ const Tasks = () => {
         const rowData = info.row.original;
 
         return (
-          <div className="flex gap-2">
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
-              <Eye size={16} />
+          <div className="flex gap-1">
+            <button className="border-none p-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Eye size={16} strokeWidth={1.5}/>
             </button>
 
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
-              <Edit size={16} />
+            <button className="border-none p-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Edit size={16} strokeWidth={1.5}/>
             </button>
 
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
-              <Trash size={16} />
+            <button className="border-none p-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+              <Trash2 size={16} strokeWidth={1.5}/>
             </button>
           </div>
         );
@@ -175,24 +169,24 @@ const Tasks = () => {
   });
 
   return (
-    <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
+    <div className="flex flex-col bg-purple-50 h-full overflow-hidden gap-3 shadow-none">
     <div className="w-full p-2 bg-white rounded-md">
         <h1 className="flex text-bold text-2xl">Tasks</h1>
         <div className="flex gap-6 ">
-          <div className="flex justify-around rounded gap-1 ml-10 mt-5">
-            <div className="flex flex-wrap gap-3">
+          <div className="flex justify-around rounded gap-1 mt-5 ml-5">
+            <div className="flex flex-wrap gap-5">
               <BigCard
                 title="Total Tasks"
                 value={29}
-                icon={<ClipboardList />}
+                icon={<TaskIcon />}
               />
 
               <BigCard
                 title="In Progress Task"
                 value={3}
-                icon={<ClipboardPenLine />}
+                icon={<TaskIcon />}
               />
-              <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
+              <BigCard title="Pending Tasks" value={1} icon={<TaskIcon />} />
             </div>
           </div>
           <div
@@ -202,7 +196,9 @@ const Tasks = () => {
         </div>
       </div>
       <div className="bg-white rounded-md ">
-        <div className="flex justify-end items-center my-2 gap-3">
+        <div className="flex justify-between items-center my-2 gap-3 px-3">
+          <p className="font-medium text-lg 3xl:!text-xl">Today's Agenda</p>
+          <div className="flex items-center gap-3">
           <TaskSearchFilter
             searchString={searchString}
             setSearchString={setSearchString}
@@ -210,11 +206,12 @@ const Tasks = () => {
           />
 
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3"
+            className="bg-violet-600 hover:bg-violet-700 text-white h-7 rounded font-light px-3"
             onClick={handleNavigation}
           >
             + New Task
           </Button>
+          </div>
         </div>
         <div className="bg-white relative">
           {(isLoading || isFetching) && (

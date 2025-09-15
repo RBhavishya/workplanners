@@ -1,11 +1,10 @@
-import * as React from "react";
-
 interface StatusCardProps {
   title: string;
-  value?: number; // optional → defaults to 0
+  value?: number;
   bg: string;
   circleBg: string;
   circleText: string;
+  border: string;
 }
 
 const StatusCard = ({
@@ -14,14 +13,15 @@ const StatusCard = ({
   bg,
   circleBg,
   circleText,
+  border,
 }: StatusCardProps) => {
   return (
     <div
-      className={`flex items-center justify-between w-[150px] h-[60px] rounded-xl px-4 ${bg}`}
+      className={`flex items-center justify-between rounded-md p-1.5 px-3 gap-2 border ${border} ${bg}`}
     >
-      <span className="text-sm font-semibold text-gray-700">{title}</span>
+      <span className="text-xs 3xl:!text-sm font-medium text-gray-700">{title}</span>
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${circleBg} ${circleText}`}
+        className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] 3xl:!text-sm font-light ${circleBg} ${circleText}`}
       >
         {value.toString().padStart(2, "0")}
       </div>
@@ -32,48 +32,56 @@ const StatusCard = ({
 // Config for all card types
 const statusConfig: Record<
   string,
-  { bg: string; circleBg: string; circleText: string }
+  { bg: string; circleBg: string; circleText: string; border: string; }
 > = {
   "Total Tasks": {
     bg: "bg-purple-200",
+    border: "",
     circleBg: "bg-purple-600",
     circleText: "text-white",
   },
   "Completed Tasks": {
     bg: "bg-green-200",
+    border: "",
     circleBg: "bg-green-600",
     circleText: "text-white",
   },
   "In Progress Task": {
     bg: "bg-blue-200",
+    border: "",
     circleBg: "bg-blue-600",
     circleText: "text-white",
   },
   "Pending Tasks": {
     bg: "bg-yellow-200",
+    border: "",
     circleBg: "bg-yellow-600",
     circleText: "text-white",
   },
   "Review Tasks": {
     bg: "bg-orange-200",
+    border: "",
     circleBg: "bg-orange-600",
     circleText: "text-white",
   },
 
   TODAY: {
-    bg: "bg-pink-200",
-    circleBg: "bg-pink-600",
-    circleText: "text-white",
+    bg: "bg-amber-200",
+    border: "border-amber-300",
+    circleBg: "bg-yellow-600",
+    circleText: "text-amber-200",
   },
   OVERDUE: {
-    bg: "bg-red-200",
-    circleBg: "bg-red-600",
-    circleText: "text-white",
+    bg: "bg-sky-200",
+    border: "border-sky-500",
+    circleBg: "bg-sky-600",
+    circleText: "text-sky-200",
   },
   CLOSED: {
-    bg: "bg-gray-300",
-    circleBg: "bg-gray-700",
-    circleText: "text-white",
+    bg: "bg-[rgba(255,116,134,0.60)]",
+    border: "border-rose-400",
+    circleBg: "bg-red-800",
+    circleText: "text-red-300",
   },
 };
 
@@ -87,6 +95,7 @@ const SmallCard = ({ cards }: SmallCardProps) => {
       {cards.map((card, index) => {
         const config = statusConfig[card.title] || {
           bg: "bg-gray-200",
+          border: "border-gray-300",
           circleBg: "bg-gray-500",
           circleText: "text-white",
         };

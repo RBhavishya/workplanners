@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Bell } from 'lucide-react';
-import UserDetails from '../login/UserDetails';
 import { useLocation } from '@tanstack/react-router';
+import { Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { NotificationIcon } from '../icons/NotificationIcon';
-
-
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
@@ -59,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     >
       {centerContent}
       <div className="flex items-center space-x-6">
-        <div className="border-r-2 border-gray-200 pr-4 border-l-2 pl-4 text-center">
+        <div className="border-r-2 border-gray-200 w-30 border-l-2 text-center">
           <p className="text-base 3xl:!text-lg font-medium text-gray-800">{formattedTime}</p>
           <p className="text-xs 3xl:!text-sm text-gray-500">{formattedDate}</p>
         </div>

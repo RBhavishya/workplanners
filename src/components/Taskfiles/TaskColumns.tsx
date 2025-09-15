@@ -20,7 +20,7 @@ export const taskColumns = [
   maxWidth: "10px",
   minWidth: "10px",
   cell: (props: any) => (
-    <div style={{ textAlign: "center" }}>{props.getValue()}</div>
+    <div>{props.getValue()}</div>
   ),
 },
   {
@@ -29,8 +29,8 @@ export const taskColumns = [
   cell: (info: any) => {
     const title = info.getValue();
     return (
-      <div className="flex items-center justify-center">
-        <span className="capitalize text-center">{title || "-"}</span>
+      <div className="flex items-center=">
+        <span className="capitalize">{title || "-"}</span>
       </div>
     );
   },

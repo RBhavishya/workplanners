@@ -3,6 +3,7 @@ import { Outlet, useMatch } from '@tanstack/react-router';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import CustomCenter from './CustomCenter';
+import { EmployeeIcon } from '../icons/EmployeeIcon';
 
 const MainLayout = () => {
   const tasksMatch = useMatch({ from: '/_layout/tasks/', shouldThrow: false });
@@ -11,12 +12,14 @@ const MainLayout = () => {
 
   const getRenderCenter = () => {
     if (tasksMatch) {
-      return () => <CustomCenter cards={[
-        { title: "Total Tasks", value: 29 },
-        { title: "Completed Tasks", value: 24 },
-        { title: "In Progress Task", value: 3 },
-        { title: "Pending Tasks", value: 1 }
-      ]} />;
+      return () => 
+      <CustomCenter cards={[
+        { title: "TODAY", value: 29 },
+        { title: "OVERDUE", value: 24 },
+        { title: "CLOSED", value: 3 },
+      ]}
+      />
+    ;
     }
     if (projectsMatch) {
       return () => null; // Placeholder for projects view
