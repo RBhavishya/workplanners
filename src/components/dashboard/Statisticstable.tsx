@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
-
+import { ChevronLeft, ChevronRight, SquarePen, Trash2 } from "lucide-react";
 
 type TaskStats = {
   id: number;
@@ -36,7 +36,7 @@ const columns: ColumnDef<TaskStats>[] = [
     id: "name",
     cell: (info: any) => {
       let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
+      return <span className="capitalize">{title ? title : "-"}</span>;
     },
     size: 200,    
     minSize: 200,
@@ -100,9 +100,10 @@ const columns: ColumnDef<TaskStats>[] = [
     id: "actions",
     header: "Actions",
     cell: () => (
-      <button className="px-4 py-1 text-sm rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200">
-        View
-      </button>
+      <div className="flex items-center gap-3">
+        <SquarePen className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5}/>
+        <Trash2 className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5}/>
+      </div>
     ),
   },
 ];
@@ -138,7 +139,7 @@ const Statisticstable = () => {
           <button
             key={i}
             onClick={() => setPage(i)}
-            className={`px-3 py-1 border rounded ${
+            className={`w-6 h-6 border rounded-full text-xs 3xl:!text-sm ${
               i === page ? "bg-purple-500 text-white" : "bg-gray-100"
             }`}
           >
@@ -166,8 +167,8 @@ const Statisticstable = () => {
     statsData.length === 0 ? 0 : startIndex + statsData.length - 1;
 
   return (
-    <div className="bg-white p-6 mt-6 rounded-2xl shadow-md">
-      <h2 className="text-lg font-semibold mb-4">STATISTICS</h2>
+    <div className="bg-white px-4 pt-6 mt-3 rounded-md shadow-none">
+      <h2 className="text-lg font-semibold mb-4 leading-1 tracking-wide">Statistics</h2>
 
      {isLoading ? (
   <table className="w-full text-left border-separate border-spacing-y-2">
@@ -186,12 +187,13 @@ const Statisticstable = () => {
 ) : (
   <>
     {/* ✅ Existing Table Render */}
-    <table className="w-full text-left border-separate border-spacing-y-2">
+    <div className="h-[calc(100vh-340px)] overflow-y-auto">
+    <table className="w-full text-left">
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="text-gray-600">
+          <tr key={headerGroup.id} className="text-neutral-400 text-sm 3xl:!text-base sticky top-0 bg-white">
             {headerGroup.headers.map((header) => (
-              <th key={header.id} className="px-4 py-2 cursor-pointer">
+              <th key={header.id} className="p-2 cursor-pointer font-medium tracking-wide">
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext()
@@ -212,12 +214,14 @@ const Statisticstable = () => {
           table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="bg-gray-50 hover:bg-gray-100 rounded-lg"
+              className={`rounded-md shadow-none ${
+                row.index % 2 === 0 ? "bg-slate-50" : "bg-white"
+              }`}
             >
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className="px-4 py-3 border-b border-gray-200"
+                  className="h-7 p-2 text-sm 3xl:!text-base"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
@@ -227,9 +231,9 @@ const Statisticstable = () => {
         )}
       </tbody>
     </table>
+    </div>
 
-    {/* Pagination */}
-    <div className="flex justify-between items-center mt-4">
+    <div className="flex justify-between items-center p-1">
       <div className="text-sm text-gray-600">
         {`${startIndex} - ${endIndex} of ${totalRecords}`}
       </div>
@@ -237,17 +241,17 @@ const Statisticstable = () => {
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={page === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className="border-none disabled:opacity-50"
         >
-          Prev
+          <ChevronLeft className="w-5 h-5"/>
         </button>
         {renderPaginationButtons()}
         <button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className="border-none disabled:opacity-50"
         >
-          Next
+          <ChevronRight className="w-5 h-5"/>
         </button>
       </div>
       <select
@@ -256,7 +260,7 @@ const Statisticstable = () => {
           setPageSize(Number(e.target.value));
           setPage(1);
         }}
-        className="border px-2 py-1 rounded"
+        className="border p-2 py-0 rounded text-sm 3xl:!text-base"
       >
         {[10, 25, 50].map((size) => (
           <option key={size} value={size}>

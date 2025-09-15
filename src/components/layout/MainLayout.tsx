@@ -27,7 +27,7 @@ const MainLayout = () => {
   return (
     <div className="flex h-screen bg-purple-50">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64"> {/* Adjusted ml-64 to match sidebar width */}
+      <div className="flex-1 flex flex-col ml-64">
         <Header renderCenter={getRenderCenter()} />
         <main className="flex-1 overflow-y-auto p-3">
           <Outlet />

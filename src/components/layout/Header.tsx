@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Search, Bell } from 'lucide-react';
 import UserDetails from '../login/UserDetails';
 import { useLocation } from '@tanstack/react-router';
+import { NotificationIcon } from '../icons/NotificationIcon';
 
 
 
@@ -35,12 +36,12 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
   const defaultCenter =
   location.pathname === "/dashboard" ? (
     <div className="flex-1 max-w-md mx-2">
-      <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
-        <Search className="w-5 h-5 text-purple-500 mr-2" />
+      <div className="flex items-center border border-black/40 rounded-full p-1.5">
+        <Search className="w-5 h-5 mx-2" />
         <input
           type="text"
           placeholder="Find your Task, Projects.."
-          className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
+          className="bg-transparent outline-none w-full text-gray-700 placeholder:text-gray-400 placeholder:text-sm text-sm 3xl:!text-base"
         />
       </div>
     </div>
@@ -52,22 +53,22 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     <header
       className="
         flex items-center justify-between
-        px-4 bg-white border-b border-purple-100 shadow-sm
-        h-20 3xl:!h-26                      
+        px-4 bg-white border-b border-gray-300 shadow-none
+        h-18 3xl:!h-26                      
       "
     >
       {centerContent}
       <div className="flex items-center space-x-6">
-        <div className="text-right border-r-2 border-gray-200 pr-4 border-l-2 pl-4">
-          <p className="text-lg font-semibold text-gray-800">{formattedTime}</p>
-          <p className="text-sm text-gray-500">{formattedDate}</p>
+        <div className="border-r-2 border-gray-200 pr-4 border-l-2 pl-4 text-center">
+          <p className="text-base 3xl:!text-lg font-medium text-gray-800">{formattedTime}</p>
+          <p className="text-xs 3xl:!text-sm text-gray-500">{formattedDate}</p>
         </div>
-        {/* <div className="relative">
-          <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
-          <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">
+        <div className="relative bg-blue-100 h-10 w-10 flex items-center justify-center rounded-full">
+          <NotificationIcon />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             33
           </span>
-        </div> */}
+        </div>
       </div>
     </header>
   );
