@@ -12,21 +12,24 @@ import {
 import { Button } from "@/components/ui/button";
 
 import BigCard from "../core/Cards";
-import AddTaskForm from "./AddTaskForm";
-import SmallCard from "../core/StatusCard";
-import { useQuery } from "@tanstack/react-query";
-import { getAllPaginatedTasks, gettasksByIdAPI } from "@/https/services/tasks";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteTasksAPI,
+  getAllPaginatedTasks,
+  gettasksByIdAPI,
+} from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
-import { tr } from "date-fns/locale";
 import { toast } from "sonner";
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
 
 const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
@@ -45,17 +48,15 @@ const Tasks = () => {
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedProject, setSelectedProject] = useState<any>(intialProject);
   const [selectedpriority, setSelectedpriority] = useState(initialPrioritys);
-  const [dateValue, setDateValue] = useState<any>(null);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [del, setDel] = useState<any>(1);
   const [time, setTime] = useState(new Date());
-  const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-   const [taskData, setTaskData] = useState<any>(null);
-  const [loadingEdit, setLoadingEdit] = useState(false);
 
   const { isLoading, isError, data, error, isFetching } = useQuery({
     queryKey: [
@@ -102,6 +103,25 @@ const Tasks = () => {
     },
   });
 
+  const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
+  mutationFn: (id: number) => deleteTasksAPI(id),
+  onSuccess: (res: any) => {
+    toast.success(res?.data?.message || "Task deleted successfully");
+    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
+    setDeleteDialogOpen(false);
+  },
+  onError: (err: any) => {
+    toast.error(err?.response?.data?.message || "Failed to delete task");
+  },
+});
+
+  const handleDeleteClick = () => {
+    if (taskToDelete) {
+      deleteTask(taskToDelete);
+    }
+  };
+
   const handleNavigation = () => navigate({ to: `/tasks/add` });
 
   const taksDataAfterSerial =
@@ -130,13 +150,20 @@ const Tasks = () => {
               <Eye size={16} />
             </button>
 
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
               <Edit size={16} />
             </button>
 
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              onClick={() => {
+                setTaskToDelete(rowData.id);
+                setDeleteDialogOpen(true);
+              }}
+            >
               <Trash size={16} />
             </button>
           </div>
@@ -181,7 +208,7 @@ const Tasks = () => {
 
   return (
     <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
-    <div className="w-full p-2 bg-white rounded-md">
+      <div className="w-full p-2 bg-white rounded-md">
         <h1 className="flex text-bold text-2xl">Tasks</h1>
         <div className="flex gap-6 ">
           <div className="flex justify-around rounded gap-1 ml-10 mt-5">
@@ -246,8 +273,15 @@ const Tasks = () => {
             ]}
           />
         </div>
+        <DeleteTaskDialog
+          openOrNot={deleteDialogOpen}
+          onCancelClick={() => setDeleteDialogOpen(false)}
+          label="Are you sure you want to delete this task?"
+          onOKClick={handleDeleteClick}
+          deleteLoading={deleteLoading}
+        />
       </div>
-      </div>
+    </div>
   );
 };
 

@@ -80,3 +80,13 @@ export const gettasksByIdAPI = async (id: number) => {
     throw error;
   }
 };
+
+export const deleteTasksAPI = async (id: number) => {
+  try {
+    const payload = { task_ids: [id] };
+    const response = await $fetch.delete(`/task-assignees/${id}`,  payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
