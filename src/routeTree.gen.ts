@@ -18,6 +18,7 @@ import { Route as LayoutTasksAddIndexRouteImport } from './routes/_layout/tasks/
 import { Route as LayoutProjectsTableIndexRouteImport } from './routes/_layout/projects/table/index'
 import { Route as LayoutProjectsAddIndexRouteImport } from './routes/_layout/projects/add/index'
 import { Route as LayoutProjectsIdIndexRouteImport } from './routes/_layout/projects/$id/index'
+import { Route as LayoutTasksEditIdIndexRouteImport } from './routes/_layout/tasks/edit/$id/index'
 import { Route as LayoutProjectsEditIdIndexRouteImport } from './routes/_layout/projects/edit/$id/index'
 
 const LayoutRoute = LayoutRouteImport.update({
@@ -65,6 +66,11 @@ const LayoutProjectsIdIndexRoute = LayoutProjectsIdIndexRouteImport.update({
   path: '/projects/$id/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutTasksEditIdIndexRoute = LayoutTasksEditIdIndexRouteImport.update({
+  id: '/tasks/edit/$id/',
+  path: '/tasks/edit/$id/',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutProjectsEditIdIndexRoute =
   LayoutProjectsEditIdIndexRouteImport.update({
     id: '/projects/edit/$id/',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/projects/table': typeof LayoutProjectsTableIndexRoute
   '/tasks/add': typeof LayoutTasksAddIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
+  '/tasks/edit/$id': typeof LayoutTasksEditIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/projects/table': typeof LayoutProjectsTableIndexRoute
   '/tasks/add': typeof LayoutTasksAddIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
+  '/tasks/edit/$id': typeof LayoutTasksEditIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_layout/projects/table/': typeof LayoutProjectsTableIndexRoute
   '/_layout/tasks/add/': typeof LayoutTasksAddIndexRoute
   '/_layout/projects/edit/$id/': typeof LayoutProjectsEditIdIndexRoute
+  '/_layout/tasks/edit/$id/': typeof LayoutTasksEditIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/projects/table'
     | '/tasks/add'
     | '/projects/edit/$id'
+    | '/tasks/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/projects/table'
     | '/tasks/add'
     | '/projects/edit/$id'
+    | '/tasks/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/_layout/projects/table/'
     | '/_layout/tasks/add/'
     | '/_layout/projects/edit/$id/'
+    | '/_layout/tasks/edit/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutProjectsIdIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/tasks/edit/$id/': {
+      id: '/_layout/tasks/edit/$id/'
+      path: '/tasks/edit/$id'
+      fullPath: '/tasks/edit/$id'
+      preLoaderRoute: typeof LayoutTasksEditIdIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/projects/edit/$id/': {
       id: '/_layout/projects/edit/$id/'
       path: '/projects/edit/$id'
@@ -233,6 +252,7 @@ interface LayoutRouteChildren {
   LayoutProjectsTableIndexRoute: typeof LayoutProjectsTableIndexRoute
   LayoutTasksAddIndexRoute: typeof LayoutTasksAddIndexRoute
   LayoutProjectsEditIdIndexRoute: typeof LayoutProjectsEditIdIndexRoute
+  LayoutTasksEditIdIndexRoute: typeof LayoutTasksEditIdIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
@@ -244,6 +264,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutProjectsTableIndexRoute: LayoutProjectsTableIndexRoute,
   LayoutTasksAddIndexRoute: LayoutTasksAddIndexRoute,
   LayoutProjectsEditIdIndexRoute: LayoutProjectsEditIdIndexRoute,
+  LayoutTasksEditIdIndexRoute: LayoutTasksEditIdIndexRoute,
 }
 
 const LayoutRouteWithChildren =

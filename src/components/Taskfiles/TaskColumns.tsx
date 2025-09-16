@@ -65,7 +65,7 @@ export const taskColumns = [
   footer: (props: any) => props.column.id,
 },
   {
-  accessorFn: (row: any) => row.designation,
+  accessorFn: (row: any) => row.project?.title,
   id: "project_name",
   cell: (info: any) => {
     const title = info.getValue();

@@ -256,7 +256,7 @@ const Viewdetails = () => {
             >
               <option value="NEW">NEW</option>
               <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="OVER_DUE">PENDING</option>
+              <option value="OVERDUE">PENDING</option>
               <option value="REVIEW">REVIEW</option>
               <option value="COMPLETED">COMPLETED</option>
             </select>

@@ -63,3 +63,20 @@ export const getSingleDropDownForAssignedUsersAPI = async ( project_id:any) => {
     throw err;
   }
 };
+
+export const updateTasksAPI = async (id: any, payload: any) => {
+  try {
+    return await $fetch.patch(`/tasks/${id}`, payload);
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const gettasksByIdAPI = async (id: number) => {
+  try {
+    const response = await $fetch.get(`/tasks/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
