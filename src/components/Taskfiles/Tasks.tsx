@@ -8,6 +8,7 @@ import {
   Eye,
   Edit,
   Trash,
+  Filter,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +25,12 @@ import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import { toast } from "sonner";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -38,7 +45,7 @@ const Tasks = () => {
     ? searchParams.get("order_by")
     : "";
   const initialSearch = searchParams.get("search") || "";
-  const initialStatus = searchParams.get("status") || "";
+  const initialStatus = searchParams.get("task_status") || "";
   const initialPrioritys = searchParams.get("priority") || "";
   const intialProject = searchParams.get("project_id") || "";
 
@@ -75,7 +82,7 @@ const Tasks = () => {
         pageSize: pagination.pageSize,
         order_by: pagination.order_by,
         search_string: debouncedSearch,
-        status: selectedStatus,
+        task_status: selectedStatus,
         priority: selectedpriority,
         project_id: selectedProject,
         from_date: selectedDate?.length ? selectedDate[0] : null,
@@ -92,7 +99,7 @@ const Tasks = () => {
             search: debouncedSearch || undefined,
             from_date: selectedDate?.length ? selectedDate[0] : undefined,
             to_date: selectedDate?.length ? selectedDate[1] : undefined,
-            status: selectedStatus || undefined,
+            task_status: selectedStatus || undefined,
             project_id: selectedProject || undefined,
             priority: selectedpriority || undefined,
           },
@@ -104,17 +111,17 @@ const Tasks = () => {
   });
 
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
-  mutationFn: (id: number) => deleteTasksAPI(id),
-  onSuccess: (res: any) => {
-    toast.success(res?.data?.message || "Task deleted successfully");
-    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    mutationFn: (id: number) => deleteTasksAPI(id),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "Task deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
 
-    setDeleteDialogOpen(false);
-  },
-  onError: (err: any) => {
-    toast.error(err?.response?.data?.message || "Failed to delete task");
-  },
-});
+      setDeleteDialogOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to delete task");
+    },
+  });
 
   const handleDeleteClick = () => {
     if (taskToDelete) {
@@ -240,6 +247,28 @@ const Tasks = () => {
             setSearchString={setSearchString}
             title="Find your Task"
           />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
+                <Filter className="text-purple-500" size={16} />
+                {selectedStatus || "Sort by"}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {["New", "In_Progress", "Review", "Overdue", "Done"].map(
+                (option) => (
+                  <DropdownMenuItem
+                    key={option}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedStatus(option)}
+                  >
+                    {option}
+                  </DropdownMenuItem>
+                )
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3"

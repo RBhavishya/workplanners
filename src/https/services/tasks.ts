@@ -6,7 +6,7 @@ interface GetAllPaginatedUsersPropTypes {
   search_string: any;
   from_date: string;
   to_date: string;
-  status: string;
+  task_status: string;
   priority: string;
   project_id: any;
 }
@@ -18,7 +18,7 @@ export const getAllPaginatedTasks = async ({
   search_string,
   from_date,
   to_date,
-  status,
+  task_status,
   priority,
   project_id,
 }: GetAllPaginatedUsersPropTypes) => {
@@ -30,7 +30,7 @@ export const getAllPaginatedTasks = async ({
       search_string: search_string,
       from_date: from_date,
       to_date: to_date,
-      status: status,
+      task_status: task_status,
       priority: priority,
       project_id: project_id,
     };
