@@ -171,7 +171,8 @@ const AddTaskForm = ({
     const payload: any = {
       task_title: title,
       description,
-      project_id: selectedProject,
+      // project_id: selectedProject,
+       ...(mode === "create" ? { project_id:selectedProject} : {}),
       start_date: startDate ? formatDate(startDate) : null,
       end_date: dueDate ? formatDate(dueDate) : null,
       ...(mode === "create" ? { assigned_users: assignedUsers } : {}),
@@ -220,7 +221,7 @@ const AddTaskForm = ({
           ? new Date(taskResp.data?.data.end_date)
           : undefined
       );
-      setSelectedProject(taskResp.data?.data.project_id);
+      // setSelectedProject(taskResp.data?.data.project_id);
       // setAssignedUsers(taskResp.data.assigned_users || []);
     }
   }, [taskResp, mode]);
@@ -373,6 +374,7 @@ const AddTaskForm = ({
       </div>
 
       {/* Select Project */}
+       {mode === "create" && (
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
           Select Project <span className="text-red-500">*</span>
@@ -453,6 +455,7 @@ const AddTaskForm = ({
           </p>
         )}
       </div>
+         )}
 
       {/* Assign Users (Create mode only) */}
       {mode === "create" && (

@@ -265,10 +265,7 @@ const Tasks = () => {
               "serial",
               "actions",
               "project_name",
-              "task_name",
               "task_brief",
-              "status",
-              "end_date",
               "actions",
             ]}
           />
