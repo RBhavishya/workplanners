@@ -15,12 +15,13 @@ import BigCard from "../core/Cards";
 import AddTaskForm from "./AddTaskForm";
 import SmallCard from "../core/StatusCard";
 import { useQuery } from "@tanstack/react-query";
-import { getAllPaginatedTasks } from "@/https/services/tasks";
+import { getAllPaginatedTasks, gettasksByIdAPI } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import { tr } from "date-fns/locale";
+import { toast } from "sonner";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const Tasks = () => {
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
+   const [taskData, setTaskData] = useState<any>(null);
+  const [loadingEdit, setLoadingEdit] = useState(false);
 
   const { isLoading, isError, data, error, isFetching } = useQuery({
     queryKey: [
@@ -127,7 +130,9 @@ const Tasks = () => {
               <Eye size={16} />
             </button>
 
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer">
+            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
+            >
               <Edit size={16} />
             </button>
 
@@ -242,9 +247,6 @@ const Tasks = () => {
           />
         </div>
       </div>
-
-        {/* 🔹 Modal */}
-        {/* <AddTaskForm open={open} onClose={() => setOpen(true)} /> */}
       </div>
   );
 };
