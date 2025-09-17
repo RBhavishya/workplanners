@@ -4,8 +4,8 @@ interface GetAllPaginatedUsersPropTypes {
   pageSize: number;
   order_by: any;
   search_string: any;
-  from_date: string;
-  to_date: string;
+  from_date: any;
+  to_date: any;
   task_status: string;
   priority: string;
   project_id: any;

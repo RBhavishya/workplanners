@@ -31,6 +31,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { DateRangePicker } from "rsuite";
+import "rsuite/dist/rsuite-no-reset.min.css";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -44,6 +46,8 @@ const Tasks = () => {
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
+  const initialStartDate = searchParams.get("from_date") || null;
+  const initialEndDate = searchParams.get("to_date") || null;
   const initialSearch = searchParams.get("search") || "";
   const initialStatus = searchParams.get("task_status") || "";
   const initialPrioritys = searchParams.get("priority") || "";
@@ -51,7 +55,6 @@ const Tasks = () => {
 
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
-  const [selectedDate, setSelectedDate] = useState<any>(new Date());
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedProject, setSelectedProject] = useState<any>(intialProject);
   const [selectedpriority, setSelectedpriority] = useState(initialPrioritys);
@@ -64,13 +67,23 @@ const Tasks = () => {
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
+  const [selectedDate, setSelectedDate] = useState<any>();
+
+  const [dateValue, setDateValue] = useState<any>(
+    initialStartDate && initialEndDate
+      ? [new Date(initialStartDate), new Date(initialEndDate)]
+      : null
+  );
+
+    const formatDate = (date: Date) =>
+    date ? date.toLocaleDateString("en-CA") : undefined;
 
   const { isLoading, isError, data, error, isFetching } = useQuery({
     queryKey: [
       "tasks",
       pagination,
       debouncedSearch,
-      selectedDate,
+      dateValue,
       del,
       selectedStatus,
       selectedpriority,
@@ -85,9 +98,11 @@ const Tasks = () => {
         task_status: selectedStatus,
         priority: selectedpriority,
         project_id: selectedProject,
-        from_date: selectedDate?.length ? selectedDate[0] : null,
-        to_date: selectedDate?.length ? selectedDate[1] : null,
-      });
+       from_date:
+        dateValue?.length && dateValue[0] ? formatDate(dateValue[0]) : undefined,
+      to_date:
+        dateValue?.length && dateValue[1] ? formatDate(dateValue[1]) : undefined,
+    });
 
       if (location.pathname !== "/dashboard") {
         router.navigate({
@@ -97,8 +112,14 @@ const Tasks = () => {
             page_size: Number(pagination.pageSize),
             order_by: pagination.order_by || undefined,
             search: debouncedSearch || undefined,
-            from_date: selectedDate?.length ? selectedDate[0] : undefined,
-            to_date: selectedDate?.length ? selectedDate[1] : undefined,
+             from_date:
+            dateValue?.length && dateValue[0]
+              ? formatDate(dateValue[0])
+              : undefined,
+          to_date:
+            dateValue?.length && dateValue[1]
+              ? formatDate(dateValue[1])
+              : undefined,
             task_status: selectedStatus || undefined,
             project_id: selectedProject || undefined,
             priority: selectedpriority || undefined,
@@ -182,7 +203,7 @@ const Tasks = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
-      if (searchString || selectedStatus) {
+      if (searchString || selectedStatus || dateValue) {
         getAllTasks({
           pageIndex: 1,
           pageSize: pageSizeParam,
@@ -199,7 +220,7 @@ const Tasks = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchString, selectedStatus]);
+  }, [searchString, selectedStatus, dateValue]);
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -247,7 +268,13 @@ const Tasks = () => {
             setSearchString={setSearchString}
             title="Find your Task"
           />
-
+          <DateRangePicker
+            placement="auto"
+            value={dateValue}
+            onChange={(range) => setDateValue(range)}
+            placeholder="Select Date Range"
+            className="h-8 text-sm"
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
