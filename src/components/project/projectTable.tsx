@@ -195,13 +195,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         header: () => (
           <div
             className="flex items-center cursor-pointer select-none"
-            onClick={() => handleSort("end_date")}
+            onClick={() => handleSort("due_date")}
           >
-            End Date {renderSortIcon("end_date")}
+            End Date {renderSortIcon("due_date")}
           </div>
         ),
         accessorFn: (row: any) => row.project_end_date,
-        id: "end_date",
+        id: "due_date",
         cell: (info: any) => {
           const date: string = info.getValue();
           return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
@@ -314,7 +314,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       </table>
 
       {/* Pagination */}
-      {pagination && (
+      2{pagination && (
         <div className="flex justify-between items-center p-3 text-sm text-gray-600">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
