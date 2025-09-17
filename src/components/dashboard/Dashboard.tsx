@@ -47,48 +47,17 @@ const Dashboard = () => {
     },
   });
   return (
-    <div className="p-4">
+    <div className="p-1">
       {/* Cards + Month Pickers */}
-      <div className="w-3/4">
+       <div className="w-3/4">
         <div className="bg-white p-2 rounded-xl shadow gap-2">
           {/* Month Range Picker */}
-          <div className="flex justify-end py-2">
-            <div
-              className="inline-flex rounded items-center gap-4"
-              style={{
-                padding: "10px 12px",
-                borderRadius: "10px",
-                border: "1px solid #D5B8FF",
-                background: "#FFF",
-              }}
-            >
-              <div>
-                <label className="block text-sm mb-1">Start Month</label>
-                <DatePicker
-                  selected={startMonth}
-                  onChange={(date) => setStartMonth(date)}
-                  dateFormat="MMM yyyy"
-                  showMonthYearPicker
-                  className="border rounded p-2"
-                />
-              </div>
-              <span className="font-medium">to</span>
-              <div>
-                <label className="block text-sm mb-1">End Month</label>
-                <DatePicker
-                  selected={endMonth}
-                  onChange={(date) => setEndMonth(date)}
-                  dateFormat="MMM yyyy"
-                  showMonthYearPicker
-                  className="border rounded p-2"
-                />
-              </div>
-            </div>
+          <div className="flex justify-end py-1">
           </div>
 
           {/* Stats Cards */}
          <div className="flex rounded gap-4">
-  <div className="flex flex-wrap gap-4">
+  <div className="flex flex-wrap gap-8">
     {isError ? (
       <p className="text-red-500">Error loading stats</p>
     ) : (
