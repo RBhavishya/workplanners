@@ -37,7 +37,7 @@ export const taskColumns = [
           <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
-          <span className="capitalize">{title}</span>
+          <span className="capitalize font-medium">{title}</span>
         </div>
       );
     },
