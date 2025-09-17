@@ -90,3 +90,66 @@ export const deleteTasksAPI = async (id: number) => {
     throw error;
   }
 };
+
+export const getTaskByIdAPI = async (id: number) => {
+  try {
+    const response = await $fetch.get(`/tasks/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const TasksStatusAPI = async(id: number, data: { task_status: string }) => {
+  try{
+    const response= await $fetch.patch(`/tasks/${id}/status`, data);
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+export const getTaskAssignedUsersAPI = async(id: number) =>{
+  try{
+    const response = await $fetch.get(`/task-assignees/${id}/users`);
+    return response;
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+export const deleteTaskAssignedUserAPI = async (projectId: number, userId: number) => {
+  try {
+    const payload = { user_ids: [userId] };
+    const response = await $fetch.delete(`/task-assignees/${projectId}/assignees`,  payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getTasksAvailableUsersAPI = async(id: number) =>{
+  try{
+    const response=await $fetch.get(`/task-assignees/${id}/non-assignees`);
+    return response;
+  }
+  catch(error){
+    throw error;
+  }
+}
+
+export const addAsignedUserAPI = async (projectId: number, userId: number) => {
+  try {
+    const payload = {
+      project_id: projectId,
+      user_ids: [userId], 
+    };
+    const response = await $fetch.post(`/task-assignees/${projectId}/assignees`, payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
