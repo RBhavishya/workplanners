@@ -1,19 +1,13 @@
 import { ProjectData, TaskResponse, UsersDropdownResponse } from "@/interfaces/project";
 import { $fetch } from "../fetch";
 
-// export const getAllProjectsAPI = async (queryParam: any) => {
-//   try {
-//     return await $fetch.get(`/projects?${queryParam}`);
-//   } catch (error) {
-//     throw error;
-//   }
-// };
 
 interface GetAllPaginatedUsersPropTypes {
   pageIndex: number;
   pageSize: number;
   viewMode: any;
   order_by: any;
+  project_status: any;
   search_string: any;
 }
 
@@ -22,6 +16,7 @@ export const getAllPaginatedProjects = async ({
   pageSize,
   viewMode,
   order_by,
+  project_status,
   search_string,
 }: GetAllPaginatedUsersPropTypes) => {
   try {
@@ -29,7 +24,8 @@ export const getAllPaginatedProjects = async ({
       page: pageIndex,
       page_size: pageSize,
       view_mode: viewMode,
-      project_status: order_by,
+      project_status: project_status,
+      order_by: order_by,
       search_string: search_string,
     };
     return await $fetch.get("/projects", queryParams);
@@ -97,6 +93,7 @@ export const getAllUsersProjects = async ({
   pageSize,
   viewMode,
   order_by,
+  project_status,
   search_string,
   
 }: GetAllPaginatedUsersPropTypes) => {
@@ -105,7 +102,8 @@ export const getAllUsersProjects = async ({
       page: pageIndex,
       page_size: pageSize,
       view_mode: viewMode,
-      project_status: order_by,
+      project_status: project_status,
+      order_by: order_by,
       search_string: search_string,
     
     };
