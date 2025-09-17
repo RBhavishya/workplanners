@@ -40,6 +40,7 @@ interface ProjectsTableProps {
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({
   debouncedSearch,
+
   selectedSort,
   selectedStatus,
   setSelectedSort,
@@ -58,6 +59,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       page,
       pageSize,
       debouncedSearch,
+      
       selectedSort,
       selectedStatus,
     ],

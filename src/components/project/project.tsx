@@ -98,6 +98,7 @@ const Projects = () => {
       viewMode,
       debouncedSearch,
       selectedStatus,
+      selectedSort,
     ],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
