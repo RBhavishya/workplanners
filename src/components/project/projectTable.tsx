@@ -5,13 +5,10 @@ import {
   getCoreRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Eye, Edit, Trash, ArrowUpDown } from "lucide-react";
-import {
-  deleteProjectAPI,
-  getAllUsersProjects,
-} from "@/https/services/project";
+import { Eye, Edit, Trash } from "lucide-react";
+import { getAllUsersProjects } from "@/https/services/project";
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +16,6 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import dayjs from "dayjs";
-import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -32,57 +28,80 @@ const statusColors: Record<string, string> = {
 interface ProjectsTableProps {
   debouncedSearch: string;
   selectedSort: string;
-  setSelectedSort: (val: string) => void; // ✅ added setter
+  selectedStatus: string;
+  setSelectedSort: (val: string) => void;
+  setSelectedStatus: (val: string) => void;
+  setPageSize: (val: number) => void;
   page: number;
   pageSize: number;
   setPage: (page: number) => void;
-  setPageSize: (size: number) => void;
   onDelete: (project: any) => void;
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({
   debouncedSearch,
+
   selectedSort,
+  selectedStatus,
   setSelectedSort,
+  setSelectedStatus,
   page,
   pageSize,
   setPage,
   onDelete,
 }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  // View Project Handler
-  const handleView = (id: number) => {
-    navigate({ to: `/projects/${id}` });
-  };
 
   // Fetch projects with filters
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["projectsTable", page, pageSize, debouncedSearch, selectedSort],
+    queryKey: [
+      "projectsTable",
+      page,
+      pageSize,
+      debouncedSearch,
+      
+      selectedSort,
+      selectedStatus,
+    ],
     queryFn: () =>
       getAllUsersProjects({
         pageIndex: page,
         pageSize,
         viewMode: "table",
         order_by: selectedSort,
+        project_status: selectedStatus,
         search_string: debouncedSearch,
       }),
   });
   const projects = data?.data?.data?.records || [];
   const pagination = data?.data?.data?.pagination_info;
 
-
   // Sort toggle helper
   const handleSort = (column: string) => {
-    if (selectedSort === column) {
-      setSelectedSort(`${column}_desc`);
-    } else if (selectedSort === `${column}_desc`) {
+    if (selectedSort === `${column}:asc`) {
+      setSelectedSort(`${column}:desc`);
+    } else if (selectedSort === `${column}:desc`) {
       setSelectedSort(""); // clear sort
     } else {
-      setSelectedSort(column);
+      setSelectedSort(`${column}:asc`);
     }
   };
+
+  const renderSortIcon = (column: string) => {
+    if (selectedSort === `${column}:asc`) {
+      return <img src="/table/sort-asc.svg" height={15} width={15} alt="Asc" />;
+    }
+    if (selectedSort === `${column}:desc`) {
+      return (
+        <img src="/table/sort-desc.svg" height={15} width={15} alt="Desc" />
+      );
+    }
+    return (
+      <img src="/table/sort-norm.svg" height={15} width={15} alt="No Sort" />
+    );
+  };
+
+  // Show active sort icon
 
   // Table Columns
   const columns = React.useMemo<ColumnDef<any>[]>(() => {
@@ -92,7 +111,14 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         cell: ({ row }) => row.index + 1 + (page - 1) * pageSize,
       },
       {
-        header: "Project Name",
+        header: () => (
+          <div
+            className="flex items-center cursor-pointer select-none"
+            onClick={() => handleSort("title")}
+          >
+            Project Name {renderSortIcon("title")}
+          </div>
+        ),
         accessorKey: "project_name",
         cell: ({ row }) => {
           const p = row.original;
@@ -107,7 +133,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         },
       },
       {
-        header: "Assigned Users",
+        header: "Assigned Users", // simple header without sort
         accessorKey: "users",
         cell: ({ row }) => {
           const users = row.original.users || [];
@@ -150,30 +176,36 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         },
       },
       {
-        accessorFn: (row: any) => row.start_date,
+        header: () => (
+          <div
+            className="flex items-center cursor-pointer select-none"
+            onClick={() => handleSort("start_date")}
+          >
+            Start Date {renderSortIcon("start_date")}
+          </div>
+        ),
+        accessorFn: (row: any) => row.project_start_date,
         id: "start_date",
         cell: (info: any) => {
           const date: string = info.getValue();
           return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
         },
-        width: "90px",
-        maxWidth: "90px",
-        minWidth: "90px",
-        header: () => <span>Start Date</span>,
-        footer: (props: any) => props.column.id,
       },
       {
-        accessorFn: (row: any) => row.due_date,
+        header: () => (
+          <div
+            className="flex items-center cursor-pointer select-none"
+            onClick={() => handleSort("end_date")}
+          >
+            End Date {renderSortIcon("end_date")}
+          </div>
+        ),
+        accessorFn: (row: any) => row.project_end_date,
         id: "end_date",
         cell: (info: any) => {
           const date: string = info.getValue();
           return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
         },
-        width: "90px",
-        maxWidth: "90px",
-        minWidth: "90px",
-        header: () => <span>End Date</span>,
-        footer: (props: any) => props.column.id,
       },
       {
         header: "Status",
@@ -218,6 +250,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       },
     ];
   }, [navigate, page, pageSize, selectedSort, onDelete]);
+
   const table = useReactTable({
     data: projects,
     columns,
@@ -246,7 +279,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3 cursor-pointer">
+                <th key={header.id} className="px-4 py-3">
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
@@ -280,13 +313,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         </tbody>
       </table>
 
+      {/* Pagination */}
       {pagination && (
         <div className="flex justify-between items-center p-3 text-sm text-gray-600">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
 
-          {/* Pagination */}
           <div className="flex items-center gap-2">
             <button
               disabled={!pagination.prev_page}

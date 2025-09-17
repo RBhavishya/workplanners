@@ -46,12 +46,14 @@ const Projects = () => {
   };
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 10;
-  const orderBY = searchParams.get("order_by") || "";
+  const initialStatus = searchParams.get("project_status") || "";
   const initialSearch = searchParams.get("search") || "";
+  const orderBY = searchParams.get("order_by") || "";
 
   const [viewMode, setViewMode] = useState<"table" | "grid">(
     search?.viewMode || "grid"
   );
+  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -86,11 +88,18 @@ const Projects = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [search_string, selectedSort]);
+  }, [search_string, selectedStatus]);
 
   // ✅ update URL whenever pagination/search/sort changes
   const { isLoading, isError, error, data, isFetching } = useQuery({
-    queryKey: ["projects", pagination, viewMode, debouncedSearch, selectedSort],
+    queryKey: [
+      "projects",
+      pagination,
+      viewMode,
+      debouncedSearch,
+      selectedStatus,
+      selectedSort,
+    ],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
         pageIndex: pagination.pageIndex,
@@ -98,6 +107,7 @@ const Projects = () => {
         viewMode,
         search_string: debouncedSearch,
         order_by: selectedSort,
+        project_status: selectedStatus,
       });
 
       router.navigate({
@@ -107,6 +117,7 @@ const Projects = () => {
           page_size: pagination.pageSize,
           viewMode: viewMode || undefined,
           order_by: selectedSort || undefined,
+          project_status: selectedStatus || undefined,
           search: debouncedSearch || undefined,
         },
       });
@@ -157,7 +168,6 @@ const Projects = () => {
 
   return (
     <div className="w-full p-4">
-      
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
         <div className="flex items-center gap-4">
@@ -179,7 +189,7 @@ const Projects = () => {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 border px-4 py-2 rounded-lg cursor-pointer">
                 <Filter className="text-purple-500" size={18} />
-                {selectedSort || "Sort by"}
+                {selectedStatus || "Sort by"}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -188,7 +198,7 @@ const Projects = () => {
                   <DropdownMenuItem
                     key={option}
                     className="cursor-pointer"
-                    onClick={() => setSelectedSort(option)}
+                    onClick={() => setSelectedStatus(option)}
                   >
                     {option}
                   </DropdownMenuItem>
@@ -348,6 +358,8 @@ const Projects = () => {
             <ProjectsTable
               debouncedSearch={debouncedSearch}
               selectedSort={selectedSort}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
               setSelectedSort={setSelectedSort}
               page={pagination.pageIndex}
               pageSize={pagination.pageSize}
