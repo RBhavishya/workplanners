@@ -58,10 +58,10 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     >
       {centerContent}
       <div className="flex items-center space-x-6">
-        <div className="text-right border-r-2 border-gray-200 pr-4 border-l-2 pl-4">
+        {/* <div className="text-right border-r-2 border-gray-200 pr-4 border-l-2 pl-4">
           <p className="text-lg font-semibold text-gray-800">{formattedTime}</p>
           <p className="text-sm text-gray-500">{formattedDate}</p>
-        </div>
+        </div> */}
         {/* <div className="relative">
           <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
           <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">

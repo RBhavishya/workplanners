@@ -25,41 +25,27 @@ export const taskColumns = [
   {
     accessorFn: (row: any) => row.task_title,
     id: "task_title",
-    cell: (info: any) => {
-      const title = info.getValue();
-      return (
-        <div className="flex items-center justify-center">
-          <span className="capitalize text-center">{title || "-"}</span>
-        </div>
-      );
-    },
-    width: "40px",
-    maxWidth: "40px",
-    minWidth: "40px",
     header: () => (
-      <div className="flex items-center justify-end pr-2">
+      <div className="flex justify-center">
         <span>Task Name</span>
       </div>
     ),
+    cell: (info: any) => {
+      const title = info.getValue() || "-"; // fallback
+      return (
+        <div className="flex items-center gap-2" style={{ textAlign: "left" }}>
+          <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
+            {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
+          </div>
+          <span className="capitalize">{title}</span>
+        </div>
+      );
+    },
     footer: (props: any) => props.column.id,
+    width: 30,
+    minWidth: 30,
+    maxWidth: 30,
   },
-  // {
-  //   accessorFn: (row: any) => row.description,
-  //   id: "task_brief",
-  //   cell: (info: any) => {
-  //     const title = info.getValue();
-  //     return (
-  //       <span className="truncate block max-w-[200px]" title={title || "-"}>
-  //         {title ? title : "-"}
-  //       </span>
-  //     );
-  //   },
-  //   width: "20px",
-  //   maxWidth: "20px",
-  //   minWidth: "20px",
-  //   header: () => <span>Task Brief</span>,
-  //   footer: (props: any) => props.column.id,
-  // },
   {
     accessorFn: (row: any) => row.project?.title,
     id: "project_name",
