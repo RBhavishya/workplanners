@@ -322,6 +322,7 @@ const Tasks = () => {
               "actions",
               "project_name",
               "task_brief",
+              "task_status",
               "actions",
             ]}
           />
