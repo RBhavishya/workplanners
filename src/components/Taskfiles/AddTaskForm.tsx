@@ -553,36 +553,46 @@ const AddTaskForm = ({
         <button
           type="button"
           onClick={handleNavigation}
-          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100"
+          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
         >
           Cancel
         </button>
         <button
-          type="button"
-          onClick={handleSave}
-          disabled={
-            mode === "edit"
-              ? updateMutation.isPending
-              : createMutation.isPending
-          }
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 disabled:opacity-50"
-        >
-          {mode === "edit" ? (
-            updateMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Updating...
-              </>
-            ) : (
-              "Update"
-            )
-          ) : createMutation.isPending ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Saving...
-            </>
-          ) : (
-            "Save"
-          )}
-        </button>
+  type="button"
+  onClick={handleSave}
+  disabled={
+    mode === "edit"
+      ? updateMutation.isPending
+      : createMutation.isPending
+  }
+  className={`px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 
+    hover:bg-purple-700 
+    ${mode === "edit"
+      ? updateMutation.isPending
+        ? "cursor-not-allowed"
+        : "cursor-pointer"
+      : createMutation.isPending
+      ? "cursor-not-allowed"
+      : "cursor-pointer"
+    } 
+    disabled:opacity-50`}
+>
+  {mode === "edit" ? (
+    updateMutation.isPending ? (
+      <>
+        <Loader2 className="w-4 h-4 animate-spin" /> Updating...
+      </>
+    ) : (
+      "Update"
+    )
+  ) : createMutation.isPending ? (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+    </>
+  ) : (
+    "Save"
+  )}
+</button>
       </div>
     </div>
   );

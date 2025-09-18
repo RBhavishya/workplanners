@@ -152,4 +152,13 @@ export const addAsignedUserAPI = async (projectId: number, userId: number) => {
   }
 };
 
+export const getTasksStatsAPI = async () => {
+    try {
+        const response = await $fetch.get("/tasks/status/counts");
+        return response.data;
+    } catch (err) {
+        throw err;
+    }
+};
+
 
