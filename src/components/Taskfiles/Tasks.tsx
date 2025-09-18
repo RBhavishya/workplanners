@@ -18,6 +18,7 @@ import {
   deleteTasksAPI,
   getAllPaginatedTasks,
   gettasksByIdAPI,
+  getTasksStatsAPI,
 } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
@@ -34,6 +35,7 @@ import {
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
 import { set } from "date-fns";
+import CountUp from "react-countup";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -136,6 +138,14 @@ const Tasks = () => {
     },
   });
 
+  const { data: stats } = useQuery({
+    queryKey: ["tasksStats"],
+    queryFn: async () => {
+      const response = await getTasksStatsAPI();
+      return response.data;
+    },
+  });
+
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
     onSuccess: (res: any) => {
@@ -144,15 +154,15 @@ const Tasks = () => {
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {
-          let message = "Failed to delete project.";
-          if (error?.status === 409) {
-            message = error?.message || "Conflict: Project cannot be deleted.";
-          } else if (error?.response?.data?.message) {
-            message = error.response.data.message;
-          }
-          toast.error(message);
-         setDeleteDialogOpen(false);
-        },
+      let message = "Failed to delete project.";
+      if (error?.status === 409) {
+        message = error?.message || "Conflict: Project cannot be deleted.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      toast.error(message);
+      setDeleteDialogOpen(false);
+    },
   });
   const handleDeleteClick = () => {
     if (taskToDelete) {
@@ -256,16 +266,38 @@ const Tasks = () => {
             <div className="flex flex-wrap gap-3">
               <BigCard
                 title="Total Tasks"
-                value={29}
+                value={
+                  <CountUp
+                    start={0}
+                    end={stats?.total_tasks ?? 0}
+                    duration={1.5}
+                  />
+                }
                 icon={<ClipboardList />}
               />
 
               <BigCard
                 title="In Progress Task"
-                value={3}
+                value={
+                  <CountUp
+                    start={0}
+                    end={stats?.total_in_progress_tasks ?? 0}
+                    duration={1.5}
+                  />
+                }
                 icon={<ClipboardPenLine />}
               />
-              <BigCard title="Pending Tasks" value={1} icon={<FileClock />} />
+              <BigCard
+                title="Pending Tasks"
+                value={
+                  <CountUp
+                    start={0}
+                    end={stats?.total_overdue_tasks ?? 0}
+                    duration={1.5}
+                  />
+                }
+                icon={<FileClock />}
+              />
             </div>
           </div>
           <div
@@ -296,7 +328,7 @@ const Tasks = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Done"].map(
+              {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
                 (option) => (
                   <DropdownMenuItem
                     key={option}
