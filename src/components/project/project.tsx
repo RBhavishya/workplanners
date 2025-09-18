@@ -338,7 +338,7 @@ const Projects = () => {
                 </p>
               ) : loadingProject ? (
                 <div className="flex items-center justify-center h-[400px] w-full">
-                  <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
+                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : errorProject ? (
                 <p className="text-red-500 mt-10">
