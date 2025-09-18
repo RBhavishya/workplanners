@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
               <button
                 type="button"
                 // onClick={() => navigate({ to: "/forgot-password" })}
-                className="text-sm text-indigo-600 hover:underline"
+                className="text-sm text-indigo-600 hover:underline cursor-pointer"
               >
                 Forgot password?
               </button>
@@ -162,9 +162,9 @@ const LoginPage: React.FC = () => {
             {/* Submit button */}
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {activeTab === "signin" ? "Sign In" : "Sign Up"}
+              {activeTab === "signin" ? "Log In" : "Sign Up"}
             </button>
           </form>
         </div>
