@@ -8,7 +8,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
 
-
 type TaskStats = {
   id: number;
   name: string;
@@ -19,18 +18,18 @@ type TaskStats = {
 };
 
 const columns: ColumnDef<TaskStats>[] = [
- {
-  id: "sno",
-  header: () => <span>S.No</span>,
-  cell: ({ row }) => {
-    // row.index starts from 0, so add 1
-    return <span>{row.index + 1}</span>;
+  {
+    id: "sno",
+    header: () => <span>S.No</span>,
+    cell: ({ row }) => {
+      // row.index starts from 0, so add 1
+      return <span>{row.index + 1}</span>;
+    },
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
   },
-  size: 80,
-  minSize: 80,
-  maxSize: 80,
-},
-  
+
   {
     accessorFn: (row: any) => row.display_name,
     id: "name",
@@ -38,20 +37,20 @@ const columns: ColumnDef<TaskStats>[] = [
       let title = info.getValue();
       return <span>{title ? title : "-"}</span>;
     },
-    size: 200,    
+    size: 200,
     minSize: 200,
     maxSize: 200,
     header: () => <span>Name</span>,
     footer: (props: any) => props.column.id,
   },
-   {
+  {
     accessorFn: (row: any) => row.total_tasks,
     id: "total",
     cell: (info: any) => {
       let title = info.getValue();
       return <span>{title ? title : "-"}</span>;
     },
-    size: 200,    
+    size: 200,
     minSize: 200,
     maxSize: 200,
     header: () => <span>Total Tasks</span>,
@@ -64,7 +63,7 @@ const columns: ColumnDef<TaskStats>[] = [
       let title = info.getValue();
       return <span>{title ? title : "-"}</span>;
     },
-    size: 200,    
+    size: 200,
     minSize: 200,
     maxSize: 200,
     header: () => <span>Completed</span>,
@@ -77,7 +76,7 @@ const columns: ColumnDef<TaskStats>[] = [
       let title = info.getValue();
       return <span>{title ? title : "-"}</span>;
     },
-    size: 200,    
+    size: 200,
     minSize: 200,
     maxSize: 200,
     header: () => <span>In Progress</span>,
@@ -90,7 +89,7 @@ const columns: ColumnDef<TaskStats>[] = [
       let title = info.getValue();
       return <span>{title ? title : "-"}</span>;
     },
-    size: 200,    
+    size: 200,
     minSize: 200,
     maxSize: 200,
     header: () => <span>Pending</span>,
@@ -113,11 +112,9 @@ const Statisticstable = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard-stats", page, pageSize],
     queryFn: () => getDashboardStatistics({ pageIndex: page, pageSize }),
-   
-
   });
 
- const statsData: TaskStats[] = data?.data?.data?.records ?? [0];
+  const statsData: TaskStats[] = data?.data?.data?.records ?? [0];
   const totalRecords: number = data?.data?.pagination_info?.total_records ?? 0;
   const totalPages: number = data?.data?.pagination_info?.total_pages ?? 1;
   const table = useReactTable({
@@ -160,8 +157,7 @@ const Statisticstable = () => {
     return buttons;
   };
 
-  const startIndex =
-    statsData.length === 0 ? 0 : (page - 1) * pageSize + 1;
+  const startIndex = statsData.length === 0 ? 0 : (page - 1) * pageSize + 1;
   const endIndex =
     statsData.length === 0 ? 0 : startIndex + statsData.length - 1;
 
@@ -169,107 +165,109 @@ const Statisticstable = () => {
     <div className="bg-white p-6 mt-6 rounded-2xl shadow-md">
       <h2 className="text-lg font-semibold mb-4">STATISTICS</h2>
 
-     {isLoading ? (
-  <table className="w-full text-left border-separate border-spacing-y-2">
-    <tbody>
-      <tr>
-        <td colSpan={columns.length} className="text-center py-10">
-          <div className="flex justify-center items-center">
-            <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-) : isError ? (
-  <p className="text-red-500">Error fetching statistics</p>
-) : (
-  <>
-    {/* ✅ Existing Table Render */}
-    <table className="w-full text-left border-separate border-spacing-y-2">
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="text-gray-600">
-            {headerGroup.headers.map((header) => (
-              <th key={header.id} className="px-4 py-2 cursor-pointer">
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
-                )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.length === 0 ? (
-          <tr>
-            <td colSpan={columns.length} className="text-center py-4">
-              No data found.
-            </td>
-          </tr>
-        ) : (
-          table.getRowModel().rows.map((row) => (
-            <tr
-              key={row.id}
-              className="bg-gray-50 hover:bg-gray-100 rounded-lg"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="px-4 py-3 border-b border-gray-200"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+      {isLoading ? (
+        <table className="w-full text-left border-separate border-spacing-y-2">
+          <tbody>
+            <tr>
+              <td colSpan={columns.length} className="text-center py-10">
+                <div className="flex justify-center items-center">
+                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              </td>
             </tr>
-          ))
-        )}
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      ) : isError ? (
+        <p className="text-red-500">Error fetching statistics</p>
+      ) : (
+        <>
+          {/* ✅ Existing Table Render */}
+          <table className="w-full text-left border-separate border-spacing-y-2">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="text-gray-600">
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id} className="px-4 py-2 cursor-pointer">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-4">
+                    No data found.
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="bg-gray-50 hover:bg-gray-100 rounded-lg"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className="px-4 py-3 border-b border-gray-200"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
 
-    {/* Pagination */}
-    <div className="flex justify-between items-center mt-4">
-      <div className="text-sm text-gray-600">
-        {`${startIndex} - ${endIndex} of ${totalRecords}`}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          disabled={page === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        {renderPaginationButtons()}
-        <button
-          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-          disabled={page === totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-      <select
-        value={pageSize}
-        onChange={(e) => {
-          setPageSize(Number(e.target.value));
-          setPage(1);
-        }}
-        className="border px-2 py-1 rounded"
-      >
-        {[10, 25, 50].map((size) => (
-          <option key={size} value={size}>
-            {size}/page
-          </option>
-        ))}
-      </select>
-    </div>
-  </>
-)}
+          {/* Pagination */}
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm text-gray-600">
+              {`${startIndex} - ${endIndex} of ${totalRecords}`}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+              {renderPaginationButtons()}
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                disabled={page === totalPages}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+              className="border px-2 py-1 rounded"
+            >
+              {[10, 25, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}/page
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 export default Statisticstable;
-

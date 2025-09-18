@@ -33,6 +33,7 @@ import {
 } from "../ui/dropdown-menu";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
+import { set } from "date-fns";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ const Tasks = () => {
       : null
   );
 
-    const formatDate = (date: Date) =>
+  const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
   const { isLoading, isError, data, error, isFetching } = useQuery({
@@ -98,11 +99,15 @@ const Tasks = () => {
         task_status: selectedStatus,
         priority: selectedpriority,
         project_id: selectedProject,
-       from_date:
-        dateValue?.length && dateValue[0] ? formatDate(dateValue[0]) : undefined,
-      to_date:
-        dateValue?.length && dateValue[1] ? formatDate(dateValue[1]) : undefined,
-    });
+        from_date:
+          dateValue?.length && dateValue[0]
+            ? formatDate(dateValue[0])
+            : undefined,
+        to_date:
+          dateValue?.length && dateValue[1]
+            ? formatDate(dateValue[1])
+            : undefined,
+      });
 
       if (location.pathname !== "/dashboard") {
         router.navigate({
@@ -112,14 +117,14 @@ const Tasks = () => {
             page_size: Number(pagination.pageSize),
             order_by: pagination.order_by || undefined,
             search: debouncedSearch || undefined,
-             from_date:
-            dateValue?.length && dateValue[0]
-              ? formatDate(dateValue[0])
-              : undefined,
-          to_date:
-            dateValue?.length && dateValue[1]
-              ? formatDate(dateValue[1])
-              : undefined,
+            from_date:
+              dateValue?.length && dateValue[0]
+                ? formatDate(dateValue[0])
+                : undefined,
+            to_date:
+              dateValue?.length && dateValue[1]
+                ? formatDate(dateValue[1])
+                : undefined,
             task_status: selectedStatus || undefined,
             project_id: selectedProject || undefined,
             priority: selectedpriority || undefined,
@@ -136,14 +141,19 @@ const Tasks = () => {
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Task deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-
       setDeleteDialogOpen(false);
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to delete task");
-    },
+    onError: (error: any) => {
+          let message = "Failed to delete project.";
+          if (error?.status === 409) {
+            message = error?.message || "Conflict: Project cannot be deleted.";
+          } else if (error?.response?.data?.message) {
+            message = error.response.data.message;
+          }
+          toast.error(message);
+         setDeleteDialogOpen(false);
+        },
   });
-
   const handleDeleteClick = () => {
     if (taskToDelete) {
       deleteTask(taskToDelete);
@@ -174,7 +184,8 @@ const Tasks = () => {
 
         return (
           <div className="flex gap-2">
-            <button className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
               <Eye size={16} />

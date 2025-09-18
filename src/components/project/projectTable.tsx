@@ -40,7 +40,6 @@ interface ProjectsTableProps {
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({
   debouncedSearch,
-
   selectedSort,
   selectedStatus,
   setSelectedSort,
@@ -52,14 +51,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Fetch projects with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: [
       "projectsTable",
       page,
       pageSize,
       debouncedSearch,
-      
       selectedSort,
       selectedStatus,
     ],
@@ -73,10 +70,10 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         search_string: debouncedSearch,
       }),
   });
+
   const projects = data?.data?.data?.records || [];
   const pagination = data?.data?.data?.pagination_info;
 
-  // Sort toggle helper
   const handleSort = (column: string) => {
     if (selectedSort === `${column}:asc`) {
       setSelectedSort(`${column}:desc`);
@@ -101,9 +98,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     );
   };
 
-  // Show active sort icon
-
-  // Table Columns
   const columns = React.useMemo<ColumnDef<any>[]>(() => {
     return [
       {
@@ -133,7 +127,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         },
       },
       {
-        header: "Assigned Users", // simple header without sort
+        header: "Assigned Users",
         accessorKey: "users",
         cell: ({ row }) => {
           const users = row.original.users || [];
@@ -257,15 +251,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  // Loading
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   if (isError) {
     return (
       <p className="text-red-500 text-center py-4">Failed to fetch projects</p>
@@ -273,7 +258,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto border rounded-xl">
+    <div className="relative overflow-x-auto border rounded-xl">
       <table className="w-full text-sm border-collapse">
         <thead className="bg-gray-50 text-left text-gray-600 text-xs font-semibold">
           {table.getHeaderGroups().map((hg) => (
@@ -290,11 +275,23 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           ))}
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {projects.length === 0 ? (
+          {isLoading || isFetching ? (
             <tr>
               <td
                 colSpan={columns.length}
-                className="text-gray-500 col-span-3 text-center py-6"
+                className="text-center py-6 text-gray-500"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Loading projects...</span>
+                </div>
+              </td>
+            </tr>
+          ) : projects.length === 0 ? (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="text-gray-500 text-center py-6"
               >
                 No projects found
               </td>
@@ -314,7 +311,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       </table>
 
       {/* Pagination */}
-      2{pagination && (
+      {pagination && (
         <div className="flex justify-between items-center p-3 text-sm text-gray-600">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}

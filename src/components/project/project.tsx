@@ -245,11 +245,11 @@ const Projects = () => {
           <>
             {/* Grid Cards */}
             <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-              {(isLoading || isFetching) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-20 rounded-lg">
-                  <div className="w-12 h-12 border-4 border-purple-500 border-dashed rounded-full animate-spin"></div>
-                </div>
-              )}
+               {(isLoading || isFetching) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
 
               {projectsData.length === 0 && !isLoading ? (
                 <p className="text-gray-500 col-span-3 text-center py-6">

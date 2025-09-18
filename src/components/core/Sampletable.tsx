@@ -1,5 +1,5 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,6 +9,10 @@ import {
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { getTasksByProjectId } from "@/https/services/project";
 import { Task, TaskResponse } from "@/interfaces/project";
+import { useNavigate } from "@tanstack/react-router";
+import { deleteTasksAPI } from "@/https/services/tasks";
+import { toast } from "sonner";
+import DeleteTaskDialog from "../core/TaskDeleteFilter"; // ✅ make sure path is correct
 
 interface TasksTableProps {
   projectId: number;
@@ -20,6 +24,36 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     queryFn: () => getTasksByProjectId(projectId),
     enabled: !!projectId,
   });
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+
+  const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
+    mutationFn: (id: number) => deleteTasksAPI(id),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "Task deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      setDeleteDialogOpen(false);
+    },
+    onError: (error: any) => {
+      let message = "Failed to delete project.";
+      if (error?.status === 409) {
+        message = error?.message || "Conflict: Project cannot be deleted.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      toast.error(message);
+      setDeleteDialogOpen(false);
+    },
+  });
+
+  const handleDeleteClick = () => {
+    if (taskToDelete) {
+      deleteTask(taskToDelete);
+    }
+  };
 
   const formatDate = (dateStr: string | null) =>
     dateStr
@@ -95,19 +129,34 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     {
       header: "Actions",
       id: "actions",
-      cell: () => (
-        <div className="flex gap-3 justify-center text-gray-500">
-          <button className="hover:text-indigo-600">
-            <Eye size={16} />
-          </button>
-          <button className="hover:text-green-600">
-            <Edit size={16} />
-          </button>
-          <button className="hover:text-red-600">
-            <Trash2 size={16} />
-          </button>
-        </div>
-      ),
+      cell: (info: any) => {
+        const rowData = info.row.original;
+        return (
+          <div className="flex gap-3 justify-center text-gray-500">
+            <button
+              className="hover:text-indigo-600 cursor-pointer"
+              onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
+            >
+              <Eye size={16} />
+            </button>
+            <button
+              className="hover:text-green-600 cursor-pointer"
+              onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
+            >
+              <Edit size={16} />
+            </button>
+            <button
+              className="hover:text-red-600 cursor-pointer"
+              onClick={() => {
+                setTaskToDelete(rowData.id);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -122,38 +171,51 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
 
   return (
-    <table className="w-full border-separate border-spacing-y-3 text-sm">
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="text-left text-gray-500 text-xs">
-            {headerGroup.headers.map((header) => (
-              <th key={header.id} className="pb-2">
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className="bg-white border border-gray-200 rounded-lg shadow-sm"
-          >
-            {row.getVisibleCells().map((cell) => (
-              <td key={cell.id} className="px-4 py-3">
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <>
+      <table className="w-full border-separate border-spacing-y-3 text-sm">
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr
+              key={headerGroup.id}
+              className="text-left text-gray-500 text-xs"
+            >
+              {headerGroup.headers.map((header) => (
+                <th key={header.id} className="pb-2">
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr
+              key={row.id}
+              className="bg-white border border-gray-200 rounded-lg shadow-sm"
+            >
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} className="px-4 py-3">
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <DeleteTaskDialog
+        openOrNot={deleteDialogOpen}
+        onCancelClick={() => setDeleteDialogOpen(false)}
+        label="Are you sure you want to delete this task?"
+        onOKClick={handleDeleteClick}
+        deleteLoading={deleteLoading}
+      />
+    </>
   );
 };
 
