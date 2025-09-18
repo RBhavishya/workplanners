@@ -141,12 +141,12 @@ const Viewdetails = () => {
   const availableUsers = availableUsersData?.data?.data || [];
 
   const statusColors: Record<string, string> = {
-    NEW: "bg-blue-100 text-blue-800",
-    PENDING: "bg-yellow-100 text-yellow-800",
-    IN_PROGRESS: "bg-purple-100 text-purple-800",
-    REVIEW: "bg-orange-100 text-orange-800",
-    COMPLETED: "bg-green-100 text-green-800",
-  };
+  NEW: "bg-purple-100 text-purple-600",
+  IN_PROGRESS: "bg-blue-100 text-blue-600",
+  REVIEW: "bg-yellow-100 text-yellow-700",
+  OVERDUE: "bg-red-100 text-red-600",
+  COMPLETED: "bg-green-100 text-green-600",
+};
 
   const formatDate = (dateStr: string | null) =>
     dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
@@ -256,7 +256,7 @@ const Viewdetails = () => {
             >
               <option value="NEW">NEW</option>
               <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="OVERDUE">PENDING</option>
+              <option value="OVERDUE">OVERDUE</option>
               <option value="REVIEW">REVIEW</option>
               <option value="COMPLETED">COMPLETED</option>
             </select>
