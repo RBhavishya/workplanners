@@ -252,7 +252,7 @@ const Viewdetails = () => {
             <select
               value={projectdata.project_status}
               onChange={(e) => handleStatusChange(e.target.value)}
-              className="ml-2 border rounded p-1"
+              className="ml-2 border rounded p-1 cursor-pointer"
             >
               <option value="NEW">NEW</option>
               <option value="IN_PROGRESS">IN_PROGRESS</option>
@@ -284,7 +284,7 @@ const Viewdetails = () => {
                 >
                   <span>{user.display_name || "Unnamed"}</span>
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 cursor-pointer"
                     onClick={() => handleRemoveUser(user.id)}
                   >
                     ✕

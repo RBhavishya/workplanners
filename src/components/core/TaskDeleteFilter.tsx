@@ -33,7 +33,7 @@ const DeleteTaskDialog = ({
           {/* Delete Button */}
           <button
             type="button"
-            className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 hover:bg-red-700 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={onOKClick}
             disabled={deleteLoading}
           >
@@ -46,7 +46,7 @@ const DeleteTaskDialog = ({
           {/* Cancel Button */}
           <button
             type="button"
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
             onClick={onCancelClick}
             disabled={deleteLoading}
           >
