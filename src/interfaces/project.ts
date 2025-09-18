@@ -6,6 +6,7 @@ export interface User {
 export interface ProjectData {
   id?: number;
   title: string;
+  project_status?: string;
   description?: string;
   status?: string;
   created_by: string | number;

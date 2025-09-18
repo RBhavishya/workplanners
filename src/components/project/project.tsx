@@ -63,6 +63,14 @@ const Projects = () => {
   const [search_string, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(search_string);
 
+  const statusColors: Record<string, string> = {
+    NEW: "bg-purple-100 text-purple-600",
+    IN_PROGRESS: "bg-blue-100 text-blue-600",
+    REVIEW: "bg-yellow-100 text-yellow-700",
+    OVERDUE: "bg-red-100 text-red-600",
+    COMPLETED: "bg-green-100 text-green-600",
+  };
+
   // live clock
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -245,11 +253,11 @@ const Projects = () => {
           <>
             {/* Grid Cards */}
             <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-               {(isLoading || isFetching) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
+              {(isLoading || isFetching) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
 
               {projectsData.length === 0 && !isLoading ? (
                 <p className="text-gray-500 col-span-3 text-center py-6">
@@ -296,12 +304,26 @@ const Projects = () => {
 
                     {/* Card Content */}
                     <CardContent className="flex flex-col items-center text-center">
+                      {/* Project logo / initial */}
                       <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white font-bold text-xl mb-4">
                         {project.title?.charAt(0).toUpperCase() || "?"}
                       </div>
+
+                      {/* Project title */}
                       <h2 className="text-lg font-semibold break-words text-center px-2">
                         {project.title || "Untitled"}
                       </h2>
+
+                      {/* Project status */}
+                      <span
+                        className={`mt-2 text-xs px-3 py-1 rounded-full font-medium ${
+                          statusColors[
+                            project.project_status?.toUpperCase() || ""
+                          ] || "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {project.project_status || "Unknown"}
+                      </span>
                     </CardContent>
                   </Card>
                 ))
