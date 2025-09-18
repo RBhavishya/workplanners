@@ -233,7 +233,7 @@ const AddTaskForm = ({
       <div className="flex items-center justify-start gap-3 mb-4">
         <button
           type="button"
-          onClick={handleNavigation}
+           onClick={() => window.history.back()}
           className="px-2 py-2 text-gray-600 rounded cursor-pointer"
         >
           <MoveLeft size={20} />
