@@ -30,6 +30,14 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
+  const statusColors: Record<string, string> = {
+  NEW: "bg-purple-100 text-purple-600",
+  IN_PROGRESS: "bg-blue-100 text-blue-600",
+  REVIEW: "bg-yellow-100 text-yellow-700",
+  OVERDUE: "bg-red-100 text-red-600",
+  COMPLETED: "bg-green-100 text-green-600",
+};
+
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
     onSuccess: (res: any) => {
@@ -101,22 +109,19 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         </div>
       ),
     },
-    {
-      header: "Status",
-      accessorKey: "task_status",
-      cell: ({ row }) => {
-        const status = row.original.task_status;
-        return (
-          <span
-            className={`px-3 py-1 rounded-md text-xs font-semibold ${getStatusStyle(
-              status
-            )}`}
-          >
-            {status}
-          </span>
-        );
+   {
+        header: "Status",
+        accessorKey: "task_status",
+        cell: ({ row }) => {
+          const status = row.original.task_status?.toUpperCase();
+          const cls = statusColors[status] || "bg-gray-100 text-gray-600";
+          return (
+            <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
+              {status || "Unknown"}
+            </span>
+          );
+        },
       },
-    },
     {
       header: "Due Date",
       accessorFn: (row) => formatDate(row.end_date),

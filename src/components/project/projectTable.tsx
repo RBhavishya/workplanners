@@ -47,6 +47,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   page,
   pageSize,
   setPage,
+  setPageSize,
   onDelete,
 }) => {
   const navigate = useNavigate();
@@ -205,11 +206,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         header: "Status",
         accessorKey: "project_status",
         cell: ({ row }) => {
-          const status = row.original.project_status;
+          const status = row.original.project_status?.toUpperCase();
           const cls = statusColors[status] || "bg-gray-100 text-gray-600";
           return (
             <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
-              {status}
+              {status || "Unknown"}
             </span>
           );
         },
@@ -313,10 +314,31 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       {/* Pagination */}
       {pagination && (
         <div className="flex justify-between items-center p-3 text-sm text-gray-600">
+          {/* Page Info */}
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
 
+          {/* Page Size Selector */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="pageSize" className="text-gray-600">
+              Show:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={(e) => setPageSize(Number(e.target.value))}
+              className="border rounded px-2 py-1 text-sm"
+            >
+              {[10, 25, 75, 100].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Pagination Controls */}
           <div className="flex items-center gap-2">
             <button
               disabled={!pagination.prev_page}
@@ -370,6 +392,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             </button>
           </div>
 
+          {/* Total Records */}
           <span>Total Records: {pagination.total_records}</span>
         </div>
       )}
