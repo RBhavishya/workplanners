@@ -175,7 +175,7 @@ const Projects = () => {
   }
 
   return (
-    <div className="w-full p-4">
+    <div className="relative overflow-x-auto border rounded-xl">
       <div className="flex items-center justify-between mb-7 px-4">
         <h2 className="font-bold text-2xl">Projects</h2>
         <div className="flex items-center gap-4">
