@@ -78,7 +78,7 @@ const DeleteProject = ({
         <DialogFooter>
           <button
             type="button"
-            className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
           >
@@ -108,7 +108,7 @@ const DeleteProject = ({
           </button>
           <button
             type="button"
-            className="px-4 py-2 border rounded-lg"
+            className="px-4 py-2 border rounded-lg cursor-pointer"
             onClick={() => {
               setOpen(false);
               onClose();

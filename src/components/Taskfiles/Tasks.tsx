@@ -311,7 +311,7 @@ const Tasks = () => {
           </DropdownMenu>
 
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3"
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
             onClick={handleNavigation}
           >
             + New Task
