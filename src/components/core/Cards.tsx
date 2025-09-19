@@ -37,7 +37,7 @@ const BigCard = ({ title, value = 0, icon }: BigCardProps) => {
 
   return (
     <div
-      className={`w-50 h-25 rounded-2xl shadow-sm flex items-center justify-between p-4 ${bg}`}
+      className={`w-47 h-25 rounded-2xl shadow-sm flex items-center justify-between p-4 ${bg}`}
     >
       <div className="flex flex-col">
         <span className="text-sm text-gray-600">{title}</span>
