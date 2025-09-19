@@ -24,8 +24,11 @@ const Dashboard = () => {
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("current_page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const [time, setTime] = useState(new Date());
+  const [open, setOpen] = useState(false);
 
   // Live clock
   useEffect(() => {
@@ -75,23 +78,24 @@ const Dashboard = () => {
         pageIndex: pageParam,
         pageSize: pageSizeParam,
       };
-
       const response = await getTodayTasksAPI(queryParams);
       const tasks = response?.data?.data?.records || [];
-      const pagination = response?.data?.data?.pagination || {
+      const pagination = response?.data?.data?.pagination_info || {
         current_page: pageParam,
         page_size: pageSizeParam,
-        total_pages: 0,
+        total_pages: 1,
         total_records: 0,
       };
-
-      return { tasks, pagination };
+      return { tasks, pagination_info: pagination };
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (!lastPage?.pagination) return undefined;
-      if (lastPage.pagination.current_page < lastPage.pagination.total_pages) {
-        return lastPage.pagination.current_page + 1;
+      if (!lastPage?.pagination_info) return undefined;
+      if (
+        lastPage.pagination_info.current_page <
+        lastPage.pagination_info.total_pages
+      ) {
+        return lastPage.pagination_info.current_page + 1;
       }
       return undefined;
     },
@@ -101,22 +105,48 @@ const Dashboard = () => {
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const handleScroll = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  const setupObserver = useCallback(() => {
+    if (isFetchingNextPage || !hasNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: containerRef.current,
+        rootMargin: "100px",
+        threshold: 0.5,
+      }
+    );
 
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    if (scrollTop + clientHeight >= scrollHeight - 20) {
-      if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+    if (loadMoreRef.current) {
+      observer.current.observe(loadMoreRef.current);
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    const cleanup = setupObserver();
+    if (!isFetchingNextPage && open) {
+      const timer = setTimeout(() => {
+        setupObserver();
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+        cleanup && cleanup();
+      };
+    }
+
+    return cleanup;
+  }, [setupObserver, isFetchingNextPage]);
 
   return (
     <div className="p-0 flex gap-4">
@@ -219,7 +249,7 @@ const Dashboard = () => {
         </div>
 
         {/* Task List */}
-        <div ref={containerRef} className="space-y-4  pr-2">
+        <div ref={containerRef} className="space-y-4 overflow-y-auto pr-2">
           {isFetching && !isFetchingNextPage ? (
             <div className="flex items-center justify-center py-6">
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
@@ -270,11 +300,14 @@ const Dashboard = () => {
             ))
           )}
 
-          {isFetchingNextPage && (
-            <p className="text-sm text-gray-500 text-center py-2">
-              Loading more...
-            </p>
-          )}
+          <div
+            ref={loadMoreRef}
+            className="min-h-[100px] flex justify-center items-center"
+          >
+            {isFetchingNextPage && (
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            )}
+          </div>
         </div>
       </div>
     </div>
