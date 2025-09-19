@@ -8,6 +8,8 @@ import loginimage from "src/assets/loginimage.png";
 import slackicon from "src/assets/slackicon.svg";
 import { slackAuthAPI, slackCallbackAPI } from "@/https/services/auth";
 import { Loader2 } from "lucide-react";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -128,7 +130,7 @@ const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm mb-1">Email</label>
-              <input
+              <Input
                 id="email"
                 placeholder="Enter your email"
                 className="w-full px-4 py-2 border rounded-lg text-sm focus:ring focus:ring-indigo-200 outline-none"
@@ -139,7 +141,7 @@ const LoginPage: React.FC = () => {
 
             <div>
               <label className="block text-sm mb-1">Password</label>
-              <input
+              <Input
                 id="password"
                 placeholder="Enter your password"
                 className="w-full px-4 py-2 border rounded-lg text-sm focus:ring focus:ring-indigo-200 outline-none"
@@ -160,12 +162,12 @@ const LoginPage: React.FC = () => {
             </div>
 
             {/* Submit button */}
-            <button
+            <Button
               type="submit"
               className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 cursor-pointer"
             >
               {activeTab === "signin" ? "Log In" : "Sign Up"}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

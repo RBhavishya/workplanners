@@ -148,7 +148,6 @@ const AddTaskForm = ({
       taskId: number;
       payload: any;
     }) => {
-      console.log("Updating task with:", taskId, payload);
       return await updateTasksAPI(taskId, payload);
     },
     onSuccess: (res: any) => {
@@ -221,12 +220,9 @@ const AddTaskForm = ({
           ? new Date(taskResp.data?.data.end_date)
           : undefined
       );
-      // setSelectedProject(taskResp.data?.data.project_id);
-      // setAssignedUsers(taskResp.data.assigned_users || []);
     }
   }, [taskResp, mode]);
 
-  console.log(taskResp, "taskResp");
   return (
     <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
       {/* Header */}

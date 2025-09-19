@@ -162,7 +162,7 @@ const Statisticstable = () => {
     statsData.length === 0 ? 0 : startIndex + statsData.length - 1;
 
   return (
-    <div className="bg-white p-6 mt-6 rounded-2xl shadow-md">
+    <div className="bg-white p-6 mt-3 rounded-2xl shadow-md">
       <h2 className="text-lg font-semibold mb-4">STATISTICS</h2>
 
       {isLoading ? (
@@ -180,12 +180,15 @@ const Statisticstable = () => {
       ) : isError ? (
         <p className="text-red-500">Error fetching statistics</p>
       ) : (
-        <>
+        <div className="h-[calc(100vh-325px)] overflow-y-auto">
           {/* ✅ Existing Table Render */}
           <table className="w-full text-left border-separate border-spacing-y-2">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="text-gray-600">
+                <tr
+                  key={headerGroup.id}
+                  className="text-gray-600 sticky top-0 bg-white"
+                >
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-4 py-2 cursor-pointer">
                       {flexRender(
@@ -228,7 +231,7 @@ const Statisticstable = () => {
           </table>
 
           {/* Pagination */}
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white">
             <div className="text-sm text-gray-600">
               {`${startIndex} - ${endIndex} of ${totalRecords}`}
             </div>
@@ -264,7 +267,7 @@ const Statisticstable = () => {
               ))}
             </select>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
