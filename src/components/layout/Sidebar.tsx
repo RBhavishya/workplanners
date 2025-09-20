@@ -10,6 +10,11 @@ import {
 } from 'lucide-react';
 import UserDetails from '../login/UserDetails';
 
+import { ProjectsIcon } from '../icons/ProjectsIcon';
+import { TasksIcon } from '../icons/TasksIcon';
+import { DashBoardIcon } from '../icons/DashBoardIcon';
+import { UsersIcon } from '../icons/UsersIcon';
+
 const Sidebar = () => {
 
   return (
@@ -22,7 +27,7 @@ const Sidebar = () => {
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
           activeProps={{ className: 'bg-purple-100 text-purple-600 font-medium' }}
         >
-          <LayoutDashboard className="mr-3 w-4 h-4" />
+          <DashBoardIcon className="mr-3 w-4 h-4" />
           Dashboard
         </Link>
         <Link
@@ -30,7 +35,7 @@ const Sidebar = () => {
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
           activeProps={{ className: 'bg-purple-100 text-purple-600 font-medium' }}
         >
-          <ClipboardList className="mr-3 w-4 h-4" />
+          <TasksIcon className="mr-3 w-4 h-4" />
           Tasks
         </Link>
         <Link
@@ -38,8 +43,16 @@ const Sidebar = () => {
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
           activeProps={{ className: 'bg-purple-100 text-purple-600 font-medium' }}
         >
-          <NotebookPen className="mr-3 w-4 h-4" />
+          <ProjectsIcon className="mr-3 w-4 h-4" />
           Projects
+        </Link>
+         <Link
+          to="/users"
+          className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
+          activeProps={{ className: 'bg-purple-100 text-purple-600 font-medium' }}
+        >
+          <UsersIcon className="mr-3 w-4 h-4" />
+          Users
         </Link>
       </nav>
     </aside>

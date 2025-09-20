@@ -18,3 +18,15 @@ export const slackCallbackAPI = async (code: string): Promise<SlackCallbackRespo
     throw error;
   }
 };
+
+export const LoginAPI = async (payload: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    const response = await $fetch.post("/auth/login", payload);
+    return response;
+  } catch (err) {
+    throw err;
+  }
+};

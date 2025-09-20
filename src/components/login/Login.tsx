@@ -6,18 +6,26 @@ import Cookies from "js-cookie";
 
 import loginimage from "src/assets/loginimage.png";
 import slackicon from "src/assets/slackicon.svg";
-import { slackAuthAPI, slackCallbackAPI } from "@/https/services/auth";
-import { Loader2 } from "lucide-react";
+import {
+  LoginAPI,
+  slackAuthAPI,
+  slackCallbackAPI,
+} from "@/https/services/auth";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { loginProps } from "@/interfaces";
+import { toast } from "sonner";
+import { errPopper } from "@/lib/helpers/errPoppers";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as any;
   const [code2, setCode2] = useState<string>();
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginDetails, setLoginDetails] = useState({ email: "", password: "" });
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     if (search?.code) {
@@ -33,11 +41,11 @@ const LoginPage: React.FC = () => {
       if (data?.authUrl) {
         window.location.href = data.authUrl;
       } else {
-        alert("Unable to start Slack login. Please try again.");
+        toast.error("Unable to start Slack login. Please try again.");
       }
     },
     onError: () => {
-      alert("Slack login error. Please try again.");
+      toast.error("Slack login error. Please try again.");
     },
   });
 
@@ -62,23 +70,49 @@ const LoginPage: React.FC = () => {
     },
   });
 
+  const loginMutation = useMutation({
+    mutationFn: async (loginDetails: loginProps) => {
+      return await LoginAPI(loginDetails);
+    },
+    onSuccess: (response) => {
+      toast.success(response?.data?.message);
+        const { data } = response?.data;
+      const { access_token, user_details } = response?.data?.data;
+      Cookies.set("token", access_token, { priority: "High" });
+      localStorage.setItem("user", JSON.stringify(user_details));
+      navigate({
+        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+      });
+    },
+    onError: (error: any) => {
+      if (error?.status === 422) {
+        const errData = error?.data?.errData;
+        setErrors(errData || {});
+      } else {
+        toast.error(error?.data?.message || "Failed to login");
+      }
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
   useEffect(() => {
     if (code2) {
       slackCallbackMutation.mutate(code2);
     }
   }, [code2]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (activeTab === "signin") {
-      console.log("Sign In:", { email, password });
-      // Call your login API
-    } else {
-      console.log("Sign Up:", { email, password });
-      // Call your register API
-    }
+    setErrors({});
+    setLoading(true);
+    loginMutation.mutate(loginDetails);
+  };
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
   };
 
+  console.log(errors);
   return (
     <div className="flex h-screen w-screen">
       {/* Left side illustration */}
@@ -101,7 +135,7 @@ const LoginPage: React.FC = () => {
             Sign In To Your Account Or Create New One
           </p>
 
-          {/* Tabs */}
+          {/* Slack button */}
           <button
             onClick={() => slackAuthMutation.mutate()}
             className="flex items-center justify-center gap-3 w-full px-6 py-3 border border-gray-300 rounded-lg mb-6 cursor-pointer"
@@ -127,29 +161,60 @@ const LoginPage: React.FC = () => {
           </div>
 
           {/* Email + Password form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm mb-1">Email</label>
+              <label className="block text-sm mb-1">
+                Email <span className="text-red-500">*</span>
+              </label>
               <Input
                 id="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-2 border rounded-lg text-sm focus:ring focus:ring-indigo-200 outline-none"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder=" Enter your Email"
+                onChange={(e) =>
+                  setLoginDetails({
+                    ...loginDetails,
+                    email: e.target.value,
+                  })
+                }
               />
+              {errors?.email && (
+                <p className="text-xs pt-1 text-red-600">
+                  {errors.email.join(", ")}
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Password</label>
-              <Input
-                id="password"
-                placeholder="Enter your password"
-                className="w-full px-4 py-2 border rounded-lg text-sm focus:ring focus:ring-indigo-200 outline-none"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <label className="block text-sm mb-1">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <div className="relative w-full">
+                <Input
+                  id="password"
+                  placeholder="Password"
+                  type={passwordVisible ? "text" : "password"}
+                  value={loginDetails.password}
+                  onChange={(e) =>
+                    setLoginDetails({
+                      ...loginDetails,
+                      password: e.target.value,
+                    })
+                  }
+                  className="pr-10" // Add padding so text/placeholder doesn't overlap button
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
+                >
+                  {passwordVisible ? <Eye /> : <EyeOff />}
+                </button>
+              </div>
+              {errors?.password && (
+                <p className="text-xs pt-1 text-red-600">
+                  {errors.password[0]}
+                </p>
+              )}
             </div>
-
             {/* Forgot Password */}
             <div className="flex justify-end">
               <button
@@ -166,7 +231,11 @@ const LoginPage: React.FC = () => {
               type="submit"
               className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {activeTab === "signin" ? "Log In" : "Sign Up"}
+              {loading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                "Log In"
+              )}
             </Button>
           </form>
         </div>
