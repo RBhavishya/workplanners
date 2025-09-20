@@ -11,7 +11,7 @@ import {
   slackAuthAPI,
   slackCallbackAPI,
 } from "@/https/services/auth";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { loginProps } from "@/interfaces";
@@ -26,7 +26,6 @@ const LoginPage: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     if (search?.code) {
@@ -76,13 +75,14 @@ const LoginPage: React.FC = () => {
       return await LoginAPI(loginDetails);
     },
     onSuccess: (response) => {
-        toast.success(response?.data?.message);
-        const { access_token, user_details } = response?.data?.data;
-        Cookies.set("token", access_token, { priority: "High" });
-        localStorage.setItem("user", JSON.stringify(user_details));
-        navigate({
-          to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
-        });
+      toast.success(response?.data?.message);
+        const { data } = response?.data;
+      const { access_token, user_details } = response?.data?.data;
+      Cookies.set("token", access_token, { priority: "High" });
+      localStorage.setItem("user", JSON.stringify(user_details));
+      navigate({
+        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+      });
     },
     onError: (error: any) => {
       if (error?.status === 422) {
@@ -107,6 +107,9 @@ const LoginPage: React.FC = () => {
     setErrors({});
     setLoading(true);
     loginMutation.mutate(loginDetails);
+  };
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
   };
 
   console.log(errors);
@@ -184,24 +187,34 @@ const LoginPage: React.FC = () => {
               <label className="block text-sm mb-1">
                 Password <span className="text-red-500">*</span>
               </label>
-              <Input
-                id="password"
-                placeholder="Password"
-                // type={passwordVisible ? "text" : "password"}
-                onChange={(e) =>
-                  setLoginDetails({
-                    ...loginDetails,
-                    password: e.target.value,
-                  })
-                }
-              />
+              <div className="relative w-full">
+                <Input
+                  id="password"
+                  placeholder="Password"
+                  type={passwordVisible ? "text" : "password"}
+                  value={loginDetails.password}
+                  onChange={(e) =>
+                    setLoginDetails({
+                      ...loginDetails,
+                      password: e.target.value,
+                    })
+                  }
+                  className="pr-10" // Add padding so text/placeholder doesn't overlap button
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
+                >
+                  {passwordVisible ? <Eye /> : <EyeOff />}
+                </button>
+              </div>
               {errors?.password && (
                 <p className="text-xs pt-1 text-red-600">
-                  {errors.password.join(", ")}
+                  {errors.password[0]}
                 </p>
               )}
             </div>
-
             {/* Forgot Password */}
             <div className="flex justify-end">
               <button
