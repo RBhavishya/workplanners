@@ -51,15 +51,16 @@ const UserDetails: React.FC = () => {
             {/* Name + Greeting inside accordion header */}
             <div className="flex items-center space-x-4">
               <img
-                src={user.profile_pic}
-                alt={user.display_name}
+                src={
+                  user.profile_pic
+                    ? user.profile_pic
+                    : "/table/profile.webp"
+                }
+                alt={user.display_name || "User"}
                 className="h-12 w-12 rounded-full object-cover shadow-md"
               />
               <div className="text-left">
-                <p className="font-semibold">{user.display_name}</p>
-                {/* <p className="text-sm text-gray-500">
-                  {getGreeting()}, {user.display_name}
-                </p> */}
+                <p className="font-semibold">{user.display_name || "User"}</p>
               </div>
             </div>
           </AccordionTrigger>
