@@ -9,10 +9,11 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import UserDetails from '../login/UserDetails';
-import { UsersIcon } from '../icons/usersIcon';
+
 import { ProjectsIcon } from '../icons/ProjectsIcon';
 import { TasksIcon } from '../icons/TasksIcon';
 import { DashBoardIcon } from '../icons/DashBoardIcon';
+import { UsersIcon } from '../icons/UsersIcon';
 
 const Sidebar = () => {
 

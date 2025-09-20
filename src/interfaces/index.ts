@@ -72,3 +72,8 @@ export interface IReportsFilters {
   setSearchString: any;
   title?: string;
 }
+
+export interface loginProps {
+  email: string;
+  password: string;
+}

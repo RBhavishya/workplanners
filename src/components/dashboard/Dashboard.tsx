@@ -257,7 +257,7 @@ const Dashboard = () => {
             </div>
           ) : !todaytasks?.length ? (
             <p className="text-sm text-gray-500 text-center">
-              No tasks for today 🎉
+              No tasks for today
             </p>
           ) : (
             todaytasks.map((task: any, index: number) => (
