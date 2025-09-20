@@ -96,7 +96,7 @@ export const taskColumns = [
     id: "start_date",
     cell: (info: any) => {
       const date: string = info.getValue();
-      return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+      return <span>{date ? dayjs(date).format("DD-MM-YYYY") : "-"}</span>;
     },
     width: "50px",
     maxWidth: "50px",
@@ -109,7 +109,7 @@ export const taskColumns = [
     id: "end_date",
     cell: (info: any) => {
       const date: string = info.getValue();
-      return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+      return <span>{date ? dayjs(date).format("DD-MM-YYYY") : "-"}</span>;
     },
     width: "50px",
     maxWidth: "50px",

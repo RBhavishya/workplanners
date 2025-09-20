@@ -183,7 +183,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         id: "start_date",
         cell: (info: any) => {
           const date: string = info.getValue();
-          return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+          return <span>{date ? dayjs(date).format("DD-MM-YYYY") : "-"}</span>;
         },
       },
       {
@@ -199,7 +199,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         id: "due_date",
         cell: (info: any) => {
           const date: string = info.getValue();
-          return <span>{date ? dayjs(date).format("MM-DD-YYYY") : "-"}</span>;
+          return <span>{date ? dayjs(date).format("DD-MM-YYYY") : "-"}</span>;
         },
       },
       {
