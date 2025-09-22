@@ -1,17 +1,19 @@
-import { getAllPaginatedUsers } from "@/https/services/users";
+import { deleteUserAPI, getAllPaginatedUsers } from "@/https/services/users";
 import { addSerial } from "@/lib/helpers/addSerial";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import TanStackTable from "../core/TasksTanstacktable";
-import { taskColumns } from "../Taskfiles/TaskColumns";
 import { usersColumns } from "./UsersColumns";
 import { Edit, Eye, Trash } from "lucide-react";
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import { toast } from "sonner";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
+    const queryClient = useQueryClient();
   const location = useLocation();
   const router = useRouter();
   const searchParams = new URLSearchParams(location.search);
@@ -24,14 +26,16 @@ const UsersDetais = () => {
 
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const { isLoading, isError, data, error, isFetching } = useQuery({
-    queryKey: ["tasks", pagination, debouncedSearch, del],
+  const { isLoading,data,isFetching } = useQuery({
+    queryKey: ["users", pagination, debouncedSearch, del],
     queryFn: async () => {
       const response = await getAllPaginatedUsers({
         pageIndex: pagination.pageIndex,
@@ -66,7 +70,33 @@ const UsersDetais = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-  const handleNavigation = () => navigate({ to: `/tasks/add` });
+
+    const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
+    mutationFn: (id: number) => deleteUserAPI(id),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "User deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDeleteDialogOpen(false);
+    },
+    onError: (error: any) => {
+      let message = "Failed to delete User.";
+      if (error?.status === 409) {
+        message = error?.message || "Conflict: User cannot be deleted.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      toast.error(message);
+      setDeleteDialogOpen(false);
+    },
+  });
+
+  const handleDeleteClick = () => {
+    if (userToDelete) {
+      deleteTask(userToDelete);
+    }
+  };
+
+  const handleNavigation = () => navigate({ to: `/users/adduser` });
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -117,10 +147,10 @@ const UsersDetais = () => {
 
             <button
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => {
-              //   setTaskToDelete(rowData.id);
-              //   setDeleteDialogOpen(true);
-              // }}
+              onClick={() => {
+                setUserToDelete(rowData.id);
+                setDeleteDialogOpen(true);
+              }}
             >
               <Trash size={16} />
             </button>
@@ -167,6 +197,13 @@ const UsersDetais = () => {
             ]}
           />
         </div>
+         <DeleteTaskDialog
+          openOrNot={deleteDialogOpen}
+          onCancelClick={() => setDeleteDialogOpen(false)}
+          label="Are you sure you want to delete this user?"
+          onOKClick={handleDeleteClick}
+          deleteLoading={deleteLoading}
+        />
       </div>
     </div>
   );

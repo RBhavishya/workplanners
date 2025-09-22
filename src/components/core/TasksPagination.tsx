@@ -178,27 +178,6 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
             />
           </PaginationItem>
 
-          {/* {getPageNumbers().map((pageNumber, index) =>
-            pageNumber === null ? (
-              <PaginationItem key={`ellipsis-${index}`}>
-                <PaginationEllipsis />
-              </PaginationItem>
-            ) : (
-              <PaginationItem key={pageNumber}>
-                <PaginationLink
-                  href="#"
-                  isActive={pageNumber === currentPage}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handlePageChange(pageNumber);
-                  }}
-                >
-                  {pageNumber}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          )} */}
-
            {getPageNumbers(currentPage, totalPages).map((pageNumber, index) =>
             pageNumber === null ? (
               <PaginationItem key={`ellipsis-${index}`}>

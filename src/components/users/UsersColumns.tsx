@@ -1,5 +1,3 @@
-import dayjs from "dayjs";
-import { Edit, Eye, Trash } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-600",
@@ -28,7 +26,7 @@ export const usersColumns = [
       </div>
     ),
     cell: (info: any) => {
-      const title = info.getValue() || "-"; // fallback
+      const title = info.getValue() || "-";
       return (
         <div className="flex items-center gap-2" style={{ textAlign: "left" }}>
           <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">

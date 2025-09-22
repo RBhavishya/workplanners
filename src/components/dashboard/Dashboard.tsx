@@ -30,7 +30,6 @@ const Dashboard = () => {
   const [time, setTime] = useState(new Date());
   const [open, setOpen] = useState(false);
 
-  // Live clock
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -43,10 +42,8 @@ const Dashboard = () => {
     month: "short",
   });
 
-  // ✅ Fetch dashboard stats
   const {
     data: stats,
-    isLoading: statsLoading,
     isError,
   } = useQuery({
     queryKey: ["dashboardStats"],
@@ -64,7 +61,6 @@ const Dashboard = () => {
     },
   });
 
-  // ✅ Infinite query for today's tasks
   const {
     data: todaytasksPages,
     fetchNextPage,
@@ -101,9 +97,7 @@ const Dashboard = () => {
     },
   });
 
-  // Flatten tasks from all pages
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
-
   const containerRef = useRef<HTMLDivElement>(null);
   const setupObserver = useCallback(() => {
     if (isFetchingNextPage || !hasNextPage) return;
@@ -150,10 +144,8 @@ const Dashboard = () => {
 
   return (
     <div className="p-0 flex gap-4">
-      {/* Left side - Stats + Table */}
       <div className="w-3/4">
         <div className="bg-white p-2 rounded-xl shadow mb-2">
-          {/* Stats Cards */}
           <div className="flex flex-wrap gap-6">
             {isError ? (
               <p className="text-red-500">Error loading stats</p>
@@ -216,8 +208,6 @@ const Dashboard = () => {
       <div className="w-1/3 bg-white rounded-xl shadow p-4 flex flex-col overflow-auto h-[calc(100vh-110px)]">
         <h2 className="text-lg font-semibold mb-1">Today’s Task</h2>
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
-
-        {/* Tabs (All, Open, Closed, Overdue) */}
         <div className="flex items-center gap-4 mb-4 text-sm font-medium">
           <span className="text-purple-600">
             TotalTasks{" "}
@@ -248,7 +238,6 @@ const Dashboard = () => {
           </span>
         </div>
 
-        {/* Task List */}
         <div ref={containerRef} className="space-y-4 overflow-y-auto pr-2">
           {isFetching && !isFetchingNextPage ? (
             <div className="flex items-center justify-center py-6">

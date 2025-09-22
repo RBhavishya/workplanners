@@ -25,3 +25,13 @@ export const getAllPaginatedUsers = async ({
     throw err;
   }
 };
+
+export const deleteUserAPI = async (id: number) => {
+  try {
+    const payload = {users_id: [id] };
+    const response = await $fetch.delete(`/users/${id}`,  payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
