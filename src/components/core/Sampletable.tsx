@@ -30,17 +30,16 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     pageSize: pageSizeParam,
   });
 
-  // ✅ fetch tasks with pagination
-  const { data, isLoading ,error} = useQuery({
-  queryKey: ["tasks", projectId, pagination],
-  queryFn: () =>
-    getTasksByProjectId({
-      projectId,
-      pageIndex: pagination.pageIndex,
-      pageSize: pagination.pageSize,
-    }),
-  enabled: !!projectId,
-});
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["tasks", projectId, pagination],
+    queryFn: () =>
+      getTasksByProjectId({
+        projectId,
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      }),
+    enabled: !!projectId,
+  });
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -63,9 +62,9 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {
-      let message = "Failed to delete project.";
+      let message = "Failed to delete task.";
       if (error?.status === 409) {
-        message = error?.message || "Conflict: Project cannot be deleted.";
+        message = error?.message || "Conflict: Task cannot be deleted.";
       } else if (error?.response?.data?.message) {
         message = error.response.data.message;
       }
@@ -101,7 +100,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     {
       header: "S. No",
       accessorFn: (_row, index) =>
-        (pagination.pageIndex - 1) * pagination.pageSize + index + 1, // ✅ continues across pages
+        (pagination.pageIndex - 1) * pagination.pageSize + index + 1,
       cell: ({ getValue }) => (
         <span className="text-gray-600 text-sm flex justify-center">
           {getValue() as number}
@@ -187,58 +186,56 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
 
   return (
-    <>
-      <table className="w-full border-separate border-spacing-y-3 text-sm">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr
-              key={headerGroup.id}
-              className="text-left text-gray-500 text-xs"
-            >
-              {headerGroup.headers.map((header) => (
-                <th key={header.id} className="pb-2">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr
-              key={row.id}
-              className="bg-white border border-gray-200 rounded-lg shadow-sm"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex flex-col h-screen p-4">
+      {/* Scrollable table container */}
+      <div className="overflow-auto flex-1 border border-gray-200 rounded-lg">
+        <table className="w-full border-separate border-spacing-y-3 text-sm">
+          <thead className="bg-gray-50 sticky top-0 z-10">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="text-left text-gray-500 text-xs">
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} className="pb-2 px-4">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="bg-white border-b border-gray-200">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-3">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <TasksPagination
-        paginationDetails={
-          data?.data?.data?.pagination_info || {
-            total_records: 0,
-            total_pages: 1,
-            current_page: pagination.pageIndex,
-            page_size: pagination.pageSize,
-            next_page: null,
-            prev_page: null,
+      {/* Pagination */}
+      <div className="mt-4">
+        <TasksPagination
+          paginationDetails={
+            data?.data?.data?.pagination_info || {
+              total_records: 0,
+              total_pages: 1,
+              current_page: pagination.pageIndex,
+              page_size: pagination.pageSize,
+              next_page: null,
+              prev_page: null,
+            }
           }
-        }
-        capturePageNum={capturePageNum}
-        captureRowPerItems={captureRowPerItems}
-      />
+          capturePageNum={capturePageNum}
+          captureRowPerItems={captureRowPerItems}
+        />
+      </div>
 
+      {/* Delete Dialog */}
       <DeleteTaskDialog
         openOrNot={deleteDialogOpen}
         onCancelClick={() => setDeleteDialogOpen(false)}
@@ -246,7 +243,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         onOKClick={handleDeleteClick}
         deleteLoading={deleteLoading}
       />
-    </>
+    </div>
   );
 };
 
