@@ -9,21 +9,38 @@ import {
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { getTasksByProjectId } from "@/https/services/project";
 import { Task, TaskResponse } from "@/interfaces/project";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { deleteTasksAPI } from "@/https/services/tasks";
 import { toast } from "sonner";
-import DeleteTaskDialog from "../core/TaskDeleteFilter"; // ✅ make sure path is correct
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import TasksPagination from "./TasksPagination";
 
 interface TasksTableProps {
   projectId: number;
 }
 
 const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
-  const { data, isLoading, error } = useQuery<TaskResponse, Error>({
-    queryKey: ["tasks", projectId],
-    queryFn: () => getTasksByProjectId(projectId),
-    enabled: !!projectId,
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const pageIndexParam = Number(searchParams.get("page")) || 1;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+
+  const [pagination, setPagination] = useState({
+    pageIndex: pageIndexParam,
+    pageSize: pageSizeParam,
   });
+
+  // ✅ fetch tasks with pagination
+  const { data, isLoading ,error} = useQuery({
+  queryKey: ["tasks", projectId, pagination],
+  queryFn: () =>
+    getTasksByProjectId({
+      projectId,
+      pageIndex: pagination.pageIndex,
+      pageSize: pagination.pageSize,
+    }),
+  enabled: !!projectId,
+});
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -31,12 +48,12 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   const statusColors: Record<string, string> = {
-  NEW: "bg-purple-100 text-purple-600",
-  IN_PROGRESS: "bg-blue-100 text-blue-600",
-  REVIEW: "bg-yellow-100 text-yellow-700",
-  OVERDUE: "bg-red-100 text-red-600",
-  COMPLETED: "bg-green-100 text-green-600",
-};
+    NEW: "bg-purple-100 text-purple-600",
+    IN_PROGRESS: "bg-blue-100 text-blue-600",
+    REVIEW: "bg-yellow-100 text-yellow-700",
+    OVERDUE: "bg-red-100 text-red-600",
+    COMPLETED: "bg-green-100 text-green-600",
+  };
 
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
@@ -63,6 +80,14 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     }
   };
 
+  const capturePageNum = (pageIndex: number) => {
+    setPagination((prev) => ({ ...prev, pageIndex }));
+  };
+
+  const captureRowPerItems = (pageSize: number) => {
+    setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
+  };
+
   const formatDate = (dateStr: string | null) =>
     dateStr
       ? new Date(dateStr).toLocaleDateString("en-GB", {
@@ -72,25 +97,11 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         })
       : "NA";
 
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case "NEW":
-        return "bg-pink-100 text-pink-600";
-      case "Review":
-        return "bg-yellow-100 text-yellow-600";
-      case "Done":
-        return "bg-green-100 text-green-600";
-      case "Overdue":
-        return "bg-red-100 text-red-600";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
-
   const taskColumns: ColumnDef<Task>[] = [
     {
       header: "S. No",
-      accessorFn: (_row, index) => index + 1,
+      accessorFn: (_row, index) =>
+        (pagination.pageIndex - 1) * pagination.pageSize + index + 1, // ✅ continues across pages
       cell: ({ getValue }) => (
         <span className="text-gray-600 text-sm flex justify-center">
           {getValue() as number}
@@ -109,19 +120,19 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         </div>
       ),
     },
-   {
-        header: "Status",
-        accessorKey: "task_status",
-        cell: ({ row }) => {
-          const status = row.original.task_status?.toUpperCase();
-          const cls = statusColors[status] || "bg-gray-100 text-gray-600";
-          return (
-            <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
-              {status || "Unknown"}
-            </span>
-          );
-        },
+    {
+      header: "Status",
+      accessorKey: "task_status",
+      cell: ({ row }) => {
+        const status = row.original.task_status?.toUpperCase();
+        const cls = statusColors[status] || "bg-gray-100 text-gray-600";
+        return (
+          <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
+            {status || "Unknown"}
+          </span>
+        );
       },
+    },
     {
       header: "Due Date",
       accessorFn: (row) => formatDate(row.end_date),
@@ -212,6 +223,21 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
           ))}
         </tbody>
       </table>
+
+      <TasksPagination
+        paginationDetails={
+          data?.data?.data?.pagination_info || {
+            total_records: 0,
+            total_pages: 1,
+            current_page: pagination.pageIndex,
+            page_size: pagination.pageSize,
+            next_page: null,
+            prev_page: null,
+          }
+        }
+        capturePageNum={capturePageNum}
+        captureRowPerItems={captureRowPerItems}
+      />
 
       <DeleteTaskDialog
         openOrNot={deleteDialogOpen}

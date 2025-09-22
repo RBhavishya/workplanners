@@ -66,70 +66,69 @@ const UsersDetais = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-    const handleNavigation = () => navigate({ to: `/tasks/add` });
+  const handleNavigation = () => navigate({ to: `/tasks/add` });
 
-      useEffect(() => {
-        const handler = setTimeout(() => {
-          setDebouncedSearch(searchString);
-          if (searchString || orderBY) {
-            getAllUsers({
-              pageIndex: 1,
-              pageSize: pageSizeParam,
-              order_by: orderBY,
-            });
-          } else {
-            getAllUsers({
-              pageIndex: pageIndexParam,
-              pageSize: pageSizeParam,
-              order_by: orderBY,
-            });
-          }
-        }, 500);
-        return () => {
-          clearTimeout(handler);
-        };
-      }, [searchString, orderBY]);
-    
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString || orderBY) {
+        getAllUsers({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllUsers({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchString, orderBY]);
 
   const userActions = [
-      {
-        id: "actions",
-        header: () => <span>Actions</span>,
-        footer: (props: any) => props.column.id,
-        size: 90,
-        cell: (info: any) => {
-          const rowData = info.row.original;
-  
-          return (
-            <div className="flex gap-2">
-              <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                // onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
-              >
-                <Eye size={16} />
-              </button>
-  
-              <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                // onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
-              >
-                <Edit size={16} />
-              </button>
-  
-              <button
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                // onClick={() => {
-                //   setTaskToDelete(rowData.id);
-                //   setDeleteDialogOpen(true);
-                // }}
-              >
-                <Trash size={16} />
-              </button>
-            </div>
-          );
-        },
+    {
+      id: "actions",
+      header: () => <span>Actions</span>,
+      footer: (props: any) => props.column.id,
+      size: 90,
+      cell: (info: any) => {
+        const rowData = info.row.original;
+
+        return (
+          <div className="flex gap-2">
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              // onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
+            >
+              <Eye size={16} />
+            </button>
+
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              // onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
+            >
+              <Edit size={16} />
+            </button>
+
+            <button
+              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              // onClick={() => {
+              //   setTaskToDelete(rowData.id);
+              //   setDeleteDialogOpen(true);
+              // }}
+            >
+              <Trash size={16} />
+            </button>
+          </div>
+        );
       },
-    ];
+    },
+  ];
   return (
     <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
       <div className="bg-white rounded-md ">
@@ -152,10 +151,9 @@ const UsersDetais = () => {
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
-
           <TanStackTable
             data={users}
-            columns={[...usersColumns,...userActions]}
+            columns={[...usersColumns, ...userActions]}
             paginationDetails={data?.data?.data?.pagination_info}
             getData={getAllUsers}
             loading={isLoading}
