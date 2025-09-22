@@ -70,12 +70,37 @@ export const getAllUsersAPI = async (search: string = ""): Promise<UsersDropdown
   }
 };
 
-export const getTasksByProjectId = async (projectId: number): Promise<TaskResponse> => {
+interface GetTasksByProjectIdParams {
+  projectId: number;
+  pageIndex: number;
+  pageSize: number;
+}
+
+interface GetTasksByProjectIdParams {
+  projectId: number;
+  pageIndex: number;
+  pageSize: number;
+}
+
+interface GetTasksByProjectIdParams {
+  projectId: number;
+  pageIndex: number;
+  pageSize: number;
+}
+
+export const getTasksByProjectId = async ({
+  projectId,
+  pageIndex,
+  pageSize,
+}: GetTasksByProjectIdParams) => {
   try {
-    const response = await $fetch.get(`/projects/${projectId}/tasks`);
+    // Construct query string manually
+    const query = `?page=${pageIndex}&page_size=${pageSize}`;
+
+    const response = await $fetch.get(`/projects/${projectId}/tasks${query}`);
     return response;
-  } catch (error) {
-    throw error;
+  } catch (err) {
+    throw err;
   }
 };
 
