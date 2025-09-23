@@ -193,7 +193,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         <label className="text-sm font-medium">
           Name <span className="text-red-500">*</span>
         </label>
-        <input
+        <Input
           type="text"
           placeholder="Enter Name"
           value={name}
@@ -213,8 +213,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           <label className="text-sm font-medium">
             Email <span className="text-red-500">*</span>
           </label>
-          <input
-            type="email"
+          <Input
+            id="email"
             placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -231,8 +231,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           <label className="text-sm font-medium">
             Phone <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
+          <Input
+            id="phone"
             placeholder="Enter Phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -252,12 +252,19 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </label>
           <div className="relative w-full">
             <Input
+              className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
               id="password"
-              placeholder="Password"
-              type={passwordVisible ? "text" : "password"}
+              placeholder="Enter Password"
               value={password}
+              name="password"
               onChange={(e) => setPassword(e.target.value)}
-              className="pr-10"
+              type="text"
+              autoComplete="off"
+              style={
+                {
+                  WebkitTextSecurity: passwordVisible ? "none" : "disc",
+                } as any
+              }
             />
             <button
               type="button"
