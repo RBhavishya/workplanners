@@ -69,7 +69,7 @@ const Sidebar = () => {
     // Navigate to dashboard
     navigate({ to: "/" });
   }}
-  className="mt-auto flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-colors cursor-pointer"
+  className="mt-auto flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors cursor-pointer"
 >
   <LogOutIcon className="mr-3 w-4 h-4" />
   Logout
