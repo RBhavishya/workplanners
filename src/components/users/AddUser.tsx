@@ -2,8 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { createUserAPI, getusersByIdAPI, UserUpdateAPI } from "@/https/services/users"; // <-- make sure updateUserAPI exists
-import { CheckCircle, ChevronDown, Eye, EyeOff, MoveLeft, X } from "lucide-react";
+import {
+  createUserAPI,
+  getusersByIdAPI,
+  UserUpdateAPI,
+} from "@/https/services/users"; // <-- make sure updateUserAPI exists
+import {
+  CheckCircle,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  MoveLeft,
+  X,
+} from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
 import {
   DropdownMenu,
@@ -22,7 +33,7 @@ export interface AddUserFormProps {
 
 const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   const [name, setName] = useState("");
-    const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState("");
   const [designation, setDesignation] = useState("");
   const [email, setEmail] = useState("");
@@ -38,8 +49,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
-    const id = params?.id ? Number(params.id) : null;
-    const mode = id ? "edit" : "create";
+  const id = params?.id ? Number(params.id) : null;
+  const mode = id ? "edit" : "create";
 
   useEffect(() => {
     if (triggerRef.current) {
@@ -48,14 +59,14 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   }, [open]);
 
   const {
-      data: userResp,
-      isLoading: loadingUser,
-      isError,
-    } = useQuery({
-      queryKey: ["users", id],
-      queryFn: () => getusersByIdAPI(Number(id)),
-      enabled: !!id,
-    });
+    data: userResp,
+    isLoading: loadingUser,
+    isError,
+  } = useQuery({
+    queryKey: ["users", id],
+    queryFn: () => getusersByIdAPI(Number(id)),
+    enabled: !!id,
+  });
 
   const createMutation = useMutation({
     mutationFn: async (payload: any) => {
@@ -125,20 +136,19 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   };
 
   useEffect(() => {
-      if (mode === "edit" && userResp?.data?.data) {
-        setName(userResp.data?.data.display_name);
-        setPassword(userResp.data?.data.password);
-        setDesignation(userResp.data?.data.designation);
-        setEmail(userResp.data?.data.email);
-        setPhone(userResp.data?.data.phone);
-      }
-    }, [userResp, mode]);
+    if (mode === "edit" && userResp?.data?.data) {
+      setName(userResp.data?.data.display_name);
+      setPassword(userResp.data?.data.password);
+      setDesignation(userResp.data?.data.designation);
+      setEmail(userResp.data?.data.email);
+      setPhone(userResp.data?.data.phone);
+    }
+  }, [userResp, mode]);
 
-    const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  
   const handleNavigation = () => {
     navigate({ to: "/users" });
   };
@@ -191,7 +201,9 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.display_name && (
-          <p className="text-red-500 text-xs mt-1">{errors.display_name.join(", ")}</p>
+          <p className="text-red-500 text-xs mt-1">
+            {errors.display_name.join(", ")}
+          </p>
         )}
       </div>
 
@@ -233,34 +245,33 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           )}
         </div>
       </div>
-       <div>
-              <label className="block text-sm mb-1">
-                Password <span className="text-red-500">*</span>
-              </label>
-              <div className="relative w-full">
-                <Input
-                  id="password"
-                  placeholder="Password"
-                  type={passwordVisible ? "text" : "password"}
-                  value={password}
-                   onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10" // Add padding so text/placeholder doesn't overlap button
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
-                >
-                  {passwordVisible ? <Eye /> : <EyeOff />}
-                </button>
-              </div>
-              {errors?.password && (
-                <p className="text-xs pt-1 text-red-600">
-                  {errors.password[0]}
-                </p>
-              )}
-            </div>
-
+      {mode === "create" && (
+        <div className="mb-4">
+          <label className="block text-sm mb-1">
+            Password <span className="text-red-500">*</span>
+          </label>
+          <div className="relative w-full">
+            <Input
+              id="password"
+              placeholder="Password"
+              type={passwordVisible ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
+            >
+              {passwordVisible ? <Eye /> : <EyeOff />}
+            </button>
+          </div>
+          {errors?.password && (
+            <p className="text-xs pt-1 text-red-600">{errors.password[0]}</p>
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
           Designation <span className="text-red-500">*</span>
@@ -290,7 +301,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-full">
-            {["FrontendDeveloper", "BackendDeveloper","QA",].map((option) => (
+            {["FrontendDeveloper", "BackendDeveloper", "QA"].map((option) => (
               <DropdownMenuItem
                 key={option}
                 className="cursor-pointer"

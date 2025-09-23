@@ -191,7 +191,7 @@ const LoginPage: React.FC = () => {
                 <Input
                   id="password"
                   placeholder="Password"
-                  type={passwordVisible ? "text" : "password"}
+                  // type={passwordVisible ? "text" : "password"}
                   value={loginDetails.password}
                   onChange={(e) =>
                     setLoginDetails({
@@ -199,7 +199,14 @@ const LoginPage: React.FC = () => {
                       password: e.target.value,
                     })
                   }
-                  className="pr-10" // Add padding so text/placeholder doesn't overlap button
+                   type="text"
+              autoComplete="off"
+              style={
+                {
+                  WebkitTextSecurity: passwordVisible ? "none" : "disc",
+                } as any
+              }
+                  className="pr-10"
                 />
                 <button
                   type="button"

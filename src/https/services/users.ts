@@ -70,3 +70,11 @@ export const getusersByIdAPI = async (id: number) => {
     throw error;
   }
 };
+
+export const resetPasswordUsersAPI = async (id: string, payload: any) => {
+  try {
+    return await $fetch.patch(`/users/${id}/reset-password`, payload);
+  } catch (err) {
+    throw err;
+  }
+};

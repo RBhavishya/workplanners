@@ -1,19 +1,19 @@
-import { deleteUserAPI, getAllPaginatedUsers } from "@/https/services/users";
+import { deleteUserAPI, getAllPaginatedUsers, resetPasswordUsersAPI } from "@/https/services/users";
 import { addSerial } from "@/lib/helpers/addSerial";
-import { useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import TanStackTable from "../core/TasksTanstacktable";
 import { usersColumns } from "./UsersColumns";
-import { Edit, Eye, Trash } from "lucide-react";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import { toast } from "sonner";
+import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const router = useRouter();
   const searchParams = new URLSearchParams(location.search);
@@ -27,14 +27,16 @@ const UsersDetais = () => {
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<number | null>(null);
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const { isLoading,data,isFetching } = useQuery({
+  const { isLoading, data, isFetching } = useQuery({
     queryKey: ["users", pagination, debouncedSearch, del],
     queryFn: async () => {
       const response = await getAllPaginatedUsers({
@@ -70,8 +72,7 @@ const UsersDetais = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-
-    const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
+  const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteUserAPI(id),
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "User deleted successfully");
@@ -90,11 +91,40 @@ const UsersDetais = () => {
     },
   });
 
+   const {
+    mutate: resetPassword,
+    isPending: resetLoading,
+  } = useMutation({
+    mutationFn: ({ id, password }: { id: number; password: string  }) =>
+      resetPasswordUsersAPI(id.toString(), { password }),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "Password reset successfully");
+      setResetPasswordDialogOpen(false);
+    },
+    onError: (error: any) => {
+      let message = "Failed to reset password.";
+      if (error?.data?.message) {
+        message = error.data.message;
+      }
+      toast.error(message);
+      setResetPasswordDialogOpen(false);
+    },
+  });
+
+  
+
   const handleDeleteClick = () => {
     if (userToDelete) {
       deleteTask(userToDelete);
     }
   };
+
+   const handlePasswordUpdate = (newPassword: string) => {
+    if (userToResetPassword && newPassword.trim() !== "") {
+      resetPassword({ id: userToResetPassword, password: newPassword });
+    }
+  };
+
 
   const handleNavigation = () => navigate({ to: `/users/adduser` });
 
@@ -131,22 +161,56 @@ const UsersDetais = () => {
 
         return (
           <div className="flex gap-2">
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-               onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
+            <Button
+              title="edit"
+              size={"sm"}
+              variant={"ghost"}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
             >
-              <Edit size={16} />
-            </button>
+              <img
+                src={"/table/editicon.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
+            <Button
+              title="reset password"
+              size={"sm"}
+              variant={"ghost"}
+              //  disabled={!isActive}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+               onClick={() => {
+                setUserToResetPassword(rowData.id);
+                setResetPasswordDialogOpen(true);
+              }}
+            >
+              <img
+                src={"/table/resetpassword.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
 
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+             <Button
+              title="delete"
+              size={"sm"}
+              variant={"ghost"}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
               onClick={() => {
                 setUserToDelete(rowData.id);
                 setDeleteDialogOpen(true);
               }}
             >
-              <Trash size={16} />
-            </button>
+              <img
+                src={"/table/deleteicon.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
           </div>
         );
       },
@@ -190,12 +254,19 @@ const UsersDetais = () => {
             ]}
           />
         </div>
-         <DeleteTaskDialog
+        <DeleteTaskDialog
           openOrNot={deleteDialogOpen}
           onCancelClick={() => setDeleteDialogOpen(false)}
           label="Are you sure you want to delete this user?"
           onOKClick={handleDeleteClick}
           deleteLoading={deleteLoading}
+        />
+        <ResetPasswordDialog
+          open={resetPasswordDialogOpen}
+          onCancelClick={() => setResetPasswordDialogOpen(false)}
+          onOKClick={handlePasswordUpdate}
+          resetLoading={resetLoading}
+          label="Enter a new password for this user."
         />
       </div>
     </div>
