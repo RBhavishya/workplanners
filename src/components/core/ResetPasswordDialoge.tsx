@@ -9,7 +9,6 @@ import {
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
 
 const ResetPasswordDialog = ({
   open,
@@ -17,21 +16,22 @@ const ResetPasswordDialog = ({
   onCancelClick,
   onOKClick,
   resetLoading,
+  error,
 }: {
   open: boolean;
   label: string;
   onCancelClick: () => void;
   onOKClick: (newPassword: string) => void;
   resetLoading: boolean;
+  error?: string;
 }) => {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleConfirm = () => {
-    if (password.trim()) {
-      onOKClick(password);
-    }
+    onOKClick(password); // always pass current password (even empty if needed)
   };
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -42,13 +42,6 @@ const ResetPasswordDialog = ({
       setPasswordVisible(false);
     }
   }, [open]);
-
-  const handleSubmit = () => {
-    if (password.trim() !== "") {
-      onOKClick(password);
-      setPassword(""); 
-    }
-  };
 
   if (!open) return null;
 
@@ -64,7 +57,9 @@ const ResetPasswordDialog = ({
 
         {/* Password Input */}
         <div className="mb-4">
-          <label className="block text-sm mb-1">New Password</label>
+          <label className="block text-sm mb-1">
+            New Password <span className="text-red-500">*</span>
+          </label>
           <div className="relative">
             <Input
               className="bg-[#F5F6FA] appearance-none block py-1 h-10 text-lg focus:outline-none focus:border-gray-500 focus-visible:ring-0 focus-visible:shadow-none placeholder:text-sm placeholder:text-slate-600 border rounded-md text-md w-full pr-10"
@@ -73,7 +68,7 @@ const ResetPasswordDialog = ({
               value={password}
               name="password"
               onChange={(e) => setPassword(e.target.value)}
-              type="text" 
+              type="text"
               autoComplete="off"
               style={
                 {
@@ -89,6 +84,7 @@ const ResetPasswordDialog = ({
               {passwordVisible ? <Eye /> : <EyeOff />}
             </button>
           </div>
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
 
         <DialogFooter>
@@ -97,7 +93,7 @@ const ResetPasswordDialog = ({
             type="button"
             className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={handleConfirm}
-            disabled={resetLoading || !password.trim()}
+            disabled={resetLoading}
           >
             {resetLoading && (
               <Loader2 className="animate-spin h-4 w-4 text-white" />

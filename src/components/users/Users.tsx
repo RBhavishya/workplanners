@@ -1,4 +1,8 @@
-import { deleteUserAPI, getAllPaginatedUsers, resetPasswordUsersAPI } from "@/https/services/users";
+import {
+  deleteUserAPI,
+  getAllPaginatedUsers,
+  resetPasswordUsersAPI,
+} from "@/https/services/users";
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -27,9 +31,12 @@ const UsersDetais = () => {
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  const [userToResetPassword, setUserToResetPassword] = useState<number | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
+    null
+  );
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -91,27 +98,30 @@ const UsersDetais = () => {
     },
   });
 
-   const {
-    mutate: resetPassword,
-    isPending: resetLoading,
-  } = useMutation({
-    mutationFn: ({ id, password }: { id: number; password: string  }) =>
+  const { mutate: resetPassword, isPending: resetLoading } = useMutation({
+    mutationFn: ({ id, password }: { id: number; password: string }) =>
       resetPasswordUsersAPI(id.toString(), { password }),
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Password reset successfully");
+      setResetError(""); // clear error
       setResetPasswordDialogOpen(false);
     },
     onError: (error: any) => {
-      let message = "Failed to reset password.";
-      if (error?.data?.message) {
-        message = error.data.message;
+      if (error?.status === 422 && error?.data?.errData) {
+        const passwordErrors = error.data.errData.password;
+        if (Array.isArray(passwordErrors) && passwordErrors.length > 0) {
+          setResetError(passwordErrors[0]);
+        } else {
+          setResetError("Password validation failed");
+        }
+      } else {
+        const message =
+          error?.data?.message || "Failed to update reset password";
+        toast.error(message);
+        setResetError(message);
       }
-      toast.error(message);
-      setResetPasswordDialogOpen(false);
     },
   });
-
-  
 
   const handleDeleteClick = () => {
     if (userToDelete) {
@@ -119,12 +129,11 @@ const UsersDetais = () => {
     }
   };
 
-   const handlePasswordUpdate = (newPassword: string) => {
-    if (userToResetPassword && newPassword.trim() !== "") {
+  const handlePasswordUpdate = (newPassword: string) => {
+    if (userToResetPassword) {
       resetPassword({ id: userToResetPassword, password: newPassword });
     }
   };
-
 
   const handleNavigation = () => navigate({ to: `/users/adduser` });
 
@@ -181,7 +190,7 @@ const UsersDetais = () => {
               variant={"ghost"}
               //  disabled={!isActive}
               className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
-               onClick={() => {
+              onClick={() => {
                 setUserToResetPassword(rowData.id);
                 setResetPasswordDialogOpen(true);
               }}
@@ -194,7 +203,7 @@ const UsersDetais = () => {
               />
             </Button>
 
-             <Button
+            <Button
               title="delete"
               size={"sm"}
               variant={"ghost"}
@@ -265,6 +274,7 @@ const UsersDetais = () => {
           open={resetPasswordDialogOpen}
           onCancelClick={() => setResetPasswordDialogOpen(false)}
           onOKClick={handlePasswordUpdate}
+          error={resetError}
           resetLoading={resetLoading}
           label="Enter a new password for this user."
         />
