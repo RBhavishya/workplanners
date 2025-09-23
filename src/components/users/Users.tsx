@@ -133,14 +133,7 @@ const UsersDetais = () => {
           <div className="flex gap-2">
             <button
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
-            >
-              <Eye size={16} />
-            </button>
-
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
+               onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
             >
               <Edit size={16} />
             </button>

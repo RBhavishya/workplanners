@@ -1,117 +1,81 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  CalendarIcon,
-  ChevronDown,
-  X,
-  CheckCircle,
-  MoveLeft,
-  Check,
-  Loader2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { useNavigate } from "@tanstack/react-router";
-import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
-
-import {
-  createProjectAPI,
-  getAllUsersAPI,
-  getProjectByIdAPI,
-  updateProjectAPI,
-} from "@/https/services/project";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { createUserAPI, getusersByIdAPI, UserUpdateAPI } from "@/https/services/users"; // <-- make sure updateUserAPI exists
+import { CheckCircle, ChevronDown, Eye, EyeOff, MoveLeft, X } from "lucide-react";
+import { ProjectData } from "@/interfaces/project";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 
-export interface AddProjectFormProps {
+export interface AddUserFormProps {
   mode: "create" | "edit";
-  nextId: number | null;
-  projectId?: number;
+  userId?: number;
   onSave?: (data: ProjectData) => void;
   onCancel?: () => void;
 }
 
-const AddUser = ({
-  mode,
-  nextId,
-  projectId,
-  onSave,
-  onCancel,
-}: AddProjectFormProps) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [links, setLinks] = useState<string[]>([]);
-  const [linkInput, setLinkInput] = useState("");
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
+  const [name, setName] = useState("");
+    const [passwordVisible, setPasswordVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const [designation, setDesignation] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
-  const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [open, setOpen] = useState(false);
 
-  const { data: projectResp, isLoading: loadingProject } = useQuery({
-    queryKey: ["project", projectId],
-    queryFn: () => getProjectByIdAPI(projectId!),
-    enabled: mode === "edit" && !!projectId,
-  });
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
+
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const params = useParams({ strict: false });
+    const id = params?.id ? Number(params.id) : null;
+    const mode = id ? "edit" : "create";
 
   useEffect(() => {
-    if (mode === "edit" && projectResp?.data?.data) {
-      const p = projectResp.data.data;
-      setTitle(p.title || "");
-      setDescription(p.description || "");
-      setLinks(p.links || []);
-      setStartDate(p.start_date ? dayjs(p.start_date).toDate() : undefined);
-      setDueDate(p.due_date ? dayjs(p.due_date).toDate() : undefined);
-      setAssignedUsers(p.assigned_users || []);
+    if (triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
     }
-  }, [mode, projectResp]);
+  }, [open]);
 
-  const { data: usersResp, isLoading } = useQuery<UsersDropdownResponse>({
-    queryKey: ["users", search],
-    queryFn: () => getAllUsersAPI(search),
-    enabled: true,
-  });
+  const {
+      data: userResp,
+      isLoading: loadingUser,
+      isError,
+    } = useQuery({
+      queryKey: ["users", id],
+      queryFn: () => getusersByIdAPI(Number(id)),
+      enabled: !!id,
+    });
 
-  const mutation = useMutation({
-    mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success(data.message || "Project created successfully");
-
-      navigate({ to: "/projects" });
-      onSave?.(data.data);
+  const createMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      setFormError(null);
+      setErrors({});
+      return await createUserAPI(payload);
+    },
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "User created successfully");
+      setSuccessMessage("User created successfully!");
+      onSave?.(res?.data?.data);
+      setTimeout(() => navigate({ to: "/users" }), 1000);
     },
     onError: (error: any) => {
       setErrors({});
       setFormError(null);
-
       if (error?.status === 422 && error?.data?.errData) {
         setErrors(error.data.errData);
       } else {
-        const message = error?.data?.message || "Failed to save project";
+        const message = error?.data?.message || "Failed to create user";
         toast.error(message);
         setFormError(message);
       }
@@ -119,82 +83,62 @@ const AddUser = ({
   });
 
   const updateMutation = useMutation({
-    mutationFn: (updatedProject: ProjectData) =>
-      updateProjectAPI(projectId!, updatedProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
-      toast.success(data.message || "Project updated successfully");
-      onSave?.(data.data);
-      navigate({ to: "/projects" });
+    mutationFn: async (payload: any) => {
+      setFormError(null);
+      setErrors({});
+      return await UserUpdateAPI(userId!, payload);
+    },
+    onSuccess: (res: any) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success(res?.data?.message || "User updated successfully");
+      onSave?.(res?.data?.data);
+      navigate({ to: "/users" });
     },
     onError: (error: any) => {
       setErrors({});
       setFormError(null);
-
       if (error?.status === 422 && error?.data?.errData) {
         setErrors(error.data.errData);
       } else {
-        const message = error?.data?.message || "Failed to update project";
+        const message = error?.data?.message || "Failed to update user";
         toast.error(message);
         setFormError(message);
       }
     },
   });
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [open]);
-
-  const toggleUser = (id: number) => {
-    setAssignedUsers((prev) =>
-      prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
-    );
-  };
-
-  const removeUser = (id: number) =>
-    setAssignedUsers((prev) => prev.filter((uid) => uid !== id));
-
-  const removeAll = () => setAssignedUsers([]);
-
-  const handleAddLink = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && linkInput.trim() !== "") {
-      e.preventDefault();
-      setLinks([...links, linkInput.trim()]);
-      setLinkInput("");
-    }
-  };
-
-  const handleRemoveLink = (index: number) => {
-    setLinks(links.filter((_, i) => i !== index));
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return "";
-    return dayjs(date).format("YYYY-MM-DD");
-  };
 
   const handleSave = () => {
     setFormError(null);
     setErrors({});
-    const projectData: ProjectData = {
-      id: projectId ?? nextId ?? 0,
-      title,
-      description,
-      links: links.length ? links : [],
-      created_by: String(user.name),
-      start_date: formatDate(startDate),
-      due_date: formatDate(dueDate),
-      assigned_users: assignedUsers,
+    const payload: any = {
+      display_name: name,
+      password: password,
+      email: email,
+      phone: phone,
+      designation: designation,
     };
     if (mode === "edit") {
-      updateMutation.mutate(projectData);
+      updateMutation.mutate(payload);
     } else {
-      mutation.mutate(projectData);
+      createMutation.mutate(payload);
     }
   };
 
+  useEffect(() => {
+      if (mode === "edit" && userResp?.data?.data) {
+        setName(userResp.data?.data.display_name);
+        setPassword(userResp.data?.data.password);
+        setDesignation(userResp.data?.data.designation);
+        setEmail(userResp.data?.data.email);
+        setPhone(userResp.data?.data.phone);
+      }
+    }, [userResp, mode]);
+
+    const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  
   const handleNavigation = () => {
     navigate({ to: "/users" });
   };
@@ -216,38 +160,43 @@ const AddUser = ({
               mode === "edit" ? "text-gray-800" : "text-purple-600"
             }`}
           >
-            {mode === "edit" ? "Edit Project" : "Add User"}
+            {mode === "edit" ? "Edit User" : "Add User"}
           </h2>
         </span>
       </div>
+
       {formError && (
         <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
           {formError}
         </div>
       )}
+
       {successMessage && (
         <div className="mb-4 flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 animate-fade-in">
           <CheckCircle className="w-5 h-5 text-green-500" />
           <span>{successMessage}</span>
         </div>
       )}
+
+      {/* Name */}
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
           Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          placeholder="Enter Project Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
-        {errors.title && (
-          <p className="text-red-500 text-xs mt-1">{errors.title.join(", ")}</p>
+        {errors.display_name && (
+          <p className="text-red-500 text-xs mt-1">{errors.display_name.join(", ")}</p>
         )}
       </div>
+
+      {/* Email + Phone */}
       <div className="flex gap-4 mb-4">
-        {/* Email */}
         <div className="flex flex-col gap-2 w-1/2">
           <label className="text-sm font-medium">
             Email <span className="text-red-500">*</span>
@@ -266,7 +215,6 @@ const AddUser = ({
           )}
         </div>
 
-        {/* Phone */}
         <div className="flex flex-col gap-2 w-1/2">
           <label className="text-sm font-medium">
             Phone <span className="text-red-500">*</span>
@@ -285,42 +233,88 @@ const AddUser = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
-          Desigination <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          placeholder="Enter Designation"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        {errors.title && (
-          <p className="text-red-500 text-xs mt-1">{errors.title.join(", ")}</p>
-        )}
-      </div>
+       <div>
+              <label className="block text-sm mb-1">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <div className="relative w-full">
+                <Input
+                  id="password"
+                  placeholder="Password"
+                  type={passwordVisible ? "text" : "password"}
+                  value={password}
+                   onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10" // Add padding so text/placeholder doesn't overlap button
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
+                >
+                  {passwordVisible ? <Eye /> : <EyeOff />}
+                </button>
+              </div>
+              {errors?.password && (
+                <p className="text-xs pt-1 text-red-600">
+                  {errors.password[0]}
+                </p>
+              )}
+            </div>
 
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
-          Password<span className="text-red-500">*</span>
+          Designation <span className="text-red-500">*</span>
         </label>
-        <input
-          id="password"
-          placeholder="Enter Password"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        {errors.title && (
-          <p className="text-red-500 text-xs mt-1">{errors.title.join(", ")}</p>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center justify-between w-full border rounded-lg px-3 py-2 text-sm cursor-pointer h-10 bg-white">
+              <span className="flex items-center gap-2">
+                {designation || "Select Designation"}
+              </span>
+
+              <span className="flex items-center gap-2">
+                {designation && (
+                  <X
+                    size={16}
+                    className="text-gray-400 hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent dropdown from opening
+                      setDesignation("");
+                    }}
+                  />
+                )}
+                <ChevronDown size={16} className="text-gray-500" />
+              </span>
+            </button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-full">
+            {["FrontendDeveloper", "BackendDeveloper","QA",].map((option) => (
+              <DropdownMenuItem
+                key={option}
+                className="cursor-pointer"
+                onClick={() => setDesignation(option)}
+              >
+                {option}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {errors.designation && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.designation.join(", ")}
+          </p>
         )}
       </div>
+
+      {/* Buttons */}
       <div className="flex justify-end gap-2 mt-4">
         <button
           onClick={handleNavigation}
           className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
-          disabled={mutation.isPending || updateMutation.isPending}
+          disabled={createMutation.isPending || updateMutation.isPending}
         >
           Cancel
         </button>
@@ -328,9 +322,9 @@ const AddUser = ({
         <button
           onClick={handleSave}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
-          disabled={mutation.isPending || updateMutation.isPending}
+          disabled={createMutation.isPending || updateMutation.isPending}
         >
-          {(mutation.isPending || updateMutation.isPending) && (
+          {(createMutation.isPending || updateMutation.isPending) && (
             <svg
               className="animate-spin h-4 w-4 text-white"
               xmlns="http://www.w3.org/2000/svg"
@@ -356,7 +350,7 @@ const AddUser = ({
             ? updateMutation.isPending
               ? "Updating..."
               : "Update"
-            : mutation.isPending
+            : createMutation.isPending
               ? "Saving..."
               : "Save"}
         </button>

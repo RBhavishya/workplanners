@@ -1,3 +1,6 @@
+import { updateUserStatusAPI } from "@/https/services/users";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-600",
@@ -127,25 +130,130 @@ export const usersColumns = [
     ),
     footer: (props: any) => props.column.id,
   },
-  {
+   {
     accessorFn: (row: any) => row.user_status,
     id: "user_status",
     cell: (info: any) => {
-      const status = info.getValue();
-      const colorClass =
-        statusColors[status?.toUpperCase()] || "bg-gray-100 text-gray-600";
+      const [isActive, setIsActive] = useState(info.getValue());
+      const [isOpen, setIsOpen] = useState(false);
+      const popoverRef = useRef<HTMLDivElement>(null);
+      const userId = info.row.original.id;
+      const togglePopover = () => setIsOpen(!isOpen);
+
+      const updateUserStatus = async (status: boolean) => {
+        try {
+          const body = {
+           user_status: status ? "ACTIVE" : "INACTIVE",
+          };
+
+          const response = await updateUserStatusAPI(userId, body);
+          if (response?.status === 200 || response?.status === 201) {
+            toast.success(
+              status
+                ? "User activated successfully"
+                : "User deactivated successfully"
+            );
+            setIsActive(status);
+          } else {
+            toast.error("Failed to change status");
+          }
+        } catch (err: any) {
+          toast.error(err?.message || "Something went wrong");
+          console.error(err);
+        } finally {
+          setIsOpen(false);
+        }
+      };
+      useEffect(() => {
+        const handleClickOutside = (event: any) => {
+          if (
+            popoverRef.current &&
+            !popoverRef.current.contains(event.target)
+          ) {
+            setIsOpen(false);
+          }
+        };
+
+        if (isOpen) {
+          document.addEventListener("mousedown", handleClickOutside);
+        } else {
+          document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, [isOpen]);
 
       return (
-        <div className="flex justify-start">
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${colorClass}`}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              color: isActive ? "#28A745" : "#A71D2A",
+              background: isActive ? "#28A74533" : "#A71D2A33",
+            }}
+            className="rounded-full cursor-pointer flex items-center py-0 px-3 min-w-[100px]"
+            onClick={togglePopover}
           >
-            {status ? status.replace("_", " ") : "-"}
-          </span>
+            <span
+              style={{
+                height: "8px",
+                width: "8px",
+                borderRadius: "50%",
+                backgroundColor: isActive ? "green" : "red",
+                marginRight: "8px",
+              }}
+            ></span>
+            {isActive ? "Active" : "Inactive"}
+          </div>
+          {isOpen && (
+            <div
+              ref={popoverRef}
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: "0",
+                marginTop: "5px",
+                padding: "5px",
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                zIndex: 100,
+              }}
+            >
+              <div
+                style={{
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                  color: "green",
+                }}
+                onClick={() => updateUserStatus(true)}
+              >
+                Active
+              </div>
+              <div
+                style={{
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                  color: "red",
+                }}
+                onClick={() => updateUserStatus(false)}
+              >
+                Inactive
+              </div>
+            </div>
+          )}
         </div>
       );
     },
-     width: "100px",
+    width: "100px",
     maxWidth: "115px",
     minWidth: "150px",
     header: () => <span>Status</span>,

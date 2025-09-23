@@ -1,3 +1,4 @@
+import { ProjectData } from "@/interfaces/project";
 import { $fetch } from "../fetch";
 interface GetAllPaginatedUsersPropTypes {
   pageIndex: number;
@@ -30,6 +31,40 @@ export const deleteUserAPI = async (id: number) => {
   try {
     const payload = {users_id: [id] };
     const response = await $fetch.delete(`/users/${id}`,  payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createUserAPI = async (payload: ProjectData) => {
+  try {
+    const response = await $fetch.post(`/users`,payload);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UserUpdateAPI = async (id: any, payload: any) => {
+  try {
+    return await $fetch.patch(`/users/${id}`, payload);
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updateUserStatusAPI = async (userId: any, payload: any) => {
+  try {
+    return await $fetch.patch(`/users/${userId}/status`, payload);
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getusersByIdAPI = async (id: number) => {
+  try {
+    const response = await $fetch.get(`/users/${id}`);
     return response;
   } catch (error) {
     throw error;
