@@ -22,7 +22,6 @@ const columns: ColumnDef<TaskStats>[] = [
     id: "sno",
     header: () => <span>S.No</span>,
     cell: ({ row }) => {
-      // row.index starts from 0, so add 1
       return <span>{row.index + 1}</span>;
     },
     size: 80,
@@ -125,7 +124,6 @@ const Statisticstable = () => {
     pageCount: totalPages,
   });
 
-  // Pagination with ellipsis
   const renderPaginationButtons = () => {
     const buttons: React.ReactElement[] = [];
 
@@ -181,7 +179,6 @@ const Statisticstable = () => {
         <p className="text-red-500">Error fetching statistics</p>
       ) : (
         <div className="h-[calc(100vh-325px)] overflow-y-auto">
-          {/* ✅ Existing Table Render */}
           <table className="w-full text-left border-separate border-spacing-y-2">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -230,7 +227,6 @@ const Statisticstable = () => {
             </tbody>
           </table>
 
-          {/* Pagination */}
           <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white">
             <div className="text-sm text-gray-600">
               {`${startIndex} - ${endIndex} of ${totalRecords}`}

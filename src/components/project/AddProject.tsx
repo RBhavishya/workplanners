@@ -35,6 +35,7 @@ import {
   updateProjectAPI,
 } from "@/https/services/project";
 import { toast } from "sonner";
+import { Input } from "../ui/input";
 
 export interface AddProjectFormProps {
   mode: "create" | "edit";
@@ -246,7 +247,7 @@ const AddProjectForm = ({
         <label className="text-sm font-medium">
           Project Title <span className="text-red-500">*</span>
         </label>
-        <input
+        <Input
           type="text"
           placeholder="Enter Project Title"
           value={title}
@@ -473,7 +474,7 @@ const AddProjectForm = ({
               </button>
             </span>
           ))}
-          <input
+          <Input
             type="text"
             placeholder="Add a link and press Enter"
             value={linkInput}

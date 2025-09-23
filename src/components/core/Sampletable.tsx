@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { getTasksByProjectId } from "@/https/services/project";
-import { Task, TaskResponse } from "@/interfaces/project";
+import { Task} from "@/interfaces/project";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { deleteTasksAPI } from "@/https/services/tasks";
 import { toast } from "sonner";

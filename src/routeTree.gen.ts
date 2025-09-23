@@ -15,10 +15,12 @@ import { Route as LayoutUsersIndexRouteImport } from './routes/_layout/users/ind
 import { Route as LayoutTasksIndexRouteImport } from './routes/_layout/tasks/index'
 import { Route as LayoutProjectsIndexRouteImport } from './routes/_layout/projects/index'
 import { Route as LayoutDashboardIndexRouteImport } from './routes/_layout/dashboard/index'
+import { Route as LayoutUsersAdduserIndexRouteImport } from './routes/_layout/users/adduser/index'
 import { Route as LayoutTasksAddIndexRouteImport } from './routes/_layout/tasks/add/index'
 import { Route as LayoutProjectsTableIndexRouteImport } from './routes/_layout/projects/table/index'
 import { Route as LayoutProjectsAddIndexRouteImport } from './routes/_layout/projects/add/index'
 import { Route as LayoutProjectsIdIndexRouteImport } from './routes/_layout/projects/$id/index'
+import { Route as LayoutUsersEditIdIndexRouteImport } from './routes/_layout/users/edit/$id/index'
 import { Route as LayoutTasksViewIdIndexRouteImport } from './routes/_layout/tasks/view/$id/index'
 import { Route as LayoutTasksEditIdIndexRouteImport } from './routes/_layout/tasks/edit/$id/index'
 import { Route as LayoutProjectsEditIdIndexRouteImport } from './routes/_layout/projects/edit/$id/index'
@@ -52,6 +54,11 @@ const LayoutDashboardIndexRoute = LayoutDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutUsersAdduserIndexRoute = LayoutUsersAdduserIndexRouteImport.update({
+  id: '/users/adduser/',
+  path: '/users/adduser/',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutTasksAddIndexRoute = LayoutTasksAddIndexRouteImport.update({
   id: '/tasks/add/',
   path: '/tasks/add/',
@@ -71,6 +78,11 @@ const LayoutProjectsAddIndexRoute = LayoutProjectsAddIndexRouteImport.update({
 const LayoutProjectsIdIndexRoute = LayoutProjectsIdIndexRouteImport.update({
   id: '/projects/$id/',
   path: '/projects/$id/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutUsersEditIdIndexRoute = LayoutUsersEditIdIndexRouteImport.update({
+  id: '/users/edit/$id/',
+  path: '/users/edit/$id/',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutTasksViewIdIndexRoute = LayoutTasksViewIdIndexRouteImport.update({
@@ -100,9 +112,11 @@ export interface FileRoutesByFullPath {
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
   '/tasks/add': typeof LayoutTasksAddIndexRoute
+  '/users/adduser': typeof LayoutUsersAdduserIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
   '/tasks/edit/$id': typeof LayoutTasksEditIdIndexRoute
   '/tasks/view/$id': typeof LayoutTasksViewIdIndexRoute
+  '/users/edit/$id': typeof LayoutUsersEditIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,9 +128,11 @@ export interface FileRoutesByTo {
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
   '/tasks/add': typeof LayoutTasksAddIndexRoute
+  '/users/adduser': typeof LayoutUsersAdduserIndexRoute
   '/projects/edit/$id': typeof LayoutProjectsEditIdIndexRoute
   '/tasks/edit/$id': typeof LayoutTasksEditIdIndexRoute
   '/tasks/view/$id': typeof LayoutTasksViewIdIndexRoute
+  '/users/edit/$id': typeof LayoutUsersEditIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,9 +146,11 @@ export interface FileRoutesById {
   '/_layout/projects/add/': typeof LayoutProjectsAddIndexRoute
   '/_layout/projects/table/': typeof LayoutProjectsTableIndexRoute
   '/_layout/tasks/add/': typeof LayoutTasksAddIndexRoute
+  '/_layout/users/adduser/': typeof LayoutUsersAdduserIndexRoute
   '/_layout/projects/edit/$id/': typeof LayoutProjectsEditIdIndexRoute
   '/_layout/tasks/edit/$id/': typeof LayoutTasksEditIdIndexRoute
   '/_layout/tasks/view/$id/': typeof LayoutTasksViewIdIndexRoute
+  '/_layout/users/edit/$id/': typeof LayoutUsersEditIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,9 +164,11 @@ export interface FileRouteTypes {
     | '/projects/add'
     | '/projects/table'
     | '/tasks/add'
+    | '/users/adduser'
     | '/projects/edit/$id'
     | '/tasks/edit/$id'
     | '/tasks/view/$id'
+    | '/users/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -160,9 +180,11 @@ export interface FileRouteTypes {
     | '/projects/add'
     | '/projects/table'
     | '/tasks/add'
+    | '/users/adduser'
     | '/projects/edit/$id'
     | '/tasks/edit/$id'
     | '/tasks/view/$id'
+    | '/users/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -175,9 +197,11 @@ export interface FileRouteTypes {
     | '/_layout/projects/add/'
     | '/_layout/projects/table/'
     | '/_layout/tasks/add/'
+    | '/_layout/users/adduser/'
     | '/_layout/projects/edit/$id/'
     | '/_layout/tasks/edit/$id/'
     | '/_layout/tasks/view/$id/'
+    | '/_layout/users/edit/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/users/adduser/': {
+      id: '/_layout/users/adduser/'
+      path: '/users/adduser'
+      fullPath: '/users/adduser'
+      preLoaderRoute: typeof LayoutUsersAdduserIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/tasks/add/': {
       id: '/_layout/tasks/add/'
       path: '/tasks/add'
@@ -255,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/projects/$id'
       fullPath: '/projects/$id'
       preLoaderRoute: typeof LayoutProjectsIdIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/users/edit/$id/': {
+      id: '/_layout/users/edit/$id/'
+      path: '/users/edit/$id'
+      fullPath: '/users/edit/$id'
+      preLoaderRoute: typeof LayoutUsersEditIdIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/tasks/view/$id/': {
@@ -290,9 +328,11 @@ interface LayoutRouteChildren {
   LayoutProjectsAddIndexRoute: typeof LayoutProjectsAddIndexRoute
   LayoutProjectsTableIndexRoute: typeof LayoutProjectsTableIndexRoute
   LayoutTasksAddIndexRoute: typeof LayoutTasksAddIndexRoute
+  LayoutUsersAdduserIndexRoute: typeof LayoutUsersAdduserIndexRoute
   LayoutProjectsEditIdIndexRoute: typeof LayoutProjectsEditIdIndexRoute
   LayoutTasksEditIdIndexRoute: typeof LayoutTasksEditIdIndexRoute
   LayoutTasksViewIdIndexRoute: typeof LayoutTasksViewIdIndexRoute
+  LayoutUsersEditIdIndexRoute: typeof LayoutUsersEditIdIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
@@ -304,9 +344,11 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutProjectsAddIndexRoute: LayoutProjectsAddIndexRoute,
   LayoutProjectsTableIndexRoute: LayoutProjectsTableIndexRoute,
   LayoutTasksAddIndexRoute: LayoutTasksAddIndexRoute,
+  LayoutUsersAdduserIndexRoute: LayoutUsersAdduserIndexRoute,
   LayoutProjectsEditIdIndexRoute: LayoutProjectsEditIdIndexRoute,
   LayoutTasksEditIdIndexRoute: LayoutTasksEditIdIndexRoute,
   LayoutTasksViewIdIndexRoute: LayoutTasksViewIdIndexRoute,
+  LayoutUsersEditIdIndexRoute: LayoutUsersEditIdIndexRoute,
 }
 
 const LayoutRouteWithChildren =

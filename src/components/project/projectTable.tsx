@@ -132,9 +132,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         accessorKey: "users",
         cell: ({ row }) => {
           const users = row.original.users || [];
-          if (users.length === 0) {
+          if (users.length === 0)
             return <span className="text-black-400 text-sm">-</span>;
-          }
           const visibleUsers = users.slice(0, 3);
           const remainingUsers = users.slice(3);
           return (
@@ -259,67 +258,70 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   }
 
   return (
-    <div className="relative overflow-x-auto border rounded-xl">
-      <table className="w-full text-sm border-collapse">
-        <thead className="bg-gray-50 text-left text-gray-600 text-xs font-semibold">
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3">
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {isLoading || isFetching ? (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="text-center py-6 text-gray-500"
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Loading projects...</span>
-                </div>
-              </td>
-            </tr>
-          ) : projects.length === 0 ? (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="text-gray-500 text-center py-6"
-              >
-                No projects found
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+    <div className="border rounded-xl overflow-hidden h-[600px] flex flex-col">
+      <div className="overflow-auto flex-1">
+        <table className="w-full text-sm border-collapse">
+          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-gray-600 text-xs font-semibold">
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id}>
+                {hg.headers.map((header) => (
+                  <th key={header.id} className="px-4 py-3">
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </th>
                 ))}
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {isLoading || isFetching ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="text-center py-6 text-gray-500"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading projects...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : projects.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="text-gray-500 text-center py-6"
+                >
+                  No projects found
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-3">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       {pagination && (
-        <div className="flex justify-between items-center p-3 text-sm text-gray-600">
-          {/* Page Info */}
+        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
 
-          {/* Page Size Selector */}
           <div className="flex items-center gap-2">
             <label htmlFor="pageSize" className="text-gray-600">
               Show:
@@ -330,7 +332,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               onChange={(e) => setPageSize(Number(e.target.value))}
               className="border rounded px-2 py-1 text-sm"
             >
-              {[10, 25, 75, 100].map((size) => (
+              {[10, 25, 50, 100].map((size) => (
                 <option key={size} value={size}>
                   {size}
                 </option>
@@ -338,7 +340,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             </select>
           </div>
 
-          {/* Pagination Controls */}
           <div className="flex items-center gap-2">
             <button
               disabled={!pagination.prev_page}
@@ -351,7 +352,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             >
               Prev
             </button>
-
             {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
               .filter((p) => {
                 const current = pagination.current_page;
@@ -378,7 +378,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   </React.Fragment>
                 );
               })}
-
             <button
               disabled={!pagination.next_page}
               onClick={() => setPage(pagination.next_page)}
@@ -392,7 +391,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             </button>
           </div>
 
-          {/* Total Records */}
           <span>Total Records: {pagination.total_records}</span>
         </div>
       )}

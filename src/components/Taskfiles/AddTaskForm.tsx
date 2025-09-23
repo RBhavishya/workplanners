@@ -30,6 +30,7 @@ import {
 } from "@/https/services/tasks";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
+import { Input } from "../ui/input";
 
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
@@ -184,6 +185,7 @@ const AddTaskForm = ({
     }
   };
 
+
   const toggleSelection = (
     id: number,
     list: number[],
@@ -257,7 +259,7 @@ const AddTaskForm = ({
         <label className="text-sm font-medium">
           Task Title <span className="text-red-500">*</span>
         </label>
-        <input
+        <Input
           type="text"
           placeholder="Enter Task Title"
           value={title}

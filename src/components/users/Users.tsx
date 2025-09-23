@@ -1,17 +1,23 @@
-import { getAllPaginatedUsers } from "@/https/services/users";
+import {
+  deleteUserAPI,
+  getAllPaginatedUsers,
+  resetPasswordUsersAPI,
+} from "@/https/services/users";
 import { addSerial } from "@/lib/helpers/addSerial";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import TanStackTable from "../core/TasksTanstacktable";
-import { taskColumns } from "../Taskfiles/TaskColumns";
 import { usersColumns } from "./UsersColumns";
-import { Edit, Eye, Trash } from "lucide-react";
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import { toast } from "sonner";
+import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const router = useRouter();
   const searchParams = new URLSearchParams(location.search);
@@ -24,14 +30,21 @@ const UsersDetais = () => {
 
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
+    null
+  );
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const { isLoading, isError, data, error, isFetching } = useQuery({
-    queryKey: ["tasks", pagination, debouncedSearch, del],
+  const { isLoading, data, isFetching } = useQuery({
+    queryKey: ["users", pagination, debouncedSearch, del],
     queryFn: async () => {
       const response = await getAllPaginatedUsers({
         pageIndex: pagination.pageIndex,
@@ -66,7 +79,63 @@ const UsersDetais = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-  const handleNavigation = () => navigate({ to: `/tasks/add` });
+  const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
+    mutationFn: (id: number) => deleteUserAPI(id),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "User deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDeleteDialogOpen(false);
+    },
+    onError: (error: any) => {
+      let message = "Failed to delete User.";
+      if (error?.status === 409) {
+        message = error?.message || "Conflict: User cannot be deleted.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      toast.error(message);
+      setDeleteDialogOpen(false);
+    },
+  });
+
+  const { mutate: resetPassword, isPending: resetLoading } = useMutation({
+    mutationFn: ({ id, password }: { id: number; password: string }) =>
+      resetPasswordUsersAPI(id.toString(), { password }),
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "Password reset successfully");
+      setResetError(""); // clear error
+      setResetPasswordDialogOpen(false);
+    },
+    onError: (error: any) => {
+      if (error?.status === 422 && error?.data?.errData) {
+        const passwordErrors = error.data.errData.password;
+        if (Array.isArray(passwordErrors) && passwordErrors.length > 0) {
+          setResetError(passwordErrors[0]);
+        } else {
+          setResetError("Password validation failed");
+        }
+      } else {
+        const message =
+          error?.data?.message || "Failed to update reset password";
+        toast.error(message);
+        setResetError(message);
+      }
+    },
+  });
+
+  const handleDeleteClick = () => {
+    if (userToDelete) {
+      deleteTask(userToDelete);
+    }
+  };
+
+  const handlePasswordUpdate = (newPassword: string) => {
+    if (userToResetPassword) {
+      resetPassword({ id: userToResetPassword, password: newPassword });
+    }
+  };
+
+  const handleNavigation = () => navigate({ to: `/users/adduser` });
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -101,29 +170,56 @@ const UsersDetais = () => {
 
         return (
           <div className="flex gap-2">
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
+            <Button
+              title="edit"
+              size={"sm"}
+              variant={"ghost"}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
             >
-              <Eye size={16} />
-            </button>
+              <img
+                src={"/table/editicon.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
+            <Button
+              title="reset password"
+              size={"sm"}
+              variant={"ghost"}
+              //  disabled={!isActive}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              onClick={() => {
+                setUserToResetPassword(rowData.id);
+                setResetPasswordDialogOpen(true);
+              }}
+            >
+              <img
+                src={"/table/resetpassword.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
 
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
+            <Button
+              title="delete"
+              size={"sm"}
+              variant={"ghost"}
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              onClick={() => {
+                setUserToDelete(rowData.id);
+                setDeleteDialogOpen(true);
+              }}
             >
-              <Edit size={16} />
-            </button>
-
-            <button
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-              // onClick={() => {
-              //   setTaskToDelete(rowData.id);
-              //   setDeleteDialogOpen(true);
-              // }}
-            >
-              <Trash size={16} />
-            </button>
+              <img
+                src={"/table/deleteicon.svg"}
+                alt="view"
+                height={18}
+                width={18}
+              />
+            </Button>
           </div>
         );
       },
@@ -167,6 +263,21 @@ const UsersDetais = () => {
             ]}
           />
         </div>
+        <DeleteTaskDialog
+          openOrNot={deleteDialogOpen}
+          onCancelClick={() => setDeleteDialogOpen(false)}
+          label="Are you sure you want to delete this user?"
+          onOKClick={handleDeleteClick}
+          deleteLoading={deleteLoading}
+        />
+        <ResetPasswordDialog
+          open={resetPasswordDialogOpen}
+          onCancelClick={() => setResetPasswordDialogOpen(false)}
+          onOKClick={handlePasswordUpdate}
+          error={resetError}
+          resetLoading={resetLoading}
+          label="Enter a new password for this user."
+        />
       </div>
     </div>
   );

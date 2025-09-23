@@ -28,7 +28,6 @@ const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
   const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -75,8 +74,6 @@ const Viewdetails = () => {
       setTriggerWidth(triggerRef.current.offsetWidth);
     }
   }, [triggerRef.current]);
-
-  // --- Mutations ---
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
       patchProjectStatusAPI(Number(id), { project_status: newStatus }),
