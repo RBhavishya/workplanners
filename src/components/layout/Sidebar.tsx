@@ -7,6 +7,7 @@ import {
   Bell,
   Users,
   ChevronDown,
+  LogOutIcon,
 } from 'lucide-react';
 import UserDetails from '../login/UserDetails';
 
@@ -14,8 +15,11 @@ import { ProjectsIcon } from '../icons/ProjectsIcon';
 import { TasksIcon } from '../icons/TasksIcon';
 import { DashBoardIcon } from '../icons/DashBoardIcon';
 import { UsersIcon } from '../icons/UsersIcon';
+import { Button } from 'rsuite';
+import { useNavigate } from '@tanstack/react-router';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
 
   return (
     <aside className="w-64 bg-white border-r border-purple-200 fixed left-0 top-0 h-full p-6 flex flex-col shadow-sm z-10">
@@ -55,6 +59,21 @@ const Sidebar = () => {
           Users
         </Link>
       </nav>
+
+        <Button
+  onClick={() => {
+    // Optional: clear auth/session if needed
+    localStorage.removeItem("authToken"); 
+    localStorage.removeItem("user");
+
+    // Navigate to dashboard
+    navigate({ to: "/" });
+  }}
+  className="mt-auto flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-colors cursor-pointer"
+>
+  <LogOutIcon className="mr-3 w-4 h-4" />
+  Logout
+</Button>
     </aside>
   );
 };
