@@ -77,7 +77,7 @@ export const usersColumns = [
         </div>
       );
     },
-   width: "80px",
+    width: "80px",
     maxWidth: "80px",
     minWidth: "80px",
     header: () => (
@@ -120,7 +120,7 @@ export const usersColumns = [
         </div>
       );
     },
-   width: "130px",
+    width: "130px",
     maxWidth: "130px",
     minWidth: "130px",
     header: () => (
@@ -130,11 +130,11 @@ export const usersColumns = [
     ),
     footer: (props: any) => props.column.id,
   },
-   {
+  {
     accessorFn: (row: any) => row.user_status,
     id: "user_status",
     cell: (info: any) => {
-      const [isActive, setIsActive] = useState(info.getValue());
+      const [isActive, setIsActive] = useState(info.getValue() === "ACTIVE");
       const [isOpen, setIsOpen] = useState(false);
       const popoverRef = useRef<HTMLDivElement>(null);
       const userId = info.row.original.id;
@@ -143,7 +143,7 @@ export const usersColumns = [
       const updateUserStatus = async (status: boolean) => {
         try {
           const body = {
-           user_status: status ? "ACTIVE" : "INACTIVE",
+            user_status: status ? "ACTIVE" : "INACTIVE",
           };
 
           const response = await updateUserStatusAPI(userId, body);
@@ -164,6 +164,11 @@ export const usersColumns = [
           setIsOpen(false);
         }
       };
+
+      useEffect(() => {
+        setIsActive(info.getValue() === "ACTIVE");
+      }, [info.getValue()]);
+
       useEffect(() => {
         const handleClickOutside = (event: any) => {
           if (
