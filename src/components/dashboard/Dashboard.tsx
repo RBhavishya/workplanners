@@ -23,7 +23,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("current_page")) || 1;
-  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 

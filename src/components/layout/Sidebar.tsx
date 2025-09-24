@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
   LayoutDashboard,
@@ -20,7 +20,12 @@ import { useNavigate } from '@tanstack/react-router';
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  
+   const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const user_type = user?.user_type;
 
+    
   return (
     <aside className="w-64 bg-white border-r border-purple-200 fixed left-0 top-0 h-full p-6 flex flex-col shadow-sm z-10">
      <div className='border-b h-24'> <UserDetails/></div>
@@ -50,6 +55,7 @@ const Sidebar = () => {
           <ProjectsIcon className="mr-3 w-4 h-4" />
           Projects
         </Link>
+      {user_type !== 'EMPLOYEE' && (
          <Link
           to="/users"
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
@@ -58,6 +64,7 @@ const Sidebar = () => {
           <UsersIcon className="mr-3 w-4 h-4" />
           Users
         </Link>
+         )}
       </nav>
 
         <Button
@@ -69,7 +76,7 @@ const Sidebar = () => {
     // Navigate to dashboard
     navigate({ to: "/" });
   }}
-  className="mt-auto flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-colors cursor-pointer"
+  className="mt-auto flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors cursor-pointer"
 >
   <LogOutIcon className="mr-3 w-4 h-4" />
   Logout
