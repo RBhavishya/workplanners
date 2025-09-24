@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
   const [loginDetails, setLoginDetails] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [errors, setErrors] = useState<any>({});
 
   useEffect(() => {
     if (search?.code) {
@@ -70,33 +70,65 @@ const LoginPage: React.FC = () => {
     },
   });
 
-  const loginMutation = useMutation({
+  // const loginMutation = useMutation({
+  //   mutationFn: async (loginDetails: loginProps) => {
+  //     return await LoginAPI(loginDetails);
+  //   },
+  //   onSuccess: (response) => {
+  //     toast.success(response?.data?.message);
+  //     const { data } = response?.data;
+  //     const { access_token , user_details} = data;
+
+  //     Cookies.set("token", access_token, { priority: "High" });
+  //     localStorage.setItem("user", JSON.stringify(user_details));
+  //     navigate({
+  //       to: user_details?.user_type === "MANAGER" ? "/users" : "/dashboard",
+  //     });
+  //   },
+  //   onError: (response: any) => {
+  //     if (response?.status === 422) {
+  //       const errData = response?.data?.errData;
+  //        setErrors(errData || {});
+  //     } else {
+  //       // toast.error(response?.data?.errData || "Failed to login.");
+  //     }
+  //   },
+  //   onSettled: () => {
+  //     setLoading(false);
+  //   },
+  // });
+
+  const { mutate, isError, error } = useMutation({
     mutationFn: async (loginDetails: loginProps) => {
-      return await LoginAPI(loginDetails);
-    },
-    onSuccess: (response) => {
-      toast.success(response?.data?.message);
-        const { data } = response?.data;
-      const { access_token, user_details } = response?.data?.data;
-      console.log(user_details,"user_details");
-      Cookies.set("token", access_token, { priority: "High" });
-      localStorage.setItem("user", JSON.stringify(user_details));
-      navigate({
-        to: user_details?.user_type === "MANAGER" ? "/users" : "/dashboard",
-      });
-    },
-    onError: (error: any) => {
-      if (error?.status === 422) {
-        const errData = error?.data?.errData;
-        setErrors(errData || {});
-      } else {
-        toast.error(error?.data?.message || "Failed to login");
+      setLoading(true);
+      try {
+        const response = await LoginAPI(loginDetails);
+        if (response?.status === 200 || response?.status === 201) {
+          toast.success(response?.data?.message);
+          const { data } = response?.data;
+          const { access_token, user_details } = data;
+
+          Cookies.set("token", access_token, {
+            priority: "High",
+          });
+          navigate({
+            to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+          });
+        } else if (response?.status === 422) {
+          const errData = response?.data?.errData;
+          setErrors(errData || {});
+        } else {
+          throw response;
+        }
+      } catch (errData) {
+        console.error(errData);
+        errPopper(errData);
+      } finally {
+        setLoading(false);
       }
     },
-    onSettled: () => {
-      setLoading(false);
-    },
   });
+
   useEffect(() => {
     if (code2) {
       slackCallbackMutation.mutate(code2);
@@ -105,9 +137,9 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({});
+    setErrors([]);
     setLoading(true);
-    loginMutation.mutate(loginDetails);
+    mutate(loginDetails);
   };
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -200,13 +232,13 @@ const LoginPage: React.FC = () => {
                       password: e.target.value,
                     })
                   }
-                   type="text"
-              autoComplete="off"
-              style={
-                {
-                  WebkitTextSecurity: passwordVisible ? "none" : "disc",
-                } as any
-              }
+                  type="text"
+                  autoComplete="off"
+                  style={
+                    {
+                      WebkitTextSecurity: passwordVisible ? "none" : "disc",
+                    } as any
+                  }
                   className="pr-10"
                 />
                 <button
