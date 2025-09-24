@@ -115,9 +115,8 @@ const UsersDetais = () => {
           setResetError("Password validation failed");
         }
       } else {
-        const message =
-          error?.data?.message || "Failed to update reset password";
-        toast.error(message);
+        const message = error?.data?.message || "Failed to reset password";
+        toast.error(message); 
         setResetError(message);
       }
     },
@@ -248,22 +247,22 @@ const UsersDetais = () => {
             </div>
           )}
           <div className="mt-5">
-          <TanStackTable
-            data={users}
-            columns={[...usersColumns, ...userActions]}
-            paginationDetails={data?.data?.data?.pagination_info}
-            getData={getAllUsers}
-            loading={isLoading}
-            removeSortingForColumnIds={[
-              "serial",
-              "actions",
-              "project_name",
-              "task_brief",
-              "task_status",
-              "actions",
-            ]}
-          />
-            </div>
+            <TanStackTable
+              data={users}
+              columns={[...usersColumns, ...userActions]}
+              paginationDetails={data?.data?.data?.pagination_info}
+              getData={getAllUsers}
+              loading={isLoading}
+              removeSortingForColumnIds={[
+                "serial",
+                "actions",
+                "project_name",
+                "task_brief",
+                "task_status",
+                "actions",
+              ]}
+            />
+          </div>
         </div>
         <DeleteTaskDialog
           openOrNot={deleteDialogOpen}
