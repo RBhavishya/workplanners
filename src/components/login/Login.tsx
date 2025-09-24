@@ -78,10 +78,11 @@ const LoginPage: React.FC = () => {
       toast.success(response?.data?.message);
         const { data } = response?.data;
       const { access_token, user_details } = response?.data?.data;
+      console.log(user_details,"user_details");
       Cookies.set("token", access_token, { priority: "High" });
       localStorage.setItem("user", JSON.stringify(user_details));
       navigate({
-        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+        to: user_details?.user_type === "MANAGER" ? "/users" : "/dashboard",
       });
     },
     onError: (error: any) => {

@@ -103,7 +103,7 @@ const UsersDetais = () => {
       resetPasswordUsersAPI(id.toString(), { password }),
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Password reset successfully");
-      setResetError(""); // clear error
+      setResetError("");
       setResetPasswordDialogOpen(false);
     },
     onError: (error: any) => {
@@ -226,7 +226,7 @@ const UsersDetais = () => {
     },
   ];
   return (
-    <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
+    <div className="card-container shadow-all border p-3 rounded-xl bg-white">
       <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center my-2 gap-3">
           <TaskSearchFilter
@@ -247,6 +247,7 @@ const UsersDetais = () => {
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
+          <div className="mt-5">
           <TanStackTable
             data={users}
             columns={[...usersColumns, ...userActions]}
@@ -262,6 +263,7 @@ const UsersDetais = () => {
               "actions",
             ]}
           />
+            </div>
         </div>
         <DeleteTaskDialog
           openOrNot={deleteDialogOpen}

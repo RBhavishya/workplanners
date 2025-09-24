@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -21,78 +21,38 @@ const columns: ColumnDef<TaskStats>[] = [
   {
     id: "sno",
     header: () => <span>S.No</span>,
-    cell: ({ row }) => {
-      return <span>{row.index + 1}</span>;
-    },
+    cell: ({ row }) => <span>{row.index + 1}</span>,
     size: 80,
-    minSize: 80,
-    maxSize: 80,
   },
-
   {
     accessorFn: (row: any) => row.display_name,
     id: "name",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
-    },
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
     header: () => <span>Name</span>,
-    footer: (props: any) => props.column.id,
   },
   {
     accessorFn: (row: any) => row.total_tasks,
     id: "total",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
-    },
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
     header: () => <span>Total Tasks</span>,
-    footer: (props: any) => props.column.id,
   },
   {
     accessorFn: (row: any) => row.completed_tasks,
     id: "completed",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
-    },
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
     header: () => <span>Completed</span>,
-    footer: (props: any) => props.column.id,
   },
   {
     accessorFn: (row: any) => row.in_progress_tasks,
     id: "inProgress",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
-    },
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
     header: () => <span>In Progress</span>,
-    footer: (props: any) => props.column.id,
   },
   {
     accessorFn: (row: any) => row.pending_tasks,
     id: "pending",
-    cell: (info: any) => {
-      let title = info.getValue();
-      return <span>{title ? title : "-"}</span>;
-    },
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
     header: () => <span>Pending</span>,
-    footer: (props: any) => props.column.id,
   },
   {
     id: "actions",
@@ -107,15 +67,17 @@ const columns: ColumnDef<TaskStats>[] = [
 
 const Statisticstable = () => {
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard-stats", page, pageSize],
-    queryFn: () => getDashboardStatistics({ pageIndex: page, pageSize }),
+    queryFn: () => getDashboardStatistics({ pageIndex: page, pageSize: pageSize }),
   });
 
-  const statsData: TaskStats[] = data?.data?.data?.records ?? [0];
+  const statsData: TaskStats[] = data?.data?.data?.records ?? [];
   const totalRecords: number = data?.data?.pagination_info?.total_records ?? 0;
   const totalPages: number = data?.data?.pagination_info?.total_pages ?? 1;
+
   const table = useReactTable({
     data: statsData,
     columns,
@@ -163,22 +125,17 @@ const Statisticstable = () => {
     <div className="bg-white p-6 mt-3 rounded-2xl shadow-md">
       <h2 className="text-lg font-semibold mb-4">STATISTICS</h2>
 
-      {isLoading ? (
-        <table className="w-full text-left border-separate border-spacing-y-2">
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className="text-center py-10">
-                <div className="flex justify-center items-center">
-                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      ) : isError ? (
+      {isError ? (
         <p className="text-red-500">Error fetching statistics</p>
       ) : (
-        <div className="h-[calc(100vh-325px)] overflow-y-auto">
+        <div className="h-[calc(100vh-325px)] overflow-y-auto relative">
+          {/* Spinner overlay inside table only */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
           <table className="w-full text-left border-separate border-spacing-y-2">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -198,7 +155,7 @@ const Statisticstable = () => {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.length === 0 ? (
+              {table.getRowModel().rows.length === 0 && !isLoading ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center py-4">
                     No data found.
@@ -227,42 +184,44 @@ const Statisticstable = () => {
             </tbody>
           </table>
 
-          <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white">
-            <div className="text-sm text-gray-600">
-              {`${startIndex} - ${endIndex} of ${totalRecords}`}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+          {!isLoading && (
+            <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white">
+              <div className="text-sm text-gray-600">
+                {`${startIndex} - ${endIndex} of ${totalRecords}`}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                  disabled={page === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                {renderPaginationButtons()}
+                <button
+                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={page === totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border px-2 py-1 rounded"
               >
-                Prev
-              </button>
-              {renderPaginationButtons()}
-              <button
-                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                disabled={page === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Next
-              </button>
+                {[25, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}/page
+                  </option>
+                ))}
+              </select>
             </div>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-              className="border px-2 py-1 rounded"
-            >
-              {[10, 25, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size}/page
-                </option>
-              ))}
-            </select>
-          </div>
+          )}
         </div>
       )}
     </div>

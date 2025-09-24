@@ -35,14 +35,14 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
   const defaultCenter =
   location.pathname === "/dashboard" ? (
     <div className="flex-1 max-w-md mx-2">
-      <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
+      {/* <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
         <Search className="w-5 h-5 text-purple-500 mr-2" />
         <input
           type="text"
           placeholder="Find your Task, Projects.."
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
         />
-      </div>
+      </div> */}
     </div>
   ) : null;
 
