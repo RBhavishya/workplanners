@@ -106,7 +106,7 @@ const Projects = () => {
   }
 
   return (
-    <div className="relative overflow-x-auto border rounded-xl p-4 h-[calc(100vh-80px)] flex flex-col">
+    <div className="relative overflow-x-auto border rounded-xl p-4 h-[calc(100vh-110px)] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         <h2 className="font-bold text-2xl">Projects</h2>
@@ -170,7 +170,7 @@ const Projects = () => {
 
       {/* Projects Section */}
       {viewMode === "grid" ? (
-        <div className="relative flex-1 overflow-y-auto">
+        <div className="relative flex-1 h-[calc(100vh-200px)] overflow-y-auto">
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
@@ -182,7 +182,7 @@ const Projects = () => {
           {projectsData.length === 0 && !isLoading ? (
             <p className="text-gray-500 text-center py-6">No projects available.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-290px)] overflow-y-auto lg:grid-cols-4 gap-4">
               {projectsData.map((project: ProjectData) => (
                 <Card
                   key={project.id}
@@ -241,7 +241,7 @@ const Projects = () => {
           )}
 
           {/* Pagination */}
-          <div className="w-full flex justify-center mt-6">
+          <div className="w-full flex justify-center mt-4">
             <TasksPagination
               paginationDetails={
                 data?.data?.data?.pagination_info || {

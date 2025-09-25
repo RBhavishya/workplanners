@@ -42,9 +42,9 @@ export const taskColumns = [
       );
     },
     footer: (props: any) => props.column.id,
-    width: 30,
-    minWidth: 30,
-    maxWidth: 30,
+    width: 60,
+    minWidth: 60,
+    maxWidth: 60,
   },
   {
     accessorFn: (row: any) => row.project?.title,

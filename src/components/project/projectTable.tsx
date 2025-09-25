@@ -258,7 +258,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   }
 
   return (
-    <div className="border rounded-xl overflow-hidden h-[600px] flex flex-col">
+    <div className="border rounded-xl overflow-hidden h-[calc(100vh-220px)] flex flex-col">
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-10 text-left text-gray-600 text-xs font-semibold">
