@@ -49,7 +49,7 @@ const UserDetails: React.FC = () => {
         <AccordionItem value="user">
           <AccordionTrigger>
             {/* Name + Greeting inside accordion header */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <img
                 src={
                   user.profile_pic
