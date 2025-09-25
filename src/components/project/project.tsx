@@ -45,7 +45,7 @@ const Projects = () => {
     viewMode?: "table" | "grid";
   };
   const pageIndexParam = Number(searchParams.get("page")) || 1;
-  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const initialStatus = searchParams.get("project_status") || "";
   const initialSearch = searchParams.get("search") || "";
   const orderBY = searchParams.get("order_by") || "";
