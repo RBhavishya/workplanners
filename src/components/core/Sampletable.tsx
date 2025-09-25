@@ -23,7 +23,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
-  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 25;
 
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
