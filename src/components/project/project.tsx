@@ -160,7 +160,7 @@ const Projects = () => {
           </div>
 
           {/* New Project */}
-          <button onClick={handleNavigation} className="px-4 py-2 bg-purple-600 text-white rounded-lg">
+          <button onClick={handleNavigation} className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer">
             + New Project
           </button>
         </div>
