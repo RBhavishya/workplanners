@@ -1,39 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  useLocation,
-  useNavigate,
-  useRouter,
-  useSearch,
-} from "@tanstack/react-router";
-import { Pagination } from "../core/Pagination";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { useNavigate, useRouter, useLocation, useSearch } from "@tanstack/react-router";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { MoreVertical, Filter, LayoutGrid, List } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
-import {
-  getAllPaginatedProjects,
-  getProjectByIdAPI,
-} from "@/https/services/project";
-
+import { getAllPaginatedProjects } from "@/https/services/project";
 import DeleteProject from "./DeleteProject";
 import ProjectsTable from "./projectTable";
 import { Input } from "../ui/input";
 import { SearchIcon } from "../icons/SearchIcon";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TasksPagination from "../core/TasksPagination";
-import TaskSearchFilter from "../core/TasksSearchFilter";
 
 const Projects = () => {
-  const [time, setTime] = useState(new Date());
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
-    null
-  );
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -41,18 +21,15 @@ const Projects = () => {
   const router = useRouter();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const search = useSearch({ strict: false }) as {
-    viewMode?: "table" | "grid";
-  };
+  const search = useSearch({ strict: false }) as { viewMode?: "table" | "grid" };
+
   const pageIndexParam = Number(searchParams.get("page")) || 1;
-  const pageSizeParam = Number(searchParams.get("page_size")) || 10;
+  const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const initialStatus = searchParams.get("project_status") || "";
   const initialSearch = searchParams.get("search") || "";
   const orderBY = searchParams.get("order_by") || "";
 
-  const [viewMode, setViewMode] = useState<"table" | "grid">(
-    search?.viewMode || "grid"
-  );
+  const [viewMode, setViewMode] = useState<"grid" | "table">(search?.viewMode || "grid");
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [pagination, setPagination] = useState({
@@ -71,43 +48,20 @@ const Projects = () => {
     COMPLETED: "bg-green-100 text-green-600",
   };
 
-  // live clock
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-  const formattedTime = time.toLocaleTimeString("en-GB");
-  const formattedDate = time.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "2-digit",
-    month: "short",
-  });
-
+  // debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search_string);
       if (search_string) {
-        setPagination({
-          ...pagination,
-          pageIndex: 1,
-        });
+        setPagination(prev => ({ ...prev, pageIndex: 1 }));
       }
     }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [search_string, selectedStatus]);
 
-  // ✅ update URL whenever pagination/search/sort changes
+  // fetch projects
   const { isLoading, isError, error, data, isFetching } = useQuery({
-    queryKey: [
-      "projects",
-      pagination,
-      viewMode,
-      debouncedSearch,
-      selectedStatus,
-      selectedSort,
-    ],
+    queryKey: ["projects", pagination, viewMode, debouncedSearch, selectedStatus, selectedSort],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
         pageIndex: pagination.pageIndex,
@@ -141,44 +95,23 @@ const Projects = () => {
       data?.data?.data?.pagination_info?.page_size
     ) || [];
 
-  const capturePageNum = (pageIndex: number) => {
-    setPagination((prev) => ({ ...prev, pageIndex }));
-  };
+  const capturePageNum = (pageIndex: number) => setPagination(prev => ({ ...prev, pageIndex }));
+  const captureRowPerItems = (pageSize: number) => setPagination(prev => ({ ...prev, pageIndex: 1, pageSize }));
 
-  const captureRowPerItems = (pageSize: number) => {
-    setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
-  };
-
-  const {
-    data: selectedProjectData,
-    isLoading: loadingProject,
-    isError: errorProject,
-    error: projectError,
-  } = useQuery({
-    queryKey: ["project", selectedProjectId],
-    queryFn: async () => {
-      if (!selectedProjectId) return null;
-      return await getProjectByIdAPI(selectedProjectId);
-    },
-    enabled: !!selectedProjectId,
-  });
-
-  const handleNavigation = () => navigate({ to: `/projects/add` });
+    const handleNavigation = () => navigate({ to: `/projects/add` });
   const handleView = (id: number) => navigate({ to: `/projects/${id}` });
 
   if (isError) {
-    return (
-      <p className="text-red-500">
-        Error fetching projects: {error?.message || "Unknown error"}
-      </p>
-    );
+    return <p className="text-red-500 p-4">Error fetching projects: {error?.message || "Unknown error"}</p>;
   }
 
   return (
-    <div className="relative overflow-x-auto border rounded-xl">
-      <div className="flex items-center justify-between mb-7 px-4">
+    <div className="relative overflow-x-auto border rounded-xl p-4 h-[calc(100vh-110px)] flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         <h2 className="font-bold text-2xl">Projects</h2>
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center gap-4 flex-wrap">
           {/* Search */}
           <div className="relative w-64 h-10 border border-[#D1D1D1] bg-[#F6F6F6] rounded-sm shadow-none flex items-center px-2">
             <Input
@@ -192,7 +125,8 @@ const Projects = () => {
               <SearchIcon className="w-5 h-5 text-gray-500" />
             </span>
           </div>
-          {/* Sort Dropdown */}
+
+          {/* Status Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 border px-4 py-2 rounded-lg cursor-pointer">
@@ -201,17 +135,11 @@ const Projects = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
-                (option) => (
-                  <DropdownMenuItem
-                    key={option}
-                    className="cursor-pointer"
-                    onClick={() => setSelectedStatus(option)}
-                  >
-                    {option}
-                  </DropdownMenuItem>
-                )
-              )}
+              {["New", "In_Progress", "Review", "Overdue", "Completed"].map((option) => (
+                <DropdownMenuItem key={option} onClick={() => setSelectedStatus(option)}>
+                  {option}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -219,27 +147,20 @@ const Projects = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg cursor-pointer ${
-                viewMode === "grid" ? "bg-purple-100 text-purple-600" : ""
-              }`}
+              className={`p-2 rounded-lg cursor-pointer ${viewMode === "grid" ? "bg-purple-100 text-purple-600" : ""}`}
             >
               <LayoutGrid size={18} />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-2 rounded-lg cursor-pointer ${
-                viewMode === "table" ? "bg-purple-100 text-purple-600" : ""
-              }`}
+              className={`p-2 rounded-lg cursor-pointer ${viewMode === "table" ? "bg-purple-100 text-purple-600" : ""}`}
             >
               <List size={18} />
             </button>
           </div>
 
           {/* New Project */}
-          <button
-            onClick={handleNavigation}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
-          >
+          <button onClick={handleNavigation} className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer">
             + New Project
           </button>
         </div>
@@ -248,170 +169,111 @@ const Projects = () => {
       <hr className="mb-4" />
 
       {/* Projects Section */}
-      <div className="flex gap-6">
-        {viewMode === "grid" ? (
-          <>
-            {/* Grid Cards */}
-            <div className="w-2/3 grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-              {(isLoading || isFetching) && (
+      {viewMode === "grid" ? (
+        <div className="relative flex-1 h-[calc(100vh-200px)] overflow-y-auto">
+          {/* Loading Spinner */}
+          {(isLoading || isFetching) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
                   <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
 
-              {projectsData.length === 0 && !isLoading ? (
-                <p className="text-gray-500 col-span-3 text-center py-6">
-                  No projects available.
-                </p>
-              ) : (
-                projectsData.map((project: ProjectData) => (
-                  <Card
-                    key={project.id}
-                    className="w-[180px] h-[180px] shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
-                    onClick={() => setSelectedProjectId(project.id ?? null)}
-                  >
-                    {/* Menu */}
-                    <div className="absolute top-3 right-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
-                            <MoreVertical size={18} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={(e) => {
+          {/* Grid Cards */}
+          {projectsData.length === 0 && !isLoading ? (
+            <p className="text-gray-500 text-center py-6">No projects available.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-290px)] overflow-y-auto lg:grid-cols-4 gap-4">
+              {projectsData.map((project: ProjectData) => (
+                <Card
+                  key={project.id}
+                  className="w-full h-52 shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
+                 onClick={() => navigate({ to: `/projects/${project.id}` })}
+                >
+                  {/* Menu */}
+                  <div className="absolute top-3 right-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
+                          <MoreVertical size={18} />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                           onClick={(e) => {
                               e.stopPropagation();
                               navigate({ to: `/projects/edit/${project.id}` });
                             }}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteTarget(project);
-                              setShowDeleteDialog(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteTarget(project);
+                            setShowDeleteDialog(true);
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Card Content */}
+                  <CardContent className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white font-bold text-xl mb-4">
+                      {project.title?.charAt(0).toUpperCase() || "?"}
                     </div>
-
-                    {/* Card Content */}
-                    <CardContent className="flex flex-col items-center text-center">
-                      {/* Project logo / initial */}
-                      <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white font-bold text-xl mb-4">
-                        {project.title?.charAt(0).toUpperCase() || "?"}
-                      </div>
-
-                      {/* Project title */}
-                      <h2 className="text-lg font-semibold break-words text-center px-2">
-                        {project.title || "Untitled"}
-                      </h2>
-
-                      {/* Project status */}
-                      <span
-                        className={`mt-2 text-xs px-3 py-1 rounded-full font-medium ${
-                          statusColors[
-                            project.project_status?.toUpperCase() || ""
-                          ] || "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {project.project_status || "Unknown"}
-                      </span>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-
-            {/* Right side - Project Details */}
-            <div className="w-1/3 flex justify-center items-start ">
-              {!selectedProjectId ? (
-                <p className="text-gray-500 mt-10">
-                  Select a project to view details
-                </p>
-              ) : loadingProject ? (
-                <div className="flex items-center justify-center h-[400px] w-full">
-                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : errorProject ? (
-                <p className="text-red-500 mt-10">
-                  Error loading project: {projectError?.message || "Unknown"}
-                </p>
-              ) : (
-                <div className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-2xl p-6 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="text-3xl text-blue-500 font-bold">
-                      {selectedProjectData?.data?.data?.title
-                        ?.charAt(0)
-                        .toUpperCase() || ""}
+                    <h2 className="text-lg font-semibold break-words text-center px-2">
+                      {project.title || "Untitled"}
+                    </h2>
+                    <span
+                      className={`mt-2 text-xs px-3 py-1 rounded-full font-medium ${
+                        statusColors[project.project_status?.toUpperCase() || ""] || "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {project.project_status || "Unknown"}
                     </span>
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    {selectedProjectData?.data?.data?.title || "Unknown"}
-                  </h2>
-                  <button
-                    onClick={() => handleView(selectedProjectId!)}
-                    className="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition my-4 cursor-pointer"
-                  >
-                    View
-                  </button>
-                  <div className="text-left">
-                    <h3 className="font-semibold text-lg text-gray-800 mb-2">
-                      About Project
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed max-h-60 overflow-y-auto">
-                      {selectedProjectData?.data?.data?.description ||
-                        "No description available."}
-                    </p>
-                  </div>
-                </div>
-              )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </>
-        ) : (
-          <div className="w-full">
-            <ProjectsTable
-              debouncedSearch={debouncedSearch}
-              selectedSort={selectedSort}
-              selectedStatus={selectedStatus}
-              setSelectedStatus={setSelectedStatus}
-              setSelectedSort={setSelectedSort}
-              page={pagination.pageIndex}
-              pageSize={pagination.pageSize}
-              setPage={capturePageNum}
-              setPageSize={captureRowPerItems}
-              onDelete={(project) => {
-                setDeleteTarget(project);
-                setShowDeleteDialog(true);
-              }}
+          )}
+
+          {/* Pagination */}
+          <div className="w-full flex justify-center mt-4">
+            <TasksPagination
+              paginationDetails={
+                data?.data?.data?.pagination_info || {
+                  total_records: 0,
+                  total_pages: 1,
+                  current_page: pagination.pageIndex,
+                  page_size: pagination.pageSize,
+                  next_page: null,
+                  prev_page: null,
+                }
+              }
+              capturePageNum={capturePageNum}
+              captureRowPerItems={captureRowPerItems}
             />
           </div>
-        )}
-      </div>
-
-      {/* Pagination (only for grid view) */}
-      {viewMode === "grid" && (
-        <div className="w-full flex justify-center mt-6">
-          <TasksPagination
-            paginationDetails={
-              data?.data?.data?.pagination_info || {
-                total_records: 0,
-                total_pages: 1,
-                current_page: pagination.pageIndex,
-                page_size: pagination.pageSize,
-                next_page: null,
-                prev_page: null,
-              }
-            }
-            capturePageNum={capturePageNum}
-            captureRowPerItems={captureRowPerItems}
+        </div>
+      ) : (
+        <div className="w-full">
+          <ProjectsTable
+            debouncedSearch={debouncedSearch}
+            selectedSort={selectedSort}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+            setSelectedSort={setSelectedSort}
+            page={pagination.pageIndex}
+            pageSize={pagination.pageSize}
+            setPage={capturePageNum}
+            setPageSize={captureRowPerItems}
+            onDelete={(project) => {
+              setDeleteTarget(project);
+              setShowDeleteDialog(true);
+            }}
           />
         </div>
       )}
@@ -431,3 +293,4 @@ const Projects = () => {
 };
 
 export default Projects;
+

@@ -62,7 +62,7 @@ const TanStackTable: FC<pageProps> = ({
     });
   };
 
-  const getWidth = (id: string) => {
+  const getWidth = (id: string | undefined) => {
     const widthObj = columns.find((col) => col.id === id);
     return widthObj ? widthObj?.width || widthObj?.size || "100px" : "100px";
   };
@@ -107,7 +107,7 @@ const TanStackTable: FC<pageProps> = ({
           className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
       ${location.pathname.includes("tasks") ? "h-[calc(100vh-380px)]" : "h-[calc(100vh-240px)]"}`}
         >
-          <Table className="w-full text-sm border-collapse">
+          <Table className="w-full text-sm border-collapse table-fixed">
             {/* Sticky Header */}
             <TableHeader className="sticky top-0 z-20 bg-gray-50 text-gray-600 text-xs font-semibold">
               {table?.getHeaderGroups().map((headerGroup) => (
@@ -147,14 +147,19 @@ const TanStackTable: FC<pageProps> = ({
           </Table>
 
           {/* Scrollable body wrapped separately */}
-          <div className="overflow-y-auto h-[calc(100vh-420px)]">
-            <Table className="w-full text-sm border-collapse">
+          <div className={` ${location.pathname.includes("tasks") ? "h-[calc(100vh-420px)] overflow-y-auto" : " h-[calc(100vh-290px)] overflow-y-auto"}`}>
+            <Table className="w-full text-sm border-collapse table-fixed">
               <TableBody className="divide-y divide-gray-200">
                 {data?.length ? (
                   table?.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} className="hover:bg-gray-50">
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="px-4 py-1">
+                        <TableCell key={cell.id} className="px-4 py-1"
+                           style={{
+                            minWidth: getWidth(cell.column.columnDef.id),
+                            width: getWidth(cell.column.columnDef.id),
+
+                      }}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

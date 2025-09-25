@@ -220,7 +220,7 @@ const AddProjectForm = ({
       <div className="flex items-center justify-start gap-3 mb-4">
         <span>
           <button
-            onClick={handleNavigation}
+           onClick={() => window.history.back()}
             className="px-2 py-2 text-gray rounded cursor-pointer"
           >
             <MoveLeft className="mr-2" size={20} />

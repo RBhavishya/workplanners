@@ -163,9 +163,9 @@ const Viewdetails = () => {
 
   // --- JSX ---
   return (
-    <div className="p-4">
+    <div className="p-4 ">
       {/* Status Cards */}
-      <div className="flex items-center mb-6 w-full">
+      <div className="flex items-center mb-2 w-full">
         <SmallCard
           cards={[
             { title: "Total Tasks", value: status?.data?.total_count },
