@@ -7,6 +7,8 @@ import {
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
+import TasksPagination from "../core/TasksPagination";
+import { addSerial } from "@/lib/helpers/addSerial";
 
 type TaskStats = {
   id: number;
@@ -15,111 +17,94 @@ type TaskStats = {
   completed: number;
   inProgress: number;
   pending: number;
+  serial?: number; // add serial field
 };
 
-const columns: ColumnDef<TaskStats>[] = [
-  {
-    id: "sno",
-    header: () => <span>S.No</span>,
-    cell: ({ row }) => <span>{row.index + 1}</span>,
-    size: 80,
-  },
-  {
-    accessorFn: (row: any) => row.display_name,
-    id: "name",
-    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-    header: () => <span>Name</span>,
-  },
-  {
-    accessorFn: (row: any) => row.total_tasks,
-    id: "total",
-    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-    header: () => <span>Total Tasks</span>,
-  },
-  {
-    accessorFn: (row: any) => row.completed_tasks,
-    id: "completed",
-    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-    header: () => <span>Completed</span>,
-  },
-  {
-    accessorFn: (row: any) => row.in_progress_tasks,
-    id: "inProgress",
-    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-    header: () => <span>In Progress</span>,
-  },
-  {
-    accessorFn: (row: any) => row.pending_tasks,
-    id: "pending",
-    cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-    header: () => <span>Pending</span>,
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: () => (
-      <button className="px-4 py-1 text-sm rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200">
-        View
-      </button>
-    ),
-  },
-];
-
 const Statisticstable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["dashboard-stats", page, pageSize],
-    queryFn: () => getDashboardStatistics({ pageIndex: page, pageSize: pageSize }),
+  const [pagination, setPagination] = useState({
+    pageIndex: 1,
+    pageSize: 25,
   });
 
-  const statsData: TaskStats[] = data?.data?.data?.records ?? [];
-  const totalRecords: number = data?.data?.pagination_info?.total_records ?? 0;
-  const totalPages: number = data?.data?.pagination_info?.total_pages ?? 1;
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["dashboard-stats", pagination.pageIndex, pagination.pageSize],
+    queryFn: () =>
+      getDashboardStatistics({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      }),
+  });
+
+  const statsData: TaskStats[] =
+    addSerial(
+      data?.data?.data?.records,
+      pagination.pageIndex,
+      pagination.pageSize
+    ) || [];
+
+  const columns: ColumnDef<TaskStats>[] = [
+    {
+      id: "sno",
+      header: () => <span>S.No</span>,
+      cell: ({ row }) => <span>{row.original.serial}</span>, // use serial field
+      size: 80,
+    },
+    {
+      accessorFn: (row: any) => row.display_name,
+      id: "name",
+      cell: (info: any) => <span>{info.getValue() || "-"}</span>,
+      header: () => <span>Name</span>,
+    },
+    {
+      accessorFn: (row: any) => row.total_tasks,
+      id: "total",
+      cell: (info: any) => <span>{info.getValue() || "-"}</span>,
+      header: () => <span>Total Tasks</span>,
+    },
+    {
+      accessorFn: (row: any) => row.completed_tasks,
+      id: "completed",
+      cell: (info: any) => <span>{info.getValue() || "-"}</span>,
+      header: () => <span>Completed</span>,
+    },
+    {
+      accessorFn: (row: any) => row.in_progress_tasks,
+      id: "inProgress",
+      cell: (info: any) => <span>{info.getValue() || "-"}</span>,
+      header: () => <span>In Progress</span>,
+    },
+    {
+      accessorFn: (row: any) => row.pending_tasks,
+      id: "pending",
+      cell: (info: any) => <span>{info.getValue() || "-"}</span>,
+      header: () => <span>Pending</span>,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: () => (
+        <button className="px-4 py-1 text-sm rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200">
+          View
+        </button>
+      ),
+    },
+  ];
 
   const table = useReactTable({
     data: statsData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    pageCount: totalPages,
   });
 
-  const renderPaginationButtons = () => {
-    const buttons: React.ReactElement[] = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
-        buttons.push(
-          <button
-            key={i}
-            onClick={() => setPage(i)}
-            className={`px-3 py-1 border rounded ${
-              i === page ? "bg-purple-500 text-white" : "bg-gray-100"
-            }`}
-          >
-            {i}
-          </button>
-        );
-      } else if (
-        (i === 2 && page > 3) ||
-        (i === totalPages - 1 && page < totalPages - 2)
-      ) {
-        buttons.push(
-          <span key={`dots-${i}`} className="px-2">
-            ...
-          </span>
-        );
-      }
-    }
-
-    return buttons;
+  // handlers for TasksPagination
+  const capturePageNum = (pageIndex: number) => {
+    setPagination((prev) => ({ ...prev, pageIndex }));
   };
 
-  const startIndex = statsData.length === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endIndex =
-    statsData.length === 0 ? 0 : startIndex + statsData.length - 1;
+  const captureRowPerItems = (pageSize: number) => {
+    setPagination({ pageIndex: 1, pageSize });
+  };
 
   return (
     <div className="bg-white p-6 mt-3 rounded-2xl shadow-md">
@@ -184,43 +169,22 @@ const Statisticstable = () => {
             </tbody>
           </table>
 
+          {/* ✅ Reusable Pagination Component */}
           {!isLoading && (
-            <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white">
-              <div className="text-sm text-gray-600">
-                {`${startIndex} - ${endIndex} of ${totalRecords}`}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                  disabled={page === 1}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Prev
-                </button>
-                {renderPaginationButtons()}
-                <button
-                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                  disabled={page === totalPages}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="border px-2 py-1 rounded"
-              >
-                {[25, 50, 100].map((size) => (
-                  <option key={size} value={size}>
-                    {size}/page
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TasksPagination
+              paginationDetails={
+                data?.data?.data?.pagination_info || {
+                  total_records: 0,
+                  total_pages: 1,
+                  current_page: pagination.pageIndex,
+                  page_size: pagination.pageSize,
+                  next_page: null,
+                  prev_page: null,
+                }
+              }
+              capturePageNum={capturePageNum}
+              captureRowPerItems={captureRowPerItems}
+            />
           )}
         </div>
       )}

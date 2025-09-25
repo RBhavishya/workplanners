@@ -42,12 +42,9 @@ const TasksPagination = ({
       limitOptionsFromProps?.length
         ? limitOptionsFromProps
         : [
-            { title: "10/page", value: 10 },
             { title: "25/page", value: 25 },
             { title: "50/page", value: 50 },
             { title: "100/page", value: 100 },
-            { title: "250/page", value: 250 },
-            { title: "500/page", value: 500 },
           ]
     );
   }, [limitOptionsFromProps]);

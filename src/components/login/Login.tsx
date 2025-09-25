@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
   const [loginDetails, setLoginDetails] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     if (search?.code) {
@@ -70,34 +70,6 @@ const LoginPage: React.FC = () => {
     },
   });
 
-  // const loginMutation = useMutation({
-  //   mutationFn: async (loginDetails: loginProps) => {
-  //     return await LoginAPI(loginDetails);
-  //   },
-  //   onSuccess: (response) => {
-  //     toast.success(response?.data?.message);
-  //     const { data } = response?.data;
-  //     const { access_token , user_details} = data;
-
-  //     Cookies.set("token", access_token, { priority: "High" });
-  //     localStorage.setItem("user", JSON.stringify(user_details));
-  //     navigate({
-  //       to: user_details?.user_type === "MANAGER" ? "/users" : "/dashboard",
-  //     });
-  //   },
-  //   onError: (response: any) => {
-  //     if (response?.status === 422) {
-  //       const errData = response?.data?.errData;
-  //        setErrors(errData || {});
-  //     } else {
-  //       // toast.error(response?.data?.errData || "Failed to login.");
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     setLoading(false);
-  //   },
-  // });
-
   const { mutate, isError, error } = useMutation({
     mutationFn: async (loginDetails: loginProps) => {
       setLoading(true);
@@ -108,9 +80,8 @@ const LoginPage: React.FC = () => {
           const { data } = response?.data;
           const { access_token, user_details } = data;
 
-          Cookies.set("token", access_token, {
-            priority: "High",
-          });
+            Cookies.set("token", access_token, { priority: "High" });
+      localStorage.setItem("user", JSON.stringify(user_details));
           navigate({
             to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
           });
@@ -137,7 +108,7 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors([]);
+    setErrors({});
     setLoading(true);
     mutate(loginDetails);
   };
@@ -145,7 +116,7 @@ const LoginPage: React.FC = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  console.log(errors);
+  console.log(errors, "errors");
   return (
     <div className="flex h-screen w-screen">
       {/* Left side illustration */}
@@ -251,7 +222,7 @@ const LoginPage: React.FC = () => {
               </div>
               {errors?.password && (
                 <p className="text-xs pt-1 text-red-600">
-                  {errors.password[0]}
+                  {errors.password.join(", ")}
                 </p>
               )}
             </div>
