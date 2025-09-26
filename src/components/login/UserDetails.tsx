@@ -45,7 +45,7 @@ const UserDetails: React.FC = () => {
   return (
     <div className="mb-6 w-full">
       {/* Top profile header */}
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full bg-white">
         <AccordionItem value="user">
           <AccordionTrigger>
             {/* Name + Greeting inside accordion header */}
@@ -64,9 +64,9 @@ const UserDetails: React.FC = () => {
               </div>
             </div>
           </AccordionTrigger>
-          <AccordionContent>
-            {/* Expanded user details */}
-            <div className="text-sm space-y-2 mt-2">
+          <AccordionContent className="bg-white" >
+          
+            <div className="text-sm space-y-2 mt-2 bg-white ">
               <p>
                 <span className="font-medium">Email:</span> {user.email}
               </p>

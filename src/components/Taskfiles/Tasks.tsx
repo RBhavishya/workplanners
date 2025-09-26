@@ -19,6 +19,7 @@ import {
   getAllPaginatedTasks,
   gettasksByIdAPI,
   getTasksStatsAPI,
+  getWeaklySummaryAPI,
 } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
@@ -146,6 +147,13 @@ const Tasks = () => {
     },
   });
 
+  const { data: weaksummery } = useQuery({
+    queryKey: ["tasksStats"],
+    queryFn: async () => {
+      const response = await getWeaklySummaryAPI();
+      return response.data;
+    },
+  });
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
     onSuccess: (res: any) => {
@@ -303,7 +311,7 @@ const Tasks = () => {
           <div
             className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
             style={{ border: "1px solid  #ddb8ffff" }}
-          ></div>
+          >  </div>
         </div>
       </div>
       <div className="bg-white rounded-md ">

@@ -161,4 +161,13 @@ export const getTasksStatsAPI = async () => {
     }
 };
 
+export const getWeaklySummaryAPI = async () => {
+    try {
+        const response = await $fetch.get("/tasks/weekly-summary");
+        return response.data;
+    } catch (err) {
+        throw err;
+    }
+};
+
 

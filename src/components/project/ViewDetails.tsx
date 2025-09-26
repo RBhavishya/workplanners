@@ -212,7 +212,7 @@ const Viewdetails = () => {
       </div>
 
       {/* Main Layout */}
-      <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-6 flex gap-6 min-h-[600px]">
+      <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-3 flex gap-6">
         {/* Tasks Table */}
         <div className="w-2/3">
           <TasksInProjectTable projectId={Number(id)} />
@@ -221,6 +221,7 @@ const Viewdetails = () => {
         {/* Project Details */}
         <div className="w-1/3 border border-gray-200 rounded-3xl p-4">
           <div className="text-2xl font-bold mb-4">Details</div>
+          <div className="h-[calc(100vh-500px)] overflow-y-auto">
 
           {/* Created By */}
           <div className="flex items-center gap-3 mb-4">
@@ -367,6 +368,7 @@ const Viewdetails = () => {
                 )}
               </button>
             </div>
+          </div>
           </div>
         </div>
       </div>
