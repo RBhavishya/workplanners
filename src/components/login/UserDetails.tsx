@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 interface User {
   id: number;
@@ -43,40 +44,34 @@ const UserDetails: React.FC = () => {
   };
 
   return (
-    <div className="mb-6 w-full">
-      {/* Top profile header */}
-      <Accordion type="single" collapsible className="w-full bg-white">
-        <AccordionItem value="user">
-          <AccordionTrigger>
-            {/* Name + Greeting inside accordion header */}
-            <div className="flex items-center space-x-3">
-              <img
-                src={
-                  user.profile_pic
-                    ? user.profile_pic
-                    : "/table/profile.webp"
-                }
-                alt={user.display_name || "User"}
-                className="h-12 w-12 rounded-full object-cover shadow-md"
-              />
-              <div className="text-left">
-                <p className="font-semibold">{user.display_name || "User"}</p>
-              </div>
+   <div className="mb-6 w-full flex justify-start">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center space-x-3 focus:outline-none">
+            <img
+              src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
+              alt={user.display_name || "User"}
+              className="h-12 w-12 rounded-full object-cover shadow-md"
+            />
+            <div className="text-left">
+              <p className="font-semibold">{user.display_name || "User"}</p>
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="bg-white" >
-          
-            <div className="text-sm space-y-2 mt-2 bg-white ">
-              <p>
-                <span className="font-medium">Email:</span> {user.email}
-              </p>
-              <p>
-                <span className="font-medium">Phone:</span> {user.phone}
-              </p>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="w-56 bg-white">
+          <DropdownMenuLabel className="text-gray-700">
+            Account Info
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <span className="font-medium">Email:</span>&nbsp; {user.email}
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span className="font-medium">Phone:</span>&nbsp; {user.phone}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
