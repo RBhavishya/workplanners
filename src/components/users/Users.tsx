@@ -116,7 +116,7 @@ const UsersDetais = () => {
         }
       } else {
         const message = error?.data?.message || "Failed to reset password";
-        toast.error(message); 
+        toast.error(message);
         setResetError(message);
       }
     },
@@ -158,73 +158,78 @@ const UsersDetais = () => {
     };
   }, [searchString, orderBY]);
 
-const userActions = [
-  {
-    id: "actions",
-    header: () => <span>Actions</span>,
-    footer: (props: any) => props.column.id,
-    size: 90,
-    cell: (info: any) => {
-      const rowData = info.row.original;
-      const isActive = rowData.user_status === "ACTIVE"; // check user status
+  const userActions = [
+    {
+      id: "actions",
+      header: () => <span>Actions</span>,
+      footer: (props: any) => props.column.id,
+      size: 90,
+      cell: (info: any) => {
+        const rowData = info.row.original;
+        const isActive = rowData.user_status === "ACTIVE"; // check user status
 
-      return (
-        <div className="flex gap-2">
-          {/* Edit button */}
-          <Button
-            title="edit"
-            size="sm"
-            variant="ghost"
-            disabled={!isActive} // disabled if INACTIVE
-            className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
-          >
-            <img src="/table/editicon.svg" alt="edit" height={18} width={18} />
-          </Button>
+        return (
+          <div className="flex gap-2">
+            {/* Edit button */}
+            <Button
+              title="edit"
+              size="sm"
+              variant="ghost"
+              disabled={!isActive} // disabled if INACTIVE
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
+            >
+              <img
+                src="/table/editicon.svg"
+                alt="edit"
+                height={18}
+                width={18}
+              />
+            </Button>
 
-          {/* Reset Password button */}
-          <Button
-            title="reset password"
-            size="sm"
-            variant="ghost"
-            disabled={!isActive} // disabled if INACTIVE
-            className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => {
-              setUserToResetPassword(rowData.id);
-              setResetPasswordDialogOpen(true);
-            }}
-          >
-            <img
-              src="/table/resetpassword.svg"
-              alt="reset"
-              height={18}
-              width={18}
-            />
-          </Button>
+            {/* Reset Password button */}
+            <Button
+              title="reset password"
+              size="sm"
+              variant="ghost"
+              disabled={!isActive} // disabled if INACTIVE
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => {
+                setUserToResetPassword(rowData.id);
+                setResetPasswordDialogOpen(true);
+              }}
+            >
+              <img
+                src="/table/resetpassword.svg"
+                alt="reset"
+                height={18}
+                width={18}
+              />
+            </Button>
 
-          {/* Delete button - always enabled */}
-          <Button
-            title="delete"
-            size="sm"
-            variant="ghost"
-            className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
-            onClick={() => {
-              setUserToDelete(rowData.id);
-              setDeleteDialogOpen(true);
-            }}
-          >
-            <img
-              src="/table/deleteicon.svg"
-              alt="delete"
-              height={18}
-              width={18}
-            />
-          </Button>
-        </div>
-      );
+            {/* Delete button - always enabled */}
+            <Button
+              title="delete"
+              size="sm"
+              variant="ghost"
+              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              onClick={() => {
+                setUserToDelete(rowData.id);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              <img
+                src="/table/deleteicon.svg"
+                alt="delete"
+                height={18}
+                width={18}
+              />
+            </Button>
+          </div>
+        );
+      },
     },
-  },
-];
+  ];
   return (
     <div className="card-container shadow-all border p-3 rounded-xl bg-white">
       <div className="bg-white rounded-md ">
@@ -274,7 +279,10 @@ const userActions = [
         />
         <ResetPasswordDialog
           open={resetPasswordDialogOpen}
-          onCancelClick={() => setResetPasswordDialogOpen(false)}
+          onCancelClick={() => {
+            setResetPasswordDialogOpen(false);
+            setResetError(""); // ✅ Clear error on cancel
+          }}
           onOKClick={handlePasswordUpdate}
           error={resetError}
           resetLoading={resetLoading}
