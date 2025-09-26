@@ -186,7 +186,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
 
   return (
-    <div className="flex flex-col h-screen p-4">
+    <div className="flex flex-col h-[calc(100vh-400px)] p-4">
       {/* Scrollable table container */}
       <div className="overflow-auto flex-1 border border-gray-200 rounded-lg">
         <table className="w-full border-separate border-spacing-y-3 text-sm">
