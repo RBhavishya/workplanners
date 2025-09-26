@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
   const [loginDetails, setLoginDetails] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     if (search?.code) {
@@ -70,36 +70,38 @@ const LoginPage: React.FC = () => {
     },
   });
 
-  const { mutate, isError, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (loginDetails: loginProps) => {
-      setLoading(true);
-      try {
-        const response = await LoginAPI(loginDetails);
-        if (response?.status === 200 || response?.status === 201) {
-          toast.success(response?.data?.message);
-          const { data } = response?.data;
-          const { access_token, user_details } = data;
+          const response = await LoginAPI(loginDetails);
 
-            Cookies.set("token", access_token, { priority: "High" });
+    if (response?.status === 200 || response?.status === 201) {
+      return response;
+    }
+    throw response;
+
+    },
+    onSuccess: (res: any) => {
+      toast.success(res?.data?.message || "Login successful");
+      const { access_token, user_details } = res?.data?.data;
+      Cookies.set("token", access_token, { priority: "High" });
       localStorage.setItem("user", JSON.stringify(user_details));
-          navigate({
-            to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
-          });
-        } else if (response?.status === 422) {
-          const errData = response?.data?.errData;
-          setErrors(errData || {});
-        } else {
-          throw response;
-        }
-      } catch (errData) {
-        console.error(errData);
-        errPopper(errData);
-      } finally {
-        setLoading(false);
-      }
+      setErrors({});
+
+      navigate({
+        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+      });
+    },
+    onError: (error: any) => {
+      setErrors({});
+
+      if (error?.status === 422 && error?.data?.errData) {
+        setErrors(error.data.errData);
+      } else{
+        toast.error(
+          error?.data?.message || "User not found or invalid credentials"
+        );}
     },
   });
-
   useEffect(() => {
     if (code2) {
       slackCallbackMutation.mutate(code2);
@@ -240,9 +242,10 @@ const LoginPage: React.FC = () => {
             {/* Submit button */}
             <Button
               type="submit"
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isPending}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              {loading ? (
+              {isPending ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
                 "Log In"
