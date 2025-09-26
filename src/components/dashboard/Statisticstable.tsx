@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
 import TasksPagination from "../core/TasksPagination";
 import { addSerial } from "@/lib/helpers/addSerial";
+import TaskSearchFilter from "../core/TasksSearchFilter";
 
 type TaskStats = {
   id: number;
@@ -25,13 +26,21 @@ const Statisticstable = () => {
     pageIndex: 1,
     pageSize: 25,
   });
+  const [searchString, setSearchString] = useState(""); // Search input
+  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["dashboard-stats", pagination.pageIndex, pagination.pageSize],
+    queryKey: [
+      "dashboard-stats",
+      pagination.pageIndex,
+      pagination.pageSize,
+      debouncedSearch,
+    ],
     queryFn: () =>
       getDashboardStatistics({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
+        search_string: debouncedSearch,
       }),
   });
 
@@ -106,9 +115,27 @@ const Statisticstable = () => {
     setPagination({ pageIndex: 1, pageSize });
   };
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      setPagination((prev) => ({ ...prev, pageIndex: 1 })); // reset to first page on search
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchString]);
+
   return (
     <div className="bg-white p-6 mt-3 rounded-2xl shadow-md flex flex-col h-[calc(100vh-240px)]">
-      <h2 className="text-lg font-semibold mb-4">STATISTICS</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">STATISTICS</h2>
+
+        {/* Search Filter aligned to the right */}
+        <TaskSearchFilter
+          searchString={searchString}
+          setSearchString={setSearchString}
+          title="Find your Task"
+        />
+      </div>
 
       {isError ? (
         <p className="text-red-500">Error fetching statistics</p>
@@ -121,7 +148,6 @@ const Statisticstable = () => {
                 <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
-
             <table className="w-full text-left border-separate border-spacing-y-2">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
