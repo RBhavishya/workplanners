@@ -155,10 +155,18 @@ const AddTaskForm = ({
       toast.success(res?.message || "Task updated successfully!");
       navigate({ to: "/tasks" });
     },
-    onError: (error: any) => {
-      console.error("Update error:", error);
-      toast.error(error?.data?.message || "Failed to update task");
-    },
+     onError: (error: any) => {
+          setErrors({});
+          setFormError(null);
+    
+          if (error?.status === 422 && error?.data?.errData) {
+            setErrors(error.data.errData);
+          } else {
+            const message = error?.data?.message || "Failed to update task";
+            toast.error(message);
+            setFormError(message);
+          }
+        },
   });
 
   const handleNavigation = () => navigate({ to: "/tasks" });

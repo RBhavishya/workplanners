@@ -1,4 +1,5 @@
 import * as React from "react";
+import CountUp from "react-countup";
 
 interface StatusCardProps {
   title: string;
