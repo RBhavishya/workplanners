@@ -70,38 +70,76 @@ const LoginPage: React.FC = () => {
     },
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (loginDetails: loginProps) => {
-          const response = await LoginAPI(loginDetails);
+  // const { mutate, isPending } = useMutation({
+  //   mutationFn: async (loginDetails: loginProps) => {
+  //         const response = await LoginAPI(loginDetails);
 
+  //   if (response?.status === 200 || response?.status === 201) {
+  //     return response;
+  //   }
+  //   throw response;
+
+  //   },
+  //   onSuccess: (res: any) => {
+  //     toast.success(res?.data?.message || "Login successful");
+  //     const { access_token, user_details } = res?.data?.data;
+  //     Cookies.set("token", access_token, { priority: "High" });
+  //     localStorage.setItem("user", JSON.stringify(user_details));
+  //     setErrors({});
+
+  //     navigate({
+  //       to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
+  //     });
+  //   },
+  //   onError: (error: any) => {
+  //     setErrors({});
+
+  //     if (error?.status === 422 && error?.data?.errData) {
+  //       setErrors(error.data.errData);
+  //     } else{
+  //       toast.error(
+  //         error?.data?.message || "User not found or invalid credentials"
+  //       );}
+  //   },
+  // });
+
+  const { mutate, isPending } = useMutation({
+  mutationFn: async (loginDetails: loginProps) => {
+    const response = await LoginAPI(loginDetails);
     if (response?.status === 200 || response?.status === 201) {
       return response;
     }
     throw response;
+  },
+  onSuccess: (res: any) => {
+    toast.success(res?.data?.message || "Login successful");
+    const { access_token, user_details } = res?.data?.data;
 
-    },
-    onSuccess: (res: any) => {
-      toast.success(res?.data?.message || "Login successful");
-      const { access_token, user_details } = res?.data?.data;
-      Cookies.set("token", access_token, { priority: "High" });
-      localStorage.setItem("user", JSON.stringify(user_details));
-      setErrors({});
+    Cookies.set("token", access_token, { priority: "High" });
+    localStorage.setItem("user", JSON.stringify(user_details));
+    setErrors({});
+    let redirectPath = "/dashboard";
+    if (user_details?.user_type === "ADMIN") {
+      redirectPath = "/dashboard";
+    } else if (user_details?.user_type === "MANAGER") {
+      redirectPath = "/dashboard";
+    } else if (user_details?.user_type === "EMPLOYEE") {
+      redirectPath = "/tasks";
+    }
 
-      navigate({
-        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
-      });
-    },
-    onError: (error: any) => {
-      setErrors({});
-
-      if (error?.status === 422 && error?.data?.errData) {
-        setErrors(error.data.errData);
-      } else{
-        toast.error(
-          error?.data?.message || "User not found or invalid credentials"
-        );}
-    },
-  });
+    navigate({ to: redirectPath });
+  },
+  onError: (error: any) => {
+    setErrors({});
+    if (error?.status === 422 && error?.data?.errData) {
+      setErrors(error.data.errData);
+    } else {
+      toast.error(
+        error?.data?.message || "User not found or invalid credentials"
+      );
+    }
+  },
+});
   useEffect(() => {
     if (code2) {
       slackCallbackMutation.mutate(code2);
@@ -118,7 +156,6 @@ const LoginPage: React.FC = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  console.log(errors, "errors");
   return (
     <div className="flex h-screen w-screen">
       {/* Left side illustration */}

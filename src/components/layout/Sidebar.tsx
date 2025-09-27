@@ -31,6 +31,7 @@ const Sidebar = () => {
      <div className='border-b h-24'> <UserDetails/></div>
       <h2 className="text-xs font-semibold text-purple-600 mb-6 uppercase tracking-wide mt-5">Menu</h2>
       <nav className="flex flex-col space-y-2 mb-8">
+         {user_type !== 'EMPLOYEE' && (
         <Link
           to="/dashboard"
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
@@ -39,6 +40,7 @@ const Sidebar = () => {
           <DashBoardIcon className="mr-3 w-4 h-4" />
           Dashboard
         </Link>
+         )}
         <Link
           to="/tasks"
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
