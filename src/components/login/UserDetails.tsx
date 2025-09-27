@@ -44,7 +44,7 @@ const UserDetails: React.FC = () => {
   };
 
   return (
-   <div className="mb-6 w-full flex justify-start">
+   <div className="w-full flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center space-x-3 focus:outline-none">
@@ -53,21 +53,17 @@ const UserDetails: React.FC = () => {
               alt={user.display_name || "User"}
               className="h-12 w-12 rounded-full object-cover shadow-md"
             />
-            <div className="text-left">
+            <div className="text-left"> 
               <p className="font-semibold">{user.display_name || "User"}</p>
             </div>
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-56 bg-white">
-          <DropdownMenuLabel className="text-gray-700">
-            Account Info
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
+        <DropdownMenuContent className="w-50 bg-white border-none shadow-[0px_0px_10px_0px_rgba(0,0,0,0.1)] p-2" side="bottom" align="start">
+          <DropdownMenuItem className="p-3">
             <span className="font-medium">Email:</span>&nbsp; {user.email}
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="p-3">
             <span className="font-medium">Phone:</span>&nbsp; {user.phone}
           </DropdownMenuItem>
         </DropdownMenuContent>

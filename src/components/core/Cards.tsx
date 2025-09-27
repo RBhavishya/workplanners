@@ -9,19 +9,19 @@ interface BigCardProps {
 
 const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   "Total Tasks": {
-    bg: "bg-purple-100",
+    bg: "bg-[rgba(255,200,73,0.20)]",
     icon: <ClipboardList className="text-purple-500" size={20} />,
   },
   "Completed Tasks": {
-    bg: "bg-blue-100",
+    bg: "bg-sky-100",
     icon: <ListChecks className="text-blue-500" size={28} />,
   },
   "In Progress Task": {
-    bg: "bg-orange-100",
+    bg: "bg-red-50",
     icon: <ListTodo className="text-orange-500" size={28} />,
   },
   "Pending Tasks": {
-    bg: "bg-green-100",
+    bg: "bg-emerald-50",
     icon: <RefreshCw className="text-green-500" size={28} />,
   },
 };
@@ -37,13 +37,13 @@ const BigCard = ({ title, value = 0, icon }: BigCardProps) => {
 
   return (
     <div
-      className={`w-47 h-25 rounded-2xl shadow-sm flex items-center justify-between p-4 ${bg}`}
+      className={`w-50 rounded-lg shadow-sm flex flex-col justify-between p-2 ${bg}`}
     >
-      <div className="flex flex-col">
-        <span className="text-sm text-gray-600">{title}</span>
-        <span className="text-3xl font-bold">{value}</span>
+      <div className="flex items-start justify-between">
+        <span className="text-sm text-neutral-400">{title}</span>
+        <div>{icon || defaultIcon}</div>
       </div>
-      <div>{icon || defaultIcon}</div>
+      <span className="text-2xl font-medium">{value}</span>
     </div>
   );
 };

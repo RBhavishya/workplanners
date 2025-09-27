@@ -52,8 +52,8 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     <header
       className="
         flex items-center justify-between
-        px-4 bg-white border-b border-purple-100 shadow-sm
-        h-20 3xl:!h-26                      
+        px-4 bg-white border-b
+        h-18                    
       "
     >
       {centerContent}

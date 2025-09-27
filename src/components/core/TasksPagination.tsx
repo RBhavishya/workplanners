@@ -117,15 +117,15 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
   return (
     <ShadCNPagination className="flex justify-between px-2 py-0">
       <PaginationContent className="px-1 py-0 flex gap-2">
-        <p>Total {paginationDetails?.total_records || "0"}</p>
+        <p className="text-sm 3xl:!text-base">Total {paginationDetails?.total_records || "0"}</p>
         <Select
           value={selectedValue?.toString()}
           onValueChange={handleRowChange}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[120px] rounded-sm !h-8">
             <SelectValue placeholder="Items per page" />
           </SelectTrigger>
-          <SelectContent className="w-[120px] bg-white pointer">
+          <SelectContent className="max-w-[100px] bg-white cursor-pointer border-none shadow-[0px_0px_0px_1px_rgba(0,0,0,0.1)]">
             {limitOptions.map((item, index) => (
               <SelectItem
                 value={item.value?.toString()}
@@ -141,14 +141,14 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
 
       <div className="flex justify-end items-center">
         <PaginationContent className="px-1 py-0">
-          <div className="flex items-center">
+          <div className="flex items-center text-sm 3xl:!text-base">
             GoTo
             <Input
-              type="number"
+              // type="number"
               value={pageValue}
               onChange={(e) => setPageValue(Number(e.target.value))}
               onKeyDown={onKeyDownInPageChange}
-              className="h-[30px] w-[40px] m-auto flex items-center text-center ml-2 bg-[#f5f5f5] focus:outline-none focus:ring-0 text-sm pl-1 pr-0"
+              className="w-10 h-8 flex items-center border rounded-sm shadow-none font-normal focus:outline-none focus:ring-0 focus-visible:ring-0 text-sm 3xl:!text-base ml-2"
               placeholder="Page"
             />
           </div>
@@ -169,8 +169,8 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
               aria-disabled={currentPage === 1}
               className={`${
                 currentPage === 1
-                  ? "pointer-events-none cursor-not-allowed opacity-50"
-                  : "cursor-pointer opacity-100"
+                  ? "pointer-events-none cursor-not-allowed opacity-50 font-normal"
+                  : "cursor-pointer opacity-100 font-normal"
               }`}
             />
           </PaginationItem>
@@ -188,7 +188,12 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
                   onClick={(e) => {
                     e.preventDefault();
                     handlePageChange(pageNumber);
-                  }}
+                  }} 
+                  className={`font-normal rounded-full w-6 h-6 shadow-none text-xs 3xl:!text-sm ${
+                    pageNumber === currentPage
+                      ? "pointer-events-none cursor-not-allowed bg-violet-500 text-white"
+                      : "cursor-pointer opacity-100"
+                  }`}
                 >
                   {pageNumber}
                 </PaginationLink>
@@ -210,8 +215,8 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
               aria-disabled={currentPage === totalPages}
               className={`${
                 currentPage === totalPages
-                  ? "pointer-events-none cursor-not-allowed opacity-50"
-                  : "cursor-pointer opacity-100"
+                  ? "pointer-events-none cursor-not-allowed opacity-50 font-normal"
+                  : "cursor-pointer opacity-100 font-normal"
               }`}
             />
           </PaginationItem>
