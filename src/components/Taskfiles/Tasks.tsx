@@ -9,6 +9,7 @@ import {
   Edit,
   Trash,
   Filter,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -36,6 +37,7 @@ import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
 import CountUp from "react-countup";
 import WeeklySummary from "../core/WeakelySummary";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -60,6 +62,7 @@ const Tasks = () => {
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedProject, setSelectedProject] = useState<any>(intialProject);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [selectedpriority, setSelectedpriority] = useState(initialPrioritys);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -323,28 +326,46 @@ const Tasks = () => {
             placeholder="Select Date Range"
             className="h-8 text-sm"
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+            <PopoverTrigger asChild>
               <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
-                <Filter className="text-purple-500" size={16} />
-                {selectedStatus || "Sort by"}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
-                (option) => (
-                  <DropdownMenuItem
-                    key={option}
-                    className="cursor-pointer"
-                    onClick={() => setSelectedStatus(option)}
-                  >
-                    {option}
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <div className="flex items-center gap-2">
+                  <Filter className="text-purple-500" size={16} />
+                  <span>{selectedStatus || "Sort by"}</span>
+                </div>
 
+                {selectedStatus && (
+                  <X
+                    size={16}
+                    className="text-gray-400 hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent popover from opening
+                      setSelectedStatus(""); // clear selected status
+                    }}
+                  />
+                )}
+              </button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-48 p-0 border rounded-md shadow-md">
+              <div className="flex flex-col">
+                {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
+                  (option) => (
+                    <div
+                      key={option}
+                      className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      onClick={() => {
+                        setSelectedStatus(option);
+                        setStatusPopoverOpen(false); // auto-close popover
+                      }}
+                    >
+                      {option}
+                    </div>
+                  )
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
             onClick={handleNavigation}

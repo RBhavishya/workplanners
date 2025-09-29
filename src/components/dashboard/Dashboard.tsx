@@ -34,11 +34,14 @@ const Dashboard = () => {
   }, []);
 
   const formattedTime = time.toLocaleTimeString("en-GB");
-  const formattedDate = time.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "2-digit",
-    month: "short",
-  });
+  const options: Intl.DateTimeFormatOptions = {
+  weekday: "long",
+  day: "2-digit",
+  month: "short",
+};
+
+const parts = time.toLocaleDateString("en-GB", options).split(" ");
+const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
 
   const {
     data: stats,

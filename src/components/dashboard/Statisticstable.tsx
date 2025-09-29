@@ -55,52 +55,53 @@ const Statisticstable = () => {
   const columns: ColumnDef<TaskStats>[] = [
     {
       id: "sno",
-      header: () => <span>S.No</span>,
+      header: () => <span className="font-medium text-black">S.No</span>,
       cell: ({ row }) => <span>{row.original.serial}</span>,
       size: 80,
     },
     {
       accessorFn: (row: any) => row.display_name,
       id: "name",
-      cell: (info: any) => <span className="capitalize">{info.getValue() || "-"}</span>,
-      header: () => <span>Name</span>,
+      cell: (info: any) => (
+        <span className="capitalize">{info.getValue() || "-"}</span>
+      ),
+      header: () => <span className="font-medium text-black">Name</span>,
     },
     {
       accessorFn: (row: any) => row.total_tasks,
       id: "total",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span>Total Tasks</span>,
+      header: () => <span className="font-medium text-black">Total Tasks</span>,
     },
     {
       accessorFn: (row: any) => row.completed_tasks,
       id: "completed",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span>Completed</span>,
+      header: () => <span className="font-medium text-black">Completed</span>,
     },
     {
       accessorFn: (row: any) => row.in_progress_tasks,
       id: "inProgress",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span>In Progress</span>,
+      header: () => <span className="font-medium text-black">In Progress</span>,
     },
     {
       accessorFn: (row: any) => row.pending_tasks,
       id: "pending",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span>Pending</span>,
+      header: () => <span className="font-medium text-black">Pending</span>,
     },
     {
       id: "actions",
-      header: "Actions",
+      header: () => <span className="font-medium text-black">Actions</span>,
       cell: () => (
         <div className="flex items-center gap-3">
-        <SquarePen className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5}/>
-        <Trash2 className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5}/>
-      </div>
+          <SquarePen className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5} />
+          <Trash2 className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5} />
+        </div>
       ),
     },
   ];
-
   const table = useReactTable({
     data: statsData,
     columns,
@@ -135,7 +136,7 @@ const Statisticstable = () => {
         <TaskSearchFilter
           searchString={searchString}
           setSearchString={setSearchString}
-          title="Find your Task"
+          title="Find your Users"
         />
       </div>
 
@@ -158,7 +159,10 @@ const Statisticstable = () => {
                     className="text-neutral-400 sticky top-0 bg-white"
                   >
                     {headerGroup.headers.map((header) => (
-                      <th key={header.id} className="px-4 py-2 cursor-pointer font-normal text-sm 3xl:!text-base">
+                      <th
+                        key={header.id}
+                        className="px-4 py-2 cursor-pointer font-normal text-sm 3xl:!text-base"
+                      >
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
