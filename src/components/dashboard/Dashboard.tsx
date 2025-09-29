@@ -1,13 +1,3 @@
-import {
-  ClipboardList,
-  ClipboardCheck,
-  ClipboardPenLine,
-  FileClock,
-} from "lucide-react";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import Statisticstable from "./Statisticstable";
 import BigCard from "@/components/core/Cards";
 import {
   getetDashboardStatsAPI,
@@ -15,9 +5,17 @@ import {
   getTodayTasksAPI,
   SettingsHistoryQueryParams,
 } from "@/https/services/dashboard";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CountUp from "react-countup";
 import { ClockIcon } from "../icons/ClockIcon";
+import { CompletedIcon } from "../icons/Dashboard/CompletedIcon";
+import { PendingIcon } from "../icons/Dashboard/PendingIcon";
+import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
+import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
 import { GreenThickIcon } from "../icons/GreenThickIcon";
+import Statisticstable from "./Statisticstable";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -143,10 +141,10 @@ const Dashboard = () => {
   }, [setupObserver, isFetchingNextPage]);
 
   return (
-    <div className="p-0 flex gap-4">
-      <div className="w-3/4">
-        <div className="bg-white p-2 rounded-xl shadow mb-2">
-          <div className="flex flex-wrap gap-6">
+    <div className="p-0 flex gap-2">
+      <div className="w-3/4 m-2">
+        <div className="bg-white p-2 rounded-sm shadow-none mb-2">
+          <div className="flex flex-wrap gap-3">
             {isError ? (
               <p className="text-red-500">Error loading stats</p>
             ) : (
@@ -160,7 +158,7 @@ const Dashboard = () => {
                       duration={1.5}
                     />
                   }
-                  icon={<ClipboardList />}
+                  icon={<TotalTaskIcon />}
                 />
                 <BigCard
                   title="Completed Tasks"
@@ -171,7 +169,7 @@ const Dashboard = () => {
                       duration={1.5}
                     />
                   }
-                  icon={<ClipboardCheck />}
+                  icon={<CompletedIcon />}
                 />
                 <BigCard
                   title="In Progress Task"
@@ -182,7 +180,7 @@ const Dashboard = () => {
                       duration={1.5}
                     />
                   }
-                  icon={<ClipboardPenLine />}
+                  icon={<ProgressIcon />}
                 />
                 <BigCard
                   title="Pending Tasks"
@@ -193,7 +191,7 @@ const Dashboard = () => {
                       duration={1.5}
                     />
                   }
-                  icon={<FileClock />}
+                  icon={<PendingIcon />}
                 />
               </>
             )}
@@ -205,34 +203,34 @@ const Dashboard = () => {
       </div>
 
       {/* Right side - Today’s Task */}
-      <div className="w-1/3 bg-white rounded-xl shadow p-4 flex flex-col overflow-auto h-[calc(100vh-110px)]">
+      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col overflow-auto ">
         <h2 className="text-lg font-semibold mb-1">Today’s Task</h2>
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
-        <div className="flex items-center gap-4 mb-4 text-sm font-medium">
-          <span className="text-purple-600">
-            TotalTasks{" "}
-            <span className="ml-1 text-xs text-gray-500">
+        <div className="flex items-center gap-3 mb-4 text-sm font-medium">
+          <span className="text-purple-600 font-normal">
+            All{" "}
+            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.total_tasks_count ?? 0} duration={1} />
             </span>
           </span>
 
-          <span className="text-gray-600">
+          <span className="text-gray-600 font-normal">
             InProgress{" "}
-            <span className="ml-1 text-xs">
+            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.in_progress_tasks ?? 0} duration={1} />
             </span>
           </span>
 
-          <span className="text-gray-600">
+          <span className="text-gray-600 font-normal">
             Completed{" "}
-            <span className="ml-1 text-xs">
+            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.completed_tasks ?? 0} duration={1} />
             </span>
           </span>
 
-          <span className="text-gray-600">
+          <span className="text-gray-600 font-normal">
             Pending{" "}
-            <span className="ml-1 text-xs">
+            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.overdue_TasksCount ?? 0} duration={1} />
             </span>
           </span>
