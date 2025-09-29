@@ -41,13 +41,11 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
       className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
       style={{ border: "1px solid #ddb8ff" }}
     >
-      {/* Title */}
       <div className="text-sm font-medium text-gray-700 mb-2">
         Weekly Summary
       </div>
 
       <div className="flex items-center justify-between">
-        {/* Progress Circle + Percentage */}
         <div className="relative w-16 h-16">
           <svg className="w-full h-full -rotate-90">
             <circle
@@ -74,8 +72,6 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
             {productivity_percentage}%
           </div>
         </div>
-
-        {/* Productive */}
         <div className="flex flex-col items-center px-4 border-r border-gray-200">
           <span className="text-xs text-gray-500">Productive</span>
           <span className="text-gray-700 font-semibold text-lg">
@@ -89,8 +85,6 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
             {productive.is_increase ? "▲" : "▼"} {productive.change_percentage}%
           </span>
         </div>
-
-        {/* Overdue */}
         <div className="flex flex-col items-center px-4">
           <span className="text-xs text-gray-500">Overdue</span>
           <span className="text-gray-700 font-semibold text-lg">

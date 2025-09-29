@@ -17,7 +17,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteTasksAPI,
   getAllPaginatedTasks,
-  gettasksByIdAPI,
   getTasksStatsAPI,
   getWeaklySummaryAPI,
 } from "@/https/services/tasks";
@@ -35,7 +34,6 @@ import {
 } from "../ui/dropdown-menu";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
-import { set } from "date-fns";
 import CountUp from "react-countup";
 import WeeklySummary from "../core/WeakelySummary";
 
@@ -72,8 +70,6 @@ const Tasks = () => {
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const [selectedDate, setSelectedDate] = useState<any>();
-
   const [dateValue, setDateValue] = useState<any>(
     initialStartDate && initialEndDate
       ? [new Date(initialStartDate), new Date(initialEndDate)]
