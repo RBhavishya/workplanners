@@ -57,12 +57,14 @@ const AddProjectForm = ({
   const [links, setLinks] = useState<string[]>([]);
   const [linkInput, setLinkInput] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [visibleMonth, setVisibleMonth] = useState<Date>(new Date());
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [startDateOpen, setStartDateOpen] = useState(false);
+  const [visibleDueMonth, setVisibleDueMonth] = useState<Date | undefined>();
   const [dueDateOpen, setDueDateOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
@@ -220,7 +222,7 @@ const AddProjectForm = ({
       <div className="flex items-center justify-start gap-3 mb-4">
         <span>
           <button
-           onClick={() => window.history.back()}
+            onClick={() => window.history.back()}
             className="px-2 py-2 text-gray rounded cursor-pointer"
           >
             <MoveLeft className="mr-2" size={20} />
@@ -296,12 +298,18 @@ const AddProjectForm = ({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                month={visibleMonth}
+                onMonthChange={setVisibleMonth}
                 selected={startDate}
                 onSelect={(date) => {
-                  setStartDate(date);
-                  setStartDateOpen(false);
-                  if (date && dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
-                    setDueDate(undefined);
+                  if (date) {
+                    setStartDate(date);
+                    setVisibleMonth(date);
+                    setStartDateOpen(false);
+
+                    if (dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
+                      setDueDate(undefined);
+                    }
                   }
                 }}
                 disabled={(date) => dayjs(date).isBefore(dayjs(), "day")}
@@ -339,14 +347,18 @@ const AddProjectForm = ({
               <Calendar
                 mode="single"
                 selected={dueDate}
+                month={visibleDueMonth || startDate || undefined} // open in startDate's month
+                onMonthChange={(month) => setVisibleDueMonth(month)} // allow navigation
                 onSelect={(date) => {
-                  setDueDate(date);
-                  setDueDateOpen(false);
+                  if (date) {
+                    setDueDate(date);
+                    setVisibleDueMonth(date); // keep calendar on selected due date
+                    setDueDateOpen(false);
+                  }
                 }}
                 disabled={(date) =>
                   !startDate || dayjs(date).isBefore(dayjs(startDate), "day")
                 }
-                className="rounded-md border bg-white shadow-sm"
               />
             </PopoverContent>
           </Popover>
