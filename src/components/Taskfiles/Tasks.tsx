@@ -17,7 +17,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteTasksAPI,
   getAllPaginatedTasks,
-  gettasksByIdAPI,
   getTasksStatsAPI,
   getWeaklySummaryAPI,
 } from "@/https/services/tasks";
@@ -35,8 +34,8 @@ import {
 } from "../ui/dropdown-menu";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
-import { set } from "date-fns";
 import CountUp from "react-countup";
+import WeeklySummary from "../core/WeakelySummary";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -71,8 +70,6 @@ const Tasks = () => {
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const [selectedDate, setSelectedDate] = useState<any>();
-
   const [dateValue, setDateValue] = useState<any>(
     initialStartDate && initialEndDate
       ? [new Date(initialStartDate), new Date(initialEndDate)]
@@ -147,13 +144,14 @@ const Tasks = () => {
     },
   });
 
-  const { data: weaksummery } = useQuery({
-    queryKey: ["tasksStats"],
+  const { data: summary } = useQuery({
+    queryKey: ["weeklySummary"],
     queryFn: async () => {
       const response = await getWeaklySummaryAPI();
       return response.data;
     },
   });
+
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
     onSuccess: (res: any) => {
@@ -308,10 +306,7 @@ const Tasks = () => {
               />
             </div>
           </div>
-          <div
-            className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
-            style={{ border: "1px solid  #ddb8ffff" }}
-          >  </div>
+          <WeeklySummary data={summary} />
         </div>
       </div>
       <div className="bg-white rounded-md ">

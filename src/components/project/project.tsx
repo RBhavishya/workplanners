@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery} from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useRouter, useLocation, useSearch } from "@tanstack/react-router";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import {
+  useNavigate,
+  useRouter,
+  useLocation,
+  useSearch,
+} from "@tanstack/react-router";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { MoreVertical, Filter, LayoutGrid, List } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
 import { getAllPaginatedProjects } from "@/https/services/project";
@@ -21,7 +31,9 @@ const Projects = () => {
   const router = useRouter();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const search = useSearch({ strict: false }) as { viewMode?: "table" | "grid" };
+  const search = useSearch({ strict: false }) as {
+    viewMode?: "table" | "grid";
+  };
 
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
@@ -29,7 +41,9 @@ const Projects = () => {
   const initialSearch = searchParams.get("search") || "";
   const orderBY = searchParams.get("order_by") || "";
 
-  const [viewMode, setViewMode] = useState<"grid" | "table">(search?.viewMode || "grid");
+  const [viewMode, setViewMode] = useState<"grid" | "table">(
+    search?.viewMode || "grid"
+  );
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [pagination, setPagination] = useState({
@@ -48,20 +62,15 @@ const Projects = () => {
     COMPLETED: "bg-green-100 text-green-600",
   };
 
-  // debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search_string);
-      if (search_string) {
-        setPagination(prev => ({ ...prev, pageIndex: 1 }));
-      }
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search_string, selectedStatus]);
-
-  // fetch projects
   const { isLoading, isError, error, data, isFetching } = useQuery({
-    queryKey: ["projects", pagination, viewMode, debouncedSearch, selectedStatus, selectedSort],
+    queryKey: [
+      "projects",
+      pagination,
+      viewMode,
+      debouncedSearch,
+      selectedStatus,
+      selectedSort,
+    ],
     queryFn: async () => {
       const response = await getAllPaginatedProjects({
         pageIndex: pagination.pageIndex,
@@ -71,19 +80,6 @@ const Projects = () => {
         order_by: selectedSort,
         project_status: selectedStatus,
       });
-
-      router.navigate({
-        to: "/projects",
-        search: {
-          page: pagination.pageIndex,
-          page_size: pagination.pageSize,
-          viewMode: viewMode || undefined,
-          order_by: selectedSort || undefined,
-          project_status: selectedStatus || undefined,
-          search: debouncedSearch || undefined,
-        },
-      });
-
       return response;
     },
   });
@@ -95,15 +91,45 @@ const Projects = () => {
       data?.data?.data?.pagination_info?.page_size
     ) || [];
 
-  const capturePageNum = (pageIndex: number) => setPagination(prev => ({ ...prev, pageIndex }));
-  const captureRowPerItems = (pageSize: number) => setPagination(prev => ({ ...prev, pageIndex: 1, pageSize }));
+  const capturePageNum = (pageIndex: number) =>
+    setPagination((prev) => ({ ...prev, pageIndex }));
+  const captureRowPerItems = (pageSize: number) =>
+    setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
 
-    const handleNavigation = () => navigate({ to: `/projects/add` });
+  const handleNavigation = () => navigate({ to: `/projects/add` });
   const handleView = (id: number) => navigate({ to: `/projects/${id}` });
 
   if (isError) {
-    return <p className="text-red-500 p-4">Error fetching projects: {error?.message || "Unknown error"}</p>;
+    return (
+      <p className="text-red-500 p-4">
+        Error fetching projects: {error?.message || "Unknown error"}
+      </p>
+    );
   }
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search_string);
+      if (search_string) {
+        setPagination((prev) => ({ ...prev, pageIndex: 1 }));
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search_string, selectedStatus]);
+
+  useEffect(() => {
+    router.navigate({
+      to: "/projects",
+      search: {
+        page: pagination.pageIndex,
+        page_size: pagination.pageSize,
+        viewMode: viewMode || undefined,
+        order_by: selectedSort || undefined,
+        project_status: selectedStatus || undefined,
+        search: debouncedSearch || undefined,
+      },
+    });
+  }, [pagination, viewMode, selectedSort, selectedStatus, debouncedSearch]);
 
   return (
     <div className="relative overflow-x-auto border rounded-xl p-4 h-[calc(100vh-110px)] flex flex-col">
@@ -135,11 +161,16 @@ const Projects = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Completed"].map((option) => (
-                <DropdownMenuItem key={option} onClick={() => setSelectedStatus(option)}>
-                  {option}
-                </DropdownMenuItem>
-              ))}
+              {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
+                (option) => (
+                  <DropdownMenuItem
+                    key={option}
+                    onClick={() => setSelectedStatus(option)}
+                  >
+                    {option}
+                  </DropdownMenuItem>
+                )
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -160,7 +191,10 @@ const Projects = () => {
           </div>
 
           {/* New Project */}
-          <button onClick={handleNavigation} className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer">
+          <button
+            onClick={handleNavigation}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
+          >
             + New Project
           </button>
         </div>
@@ -173,21 +207,23 @@ const Projects = () => {
         <div className="relative flex-1 h-[calc(100vh-200px)] overflow-y-auto">
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-                  <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
+            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
 
           {/* Grid Cards */}
           {projectsData.length === 0 && !isLoading ? (
-            <p className="text-gray-500 text-center py-6">No projects available.</p>
+            <p className="text-gray-500 text-center py-6">
+              No projects available.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-290px)] overflow-y-auto lg:grid-cols-4 gap-4">
               {projectsData.map((project: ProjectData) => (
                 <Card
                   key={project.id}
                   className="w-full h-52 shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
-                 onClick={() => navigate({ to: `/projects/${project.id}` })}
+                  onClick={() => navigate({ to: `/projects/${project.id}` })}
                 >
                   {/* Menu */}
                   <div className="absolute top-3 right-3">
@@ -199,10 +235,10 @@ const Projects = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                           onClick={(e) => {
-                              e.stopPropagation();
-                              navigate({ to: `/projects/edit/${project.id}` });
-                            }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate({ to: `/projects/edit/${project.id}` });
+                          }}
                         >
                           Edit
                         </DropdownMenuItem>
@@ -229,7 +265,9 @@ const Projects = () => {
                     </h2>
                     <span
                       className={`mt-2 text-xs px-3 py-1 rounded-full font-medium ${
-                        statusColors[project.project_status?.toUpperCase() || ""] || "bg-gray-100 text-gray-700"
+                        statusColors[
+                          project.project_status?.toUpperCase() || ""
+                        ] || "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {project.project_status || "Unknown"}
@@ -293,4 +331,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
