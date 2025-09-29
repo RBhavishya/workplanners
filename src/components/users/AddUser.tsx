@@ -8,6 +8,7 @@ import {
   UserUpdateAPI,
 } from "@/https/services/users"; // <-- make sure updateUserAPI exists
 import {
+  Check,
   CheckCircle,
   ChevronDown,
   Eye,
@@ -16,13 +17,8 @@ import {
   X,
 } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export interface AddUserFormProps {
   mode: "create" | "edit";
@@ -40,11 +36,15 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   const [phone, setPhone] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [designationPopoverOpen, setDesignationPopoverOpen] = useState(false);
+  const [designationTriggerWidth, setDesignationTriggerWidth] = useState<
+    number | null
+  >(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [open, setOpen] = useState(false);
+  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   const triggerRef = useRef<HTMLDivElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -233,9 +233,12 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </label>
           <Input
             id="phone"
-            placeholder="Enter Phone"
+            placeholder="Enter Phone Number"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+              setPhone(value);
+            }}
             className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
           />
           {errors.phone && (
@@ -284,41 +287,59 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           Designation <span className="text-red-500">*</span>
         </label>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center justify-between w-full border rounded-lg px-3 py-2 text-sm cursor-pointer h-10 bg-white">
-              <span className="flex items-center gap-2">
-                {designation || "Select Designation"}
-              </span>
+        <Popover
+          open={designationPopoverOpen}
+          onOpenChange={setDesignationPopoverOpen}
+        >
+          <PopoverTrigger asChild>
+            <div
+              ref={triggerRef}
+              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+            >
+              {designation ? (
+                <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
+                  <span>{designation}</span>
+                  {/* Optional clear button */}
+                  <button type="button" onClick={() => setDesignation("")}>
+                    <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-gray-400">Select designation...</span>
+              )}
+              <ChevronDown />
+            </div>
+          </PopoverTrigger>
 
-              <span className="flex items-center gap-2">
-                {designation && (
-                  <X
-                    size={16}
-                    className="text-gray-400 hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevent dropdown from opening
-                      setDesignation("");
-                    }}
-                  />
-                )}
-                <ChevronDown size={16} className="text-gray-500" />
-              </span>
-            </button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent className="w-full">
-            {["FrontendDeveloper", "BackendDeveloper", "QA"].map((option) => (
-              <DropdownMenuItem
-                key={option}
-                className="cursor-pointer"
-                onClick={() => setDesignation(option)}
-              >
-                {option}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <PopoverContent
+            align="start" // align left to the trigger
+            sideOffset={4} // optional spacing from trigger
+            style={{
+              width: designationTriggerWidth
+                ? `${designationTriggerWidth}px`
+                : "auto",
+            }}
+            className="p-0"
+          >
+            <div className="max-h-60 overflow-y-auto">
+              {["FrontendDeveloper", "BackendDeveloper", "QA"].map((option) => (
+                <div
+                  key={option}
+                  className="cursor-pointer p-2 rounded hover:bg-gray-100 flex items-center justify-between"
+                  onClick={() => {
+                    setDesignation(option);
+                    setDesignationPopoverOpen(false);
+                  }}
+                >
+                  <span>{option}</span>
+                  {designation === option && (
+                    <Check className="w-4 h-4 text-purple-500" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {errors.designation && (
           <p className="text-red-500 text-xs mt-1">
@@ -326,7 +347,6 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </p>
         )}
       </div>
-
       {/* Buttons */}
       <div className="flex justify-end gap-2 mt-4">
         <button

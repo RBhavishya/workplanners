@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   useNavigate,
@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreVertical, Filter, LayoutGrid, List } from "lucide-react";
+import { MoreVertical, Filter, LayoutGrid, List, X } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
 import { getAllPaginatedProjects } from "@/https/services/project";
 import DeleteProject from "./DeleteProject";
@@ -22,6 +22,7 @@ import { Input } from "../ui/input";
 import { SearchIcon } from "../icons/SearchIcon";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TasksPagination from "../core/TasksPagination";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -45,6 +46,7 @@ const Projects = () => {
     search?.viewMode || "grid"
   );
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState(orderBY);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -153,26 +155,46 @@ const Projects = () => {
           </div>
 
           {/* Status Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 border px-4 py-2 rounded-lg cursor-pointer">
-                <Filter className="text-purple-500" size={18} />
-                {selectedStatus || "Sort by"}
+          <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
+                <div className="flex items-center gap-2">
+                  <Filter className="text-purple-500" size={16} />
+                  <span>{selectedStatus || "Sort by"}</span>
+                </div>
+
+                {selectedStatus && (
+                  <X
+                    size={16}
+                    className="text-gray-400 hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent popover from opening
+                      setSelectedStatus(""); // clear selected status
+                    }}
+                  />
+                )}
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
-                (option) => (
-                  <DropdownMenuItem
-                    key={option}
-                    onClick={() => setSelectedStatus(option)}
-                  >
-                    {option}
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-48 p-0 border rounded-md shadow-md">
+              <div className="flex flex-col">
+                {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
+                  (option) => (
+                    <div
+                      key={option}
+                      className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      onClick={() => {
+                        setSelectedStatus(option);
+                        setStatusPopoverOpen(false); // auto-close popover
+                      }}
+                    >
+                      {option}
+                    </div>
+                  )
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* View Toggle */}
           <div className="flex items-center gap-2">
