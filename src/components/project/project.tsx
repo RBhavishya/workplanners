@@ -59,6 +59,20 @@ const Projects = () => {
     return () => clearTimeout(handler);
   }, [search_string, selectedStatus]);
 
+  useEffect(() => {
+    router.navigate({
+      to: "/projects",
+      search: {
+        page: pagination.pageIndex,
+        page_size: pagination.pageSize,
+        viewMode: viewMode || undefined,
+        order_by: selectedSort || undefined,
+        project_status: selectedStatus || undefined,
+        search: debouncedSearch || undefined,
+      },
+    });
+  },[pagination, viewMode, selectedSort, selectedStatus, debouncedSearch])
+
   // fetch projects
   const { isLoading, isError, error, data, isFetching } = useQuery({
     queryKey: ["projects", pagination, viewMode, debouncedSearch, selectedStatus, selectedSort],
@@ -71,19 +85,6 @@ const Projects = () => {
         order_by: selectedSort,
         project_status: selectedStatus,
       });
-
-      router.navigate({
-        to: "/projects",
-        search: {
-          page: pagination.pageIndex,
-          page_size: pagination.pageSize,
-          viewMode: viewMode || undefined,
-          order_by: selectedSort || undefined,
-          project_status: selectedStatus || undefined,
-          search: debouncedSearch || undefined,
-        },
-      });
-
       return response;
     },
   });

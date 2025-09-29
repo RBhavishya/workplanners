@@ -31,13 +31,6 @@ const TaskViewDetails = () => {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [open]);
-
   const statusColors: Record<string, string> = {
     NEW: "bg-purple-100 text-purple-600",
     OVERDUE: "bg-red-100 text-red-600",
@@ -136,6 +129,13 @@ const TaskViewDetails = () => {
       setAssignedUsers(assignedUsersData.data.data);
     }
   }, [assignedUsersData]);
+
+   useEffect(() => {
+    if (triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
+    }
+  }, [open]);
+
 
   if (isLoading) {
     return (
