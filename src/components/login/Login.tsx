@@ -27,6 +27,23 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
+  interface User {
+    id: number;
+    name: string;
+    email: string;
+    user_type: "ADMIN" | "MANAGER" | "EMPLOYEE";
+  }
+
+  interface JwtToken {
+    access_token: string;
+    refresh_token: string;
+  }
+
+  interface SlackCallbackData {
+    user: User;
+    jwt_token: JwtToken;
+  }
+
   useEffect(() => {
     if (search?.code) {
       setCode2(search.code);
@@ -50,19 +67,53 @@ const LoginPage: React.FC = () => {
   });
 
   // Slack Callback
+  // const slackCallbackMutation = useMutation({
+  //   mutationFn: slackCallbackAPI,
+  //   onSuccess: (data) => {
+  //     if (data?.status === 200) {
+  //       const user = data?.data?.data.user;
+  //       const jwt_token = data?.data?.data.jwt_token;
+
+  //       Cookies.set("user", JSON.stringify(user));
+  //       localStorage.setItem("user", JSON.stringify(user));
+  //       Cookies.set("token", jwt_token.access_token);
+  //       Cookies.set("refreshToken", jwt_token.refresh_token);
+
+  //       navigate({ to: "/dashboard" });
+  //     }
+  //   },
+  //   onError: () => {
+  //     navigate({ to: "/" });
+  //   },
+  // });
+
   const slackCallbackMutation = useMutation({
     mutationFn: slackCallbackAPI,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data?.status === 200) {
-        const user = data?.data?.data.user;
-        const jwt_token = data?.data?.data.jwt_token;
+        const user: User = data?.data?.data.user;
+        const jwt_token: JwtToken = data?.data?.data.jwt_token;
+
+        if (!user || !jwt_token) return;
 
         Cookies.set("user", JSON.stringify(user));
         localStorage.setItem("user", JSON.stringify(user));
         Cookies.set("token", jwt_token.access_token);
         Cookies.set("refreshToken", jwt_token.refresh_token);
 
-        navigate({ to: "/dashboard" });
+        // ✅ Role-based redirect
+        let redirectPath = "/dashboard";
+        switch (user.user_type) {
+          case "EMPLOYEE":
+            redirectPath = "/tasks";
+            break;
+          case "ADMIN":
+          case "MANAGER":
+          default:
+            redirectPath = "/dashboard";
+        }
+
+        navigate({ to: redirectPath });
       }
     },
     onError: () => {
@@ -72,34 +123,39 @@ const LoginPage: React.FC = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (loginDetails: loginProps) => {
-          const response = await LoginAPI(loginDetails);
-
-    if (response?.status === 200 || response?.status === 201) {
-      return response;
-    }
-    throw response;
-
+      const response = await LoginAPI(loginDetails);
+      if (response?.status === 200 || response?.status === 201) {
+        return response;
+      }
+      throw response;
     },
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Login successful");
       const { access_token, user_details } = res?.data?.data;
+
       Cookies.set("token", access_token, { priority: "High" });
       localStorage.setItem("user", JSON.stringify(user_details));
       setErrors({});
+      let redirectPath = "/dashboard";
+      if (user_details?.user_type === "ADMIN") {
+        redirectPath = "/dashboard";
+      } else if (user_details?.user_type === "MANAGER") {
+        redirectPath = "/dashboard";
+      } else if (user_details?.user_type === "EMPLOYEE") {
+        redirectPath = "/tasks";
+      }
 
-      navigate({
-        to: user_details?.user_type === "admin" ? "/users" : "/dashboard",
-      });
+      navigate({ to: redirectPath });
     },
     onError: (error: any) => {
       setErrors({});
-
       if (error?.status === 422 && error?.data?.errData) {
         setErrors(error.data.errData);
-      } else{
+      } else {
         toast.error(
           error?.data?.message || "User not found or invalid credentials"
-        );}
+        );
+      }
     },
   });
   useEffect(() => {
@@ -118,7 +174,6 @@ const LoginPage: React.FC = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  console.log(errors, "errors");
   return (
     <div className="flex h-screen w-screen">
       {/* Left side illustration */}

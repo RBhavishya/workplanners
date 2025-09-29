@@ -23,6 +23,7 @@ const Sidebar = () => {
     <aside className="w-64 bg-white border-r fixed left-0 top-0 h-full p-0 flex flex-col shadow-none z-10">
      <div className='border-b p-3'> <UserDetails/></div>
       <nav className="flex flex-col space-y-4 mt-4 p-2">
+         {user_type !== 'EMPLOYEE' && (
         <Link
           to="/dashboard"
           className="flex items-center px-3 py-1 text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none"
@@ -31,6 +32,7 @@ const Sidebar = () => {
           <LayoutGrid className="mr-3 w-5 h-5 text-neutral-500" strokeWidth={1} />
           Dashboard
         </Link>
+         )}
         <Link
           to="/tasks"
           className="flex items-center px-3 py-1 text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none"
