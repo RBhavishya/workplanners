@@ -58,7 +58,8 @@ const AddTaskForm = ({
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
-
+  const [visibleMonth, setVisibleMonth] = useState<Date>(dayjs().toDate());
+  const [visibleDueMonth, setVisibleDueMonth] = useState<Date | undefined>();
   const [title, setTitle] = useState(taskData?.task_title || "");
   const [description, setDescription] = useState(taskData?.description || "");
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -155,18 +156,18 @@ const AddTaskForm = ({
       toast.success(res?.message || "Task updated successfully!");
       navigate({ to: "/tasks" });
     },
-     onError: (error: any) => {
-          setErrors({});
-          setFormError(null);
-    
-          if (error?.status === 422 && error?.data?.errData) {
-            setErrors(error.data.errData);
-          } else {
-            const message = error?.data?.message || "Failed to update task";
-            toast.error(message);
-            setFormError(message);
-          }
-        },
+    onError: (error: any) => {
+      setErrors({});
+      setFormError(null);
+
+      if (error?.status === 422 && error?.data?.errData) {
+        setErrors(error.data.errData);
+      } else {
+        const message = error?.data?.message || "Failed to update task";
+        toast.error(message);
+        setFormError(message);
+      }
+    },
   });
 
   const handleNavigation = () => navigate({ to: "/tasks" });
@@ -180,7 +181,7 @@ const AddTaskForm = ({
       task_title: title,
       description,
       // project_id: selectedProject,
-       ...(mode === "create" ? { project_id:selectedProject} : {}),
+      ...(mode === "create" ? { project_id: selectedProject } : {}),
       start_date: startDate ? formatDate(startDate) : null,
       end_date: dueDate ? formatDate(dueDate) : null,
       ...(mode === "create" ? { assigned_users: assignedUsers } : {}),
@@ -192,7 +193,6 @@ const AddTaskForm = ({
       createMutation.mutate(payload);
     }
   };
-
 
   const toggleSelection = (
     id: number,
@@ -239,7 +239,7 @@ const AddTaskForm = ({
       <div className="flex items-center justify-start gap-3 mb-4">
         <button
           type="button"
-           onClick={() => window.history.back()}
+          onClick={() => window.history.back()}
           className="px-2 py-2 text-gray-600 rounded cursor-pointer"
         >
           <MoveLeft size={20} />
@@ -321,14 +321,22 @@ const AddTaskForm = ({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                month={visibleMonth} // control the visible month
+                onMonthChange={setVisibleMonth} // update when user navigates months
                 selected={startDate}
                 onSelect={(date) => {
-                  setStartDate(date);
-                  setStartDateOpen(false);
-                  if (date && dueDate && dayjs(dueDate).isBefore(dayjs(date)))
-                    setDueDate(undefined);
+                  if (date) {
+                    setStartDate(date);
+                    setVisibleMonth(date);
+                    setStartDateOpen(false);
+
+                    if (dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
+                      setDueDate(undefined);
+                    }
+                  }
                 }}
                 disabled={(date) => dayjs(date).isBefore(dayjs(), "day")}
+                className="rounded-md border bg-white shadow-sm"
               />
             </PopoverContent>
           </Popover>
@@ -361,9 +369,14 @@ const AddTaskForm = ({
               <Calendar
                 mode="single"
                 selected={dueDate}
+                month={visibleDueMonth || startDate || undefined} // open in startDate's month
+                onMonthChange={(month) => setVisibleDueMonth(month)} // allow navigation
                 onSelect={(date) => {
-                  setDueDate(date);
-                  setDueDateOpen(false);
+                  if (date) {
+                    setDueDate(date);
+                    setVisibleDueMonth(date); // keep calendar on selected due date
+                    setDueDateOpen(false);
+                  }
                 }}
                 disabled={(date) =>
                   !startDate || dayjs(date).isBefore(dayjs(startDate), "day")
@@ -380,88 +393,91 @@ const AddTaskForm = ({
       </div>
 
       {/* Select Project */}
-       {mode === "create" && (
-      <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
-          Select Project <span className="text-red-500">*</span>
-        </label>
-        <Popover open={projectPopoverOpen} onOpenChange={setProjectPopoverOpen}>
-          <PopoverTrigger asChild>
-            <div
-              ref={triggerRef}
-              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
-            >
-              {selectedProject ? (
-                (() => {
-                  const project = projects.find(
-                    (p: any) => p.id === selectedProject
-                  );
-                  return (
-                    <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
-                      <span>
-                        {project?.title ?? `Project ${selectedProject}`}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedProject(null)}
-                      >
-                        <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
-                      </button>
-                    </div>
-                  );
-                })()
-              ) : (
-                <span className="text-gray-400">Select project...</span>
-              )}
-              <ChevronDown />
-            </div>
-          </PopoverTrigger>
-          <PopoverContent
-            style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
-            className="p-0"
+      {mode === "create" && (
+        <div className="flex flex-col gap-2 mb-4">
+          <label className="text-sm font-medium">
+            Select Project <span className="text-red-500">*</span>
+          </label>
+          <Popover
+            open={projectPopoverOpen}
+            onOpenChange={setProjectPopoverOpen}
           >
-            <Command>
-              <CommandInput
-                placeholder="Search projects..."
-                value={searchProjects}
-                onValueChange={setSearchProjects}
-              />
-              <CommandList className="max-h-60 overflow-y-auto">
-                {loadingProjects ? (
-                  <div className="p-2 text-gray-500">Loading...</div>
-                ) : projects.length === 0 ? (
-                  <CommandEmpty>No projects found.</CommandEmpty>
+            <PopoverTrigger asChild>
+              <div
+                ref={triggerRef}
+                className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+              >
+                {selectedProject ? (
+                  (() => {
+                    const project = projects.find(
+                      (p: any) => p.id === selectedProject
+                    );
+                    return (
+                      <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
+                        <span>
+                          {project?.title ?? `Project ${selectedProject}`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProject(null)}
+                        >
+                          <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                        </button>
+                      </div>
+                    );
+                  })()
                 ) : (
-                  <CommandGroup>
-                    {projects.map((p: any) => (
-                      <CommandItem
-                        key={p.id}
-                        onSelect={() => setSelectedProject(p.id)}
-                      >
-                        <span>{p.title}</span>
-                        <Check
-                          className={cn(
-                            "h-4 w-4 ml-auto",
-                            selectedProject === p.id
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  <span className="text-gray-400">Select project...</span>
                 )}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-        {errors.project_id && (
-          <p className="text-red-500 text-xs mt-1">
-            {errors.project_id.join(", ")}
-          </p>
-        )}
-      </div>
-         )}
+                <ChevronDown />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent
+              style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+              className="p-0"
+            >
+              <Command>
+                <CommandInput
+                  placeholder="Search projects..."
+                  value={searchProjects}
+                  onValueChange={setSearchProjects}
+                />
+                <CommandList className="max-h-60 overflow-y-auto">
+                  {loadingProjects ? (
+                    <div className="p-2 text-gray-500">Loading...</div>
+                  ) : projects.length === 0 ? (
+                    <CommandEmpty>No projects found.</CommandEmpty>
+                  ) : (
+                    <CommandGroup>
+                      {projects.map((p: any) => (
+                        <CommandItem
+                          key={p.id}
+                          onSelect={() => setSelectedProject(p.id)}
+                        >
+                          <span>{p.title}</span>
+                          <Check
+                            className={cn(
+                              "h-4 w-4 ml-auto",
+                              selectedProject === p.id
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {errors.project_id && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.project_id.join(", ")}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Assign Users (Create mode only) */}
       {mode === "create" && (
@@ -564,41 +580,42 @@ const AddTaskForm = ({
           Cancel
         </button>
         <button
-  type="button"
-  onClick={handleSave}
-  disabled={
-    mode === "edit"
-      ? updateMutation.isPending
-      : createMutation.isPending
-  }
-  className={`px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 
+          type="button"
+          onClick={handleSave}
+          disabled={
+            mode === "edit"
+              ? updateMutation.isPending
+              : createMutation.isPending
+          }
+          className={`px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 
     hover:bg-purple-700 
-    ${mode === "edit"
-      ? updateMutation.isPending
-        ? "cursor-not-allowed"
-        : "cursor-pointer"
-      : createMutation.isPending
-      ? "cursor-not-allowed"
-      : "cursor-pointer"
+    ${
+      mode === "edit"
+        ? updateMutation.isPending
+          ? "cursor-not-allowed"
+          : "cursor-pointer"
+        : createMutation.isPending
+          ? "cursor-not-allowed"
+          : "cursor-pointer"
     } 
     disabled:opacity-50`}
->
-  {mode === "edit" ? (
-    updateMutation.isPending ? (
-      <>
-        <Loader2 className="w-4 h-4 animate-spin" /> Updating...
-      </>
-    ) : (
-      "Update"
-    )
-  ) : createMutation.isPending ? (
-    <>
-      <Loader2 className="w-4 h-4 animate-spin" /> Saving...
-    </>
-  ) : (
-    "Save"
-  )}
-</button>
+        >
+          {mode === "edit" ? (
+            updateMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Updating...
+              </>
+            ) : (
+              "Update"
+            )
+          ) : createMutation.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+            </>
+          ) : (
+            "Save"
+          )}
+        </button>
       </div>
     </div>
   );
