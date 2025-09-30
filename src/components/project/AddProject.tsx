@@ -102,8 +102,6 @@ const AddProjectForm = ({
     mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-
-      // ✅ Success toast
       toast.success(data.message || "Project created successfully");
 
       navigate({ to: "/projects" });

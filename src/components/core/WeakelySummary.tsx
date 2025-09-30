@@ -41,7 +41,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
       className=" bg-gray rounded-xl shadow-md p-2 w-120 h-30 "
       style={{ border: "1px solid #ddb8ff" }}
     >
-      <div className="text-sm font-medium text-gray-700 mb-2">
+      <div className="text-lg font-medium text-[#666666] mb-2">
         Weekly Summary
       </div>
 
@@ -74,7 +74,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
         </div>
         <div className="flex flex-col items-center px-4 border-r border-gray-200">
           <span className="text-xs text-gray-500">Productive</span>
-          <span className="text-gray-700 font-semibold text-lg">
+          <span className="text-[#666666] font-semibold text-4xl">
             {productive.count}
           </span>
           <span
@@ -87,7 +87,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
         </div>
         <div className="flex flex-col items-center px-4">
           <span className="text-xs text-gray-500">Overdue</span>
-          <span className="text-gray-700 font-semibold text-lg">
+          <span className="text-[#666666] font-semibold text-4xl">
             {overdue.count}
           </span>
           <span
