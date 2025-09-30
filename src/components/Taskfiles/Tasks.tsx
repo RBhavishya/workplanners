@@ -197,6 +197,7 @@ const Tasks = () => {
         return (
           <div className="flex gap-2">
             <button
+              title="View"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
@@ -204,6 +205,7 @@ const Tasks = () => {
             </button>
 
             <button
+              title="Edit"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
@@ -211,6 +213,7 @@ const Tasks = () => {
             </button>
 
             <button
+              title="Delete"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
                 setTaskToDelete(rowData.id);

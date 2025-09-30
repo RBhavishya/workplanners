@@ -221,18 +221,21 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           return (
             <div className="flex gap-2">
               <button
+                title="View"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
                 onClick={() => navigate({ to: `/projects/${p.id}` })}
               >
                 <Eye size={16} />
               </button>
               <button
+                title="Edit"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
                 onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
               >
                 <Edit size={16} />
               </button>
               <button
+                title="Delete"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
                 onClick={() => onDelete(p)}
               >

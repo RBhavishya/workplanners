@@ -42,9 +42,9 @@ export const taskColumns = [
       );
     },
     footer: (props: any) => props.column.id,
-    width: 60,
-    minWidth: 60,
-    maxWidth: 60,
+    width: 80,
+    minWidth: 80,
+    maxWidth: 80,
   },
   {
     accessorFn: (row: any) => row.project?.title,
@@ -57,9 +57,9 @@ export const taskColumns = [
         </div>
       );
     },
-    width: "30px",
-    maxWidth: "30px",
-    minWidth: "30px",
+    width: "100px",
+    maxWidth: "100px",
+    minWidth: "100px",
     header: () => (
       <div className="flex justify-center">
         <span>Project Name</span>
@@ -85,9 +85,9 @@ export const taskColumns = [
         </div>
       );
     },
-    width: "50px",
-    maxWidth: "50px",
-    minWidth: "50px",
+    width: "70px",
+    maxWidth: "70px",
+    minWidth: "70px",
     header: () => <span>Status</span>,
     footer: (props: any) => props.column.id,
   },
@@ -98,9 +98,9 @@ export const taskColumns = [
       const date: string = info.getValue();
       return <span>{date ? dayjs(date).format("DD-MM-YYYY") : "-"}</span>;
     },
-    width: "50px",
-    maxWidth: "50px",
-    minWidth: "50px",
+    width: "90px",
+    maxWidth: "90px",
+    minWidth: "90px",
     header: () => <span>Start Date</span>,
     footer: (props: any) => props.column.id,
   },
