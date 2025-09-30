@@ -317,7 +317,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
       {/* Pagination */}
       {pagination && (
-        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t">
+        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t ">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
           </span>
@@ -330,7 +330,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               id="pageSize"
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
-              className="border rounded px-2 py-1 text-sm"
+              className="border rounded px-2 py-1 text-sm cursor-pointer"
             >
               {[10, 25, 50, 100].map((size) => (
                 <option key={size} value={size}>
@@ -346,12 +346,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               onClick={() => setPage(pagination.prev_page)}
               className={`px-3 py-1 rounded border ${
                 pagination.prev_page
-                  ? "text-gray-700 bg-white hover:bg-gray-100"
+                  ? "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
                   : "text-gray-400 bg-gray-100 cursor-not-allowed"
               }`}
             >
               Prev
             </button>
+
             {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
               .filter((p) => {
                 const current = pagination.current_page;
@@ -369,8 +370,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                       onClick={() => setPage(p)}
                       className={`px-3 py-1 rounded border ${
                         p === pagination.current_page
-                          ? "bg-indigo-500 text-white border-indigo-500"
-                          : "text-gray-700 bg-white hover:bg-gray-100"
+                          ? "bg-indigo-500 text-white border-indigo-500 cursor-default"
+                          : "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
                       }`}
                     >
                       {p}
@@ -383,7 +384,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               onClick={() => setPage(pagination.next_page)}
               className={`px-3 py-1 rounded border ${
                 pagination.next_page
-                  ? "text-gray-700 bg-white hover:bg-gray-100"
+                  ? "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
                   : "text-gray-400 bg-gray-100 cursor-not-allowed"
               }`}
             >

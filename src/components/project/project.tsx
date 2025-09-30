@@ -257,6 +257,7 @@ const Projects = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
+                        className="cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate({ to: `/projects/edit/${project.id}` });
@@ -265,6 +266,7 @@ const Projects = () => {
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                        className="cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             setDeleteTarget(project);

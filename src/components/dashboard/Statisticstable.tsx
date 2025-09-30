@@ -121,7 +121,7 @@ const Statisticstable = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
-      setPagination((prev) => ({ ...prev, pageIndex: 1 })); // reset to first page on search
+      setPagination((prev) => ({ ...prev, pageIndex: 1 }));
     }, 500);
 
     return () => clearTimeout(handler);

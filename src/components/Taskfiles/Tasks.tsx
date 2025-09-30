@@ -27,12 +27,6 @@ import { taskColumns } from "./TaskColumns";
 import TaskSearchFilter from "../core/TasksSearchFilter";
 import { toast } from "sonner";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
 import CountUp from "react-countup";
@@ -57,7 +51,6 @@ const Tasks = () => {
   const initialStatus = searchParams.get("task_status") || "";
   const initialPrioritys = searchParams.get("priority") || "";
   const intialProject = searchParams.get("project_id") || "";
-
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
@@ -320,11 +313,11 @@ const Tasks = () => {
             title="Find your Task"
           />
           <DateRangePicker
-            placement="auto"
+            placement="bottomEnd"
             value={dateValue}
             onChange={(range) => setDateValue(range)}
             placeholder="Select Date Range"
-            className="h-8 text-sm"
+            className="h-8 text-sm "
           />
           <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
             <PopoverTrigger asChild>
@@ -339,8 +332,8 @@ const Tasks = () => {
                     size={16}
                     className="text-gray-400 hover:text-red-500"
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent popover from opening
-                      setSelectedStatus(""); // clear selected status
+                      e.stopPropagation();
+                      setSelectedStatus("");
                     }}
                   />
                 )}
