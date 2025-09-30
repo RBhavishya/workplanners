@@ -320,11 +320,11 @@ const Tasks = () => {
             title="Find your Task"
           />
           <DateRangePicker
-            placement="auto"
+            placement="bottomEnd"
             value={dateValue}
             onChange={(range) => setDateValue(range)}
             placeholder="Select Date Range"
-            className="h-8 text-sm"
+            className="h-8 text-sm "
           />
           <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
             <PopoverTrigger asChild>
