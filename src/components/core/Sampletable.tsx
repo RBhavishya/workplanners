@@ -149,18 +149,21 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         return (
           <div className="flex gap-3 justify-center text-gray-500">
             <button
+              title="View"
               className="hover:text-indigo-600 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
               <Eye size={16} />
             </button>
             <button
+              title="Edit"
               className="hover:text-green-600 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
               <Edit size={16} />
             </button>
             <button
+              title="Delete"
               className="hover:text-red-600 cursor-pointer"
               onClick={() => {
                 setTaskToDelete(rowData.id);

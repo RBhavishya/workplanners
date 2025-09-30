@@ -85,9 +85,9 @@ export const taskColumns = [
         </div>
       );
     },
-    width: "80px",
-    maxWidth: "80px",
-    minWidth: "80px",
+    width: "70px",
+    maxWidth: "70px",
+    minWidth: "70px",
     header: () => <span>Status</span>,
     footer: (props: any) => props.column.id,
   },

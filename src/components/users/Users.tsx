@@ -172,7 +172,7 @@ const UsersDetais = () => {
           <div className="flex gap-2">
             {/* Edit button */}
             <Button
-              title="edit"
+              title="Edit"
               size="sm"
               variant="ghost"
               disabled={!isActive} // disabled if INACTIVE
@@ -189,7 +189,7 @@ const UsersDetais = () => {
 
             {/* Reset Password button */}
             <Button
-              title="reset password"
+              title="Reset password"
               size="sm"
               variant="ghost"
               disabled={!isActive} // disabled if INACTIVE
@@ -209,7 +209,7 @@ const UsersDetais = () => {
 
             {/* Delete button - always enabled */}
             <Button
-              title="delete"
+              title="Delete"
               size="sm"
               variant="ghost"
               className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
