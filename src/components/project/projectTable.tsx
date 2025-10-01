@@ -79,7 +79,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     if (selectedSort === `${column}:asc`) {
       setSelectedSort(`${column}:desc`);
     } else if (selectedSort === `${column}:desc`) {
-      setSelectedSort(""); // clear sort
+      setSelectedSort("");
     } else {
       setSelectedSort(`${column}:asc`);
     }

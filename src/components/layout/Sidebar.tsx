@@ -53,7 +53,7 @@ const Sidebar = () => {
          <Link
           to="/users"
           className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-600 transition-colors"
-          activeProps={{ className: 'bg-purple-100 text-purple-600 font-medium' }}
+          activeProps={{ className: 'bg-violet-100 text-violet-600 font-normal' }}
         >
           <UsersIcon className="mr-3 w-4 h-4" />
           Users
