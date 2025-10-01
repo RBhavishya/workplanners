@@ -71,7 +71,7 @@ const Tasks = () => {
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
-  const { isLoading,data,isFetching } = useQuery({
+  const { isLoading,  data,isFetching } = useQuery({
     queryKey: [
       "tasks",
       pagination,

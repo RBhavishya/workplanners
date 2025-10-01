@@ -27,7 +27,7 @@ const Statisticstable = () => {
     pageIndex: 1,
     pageSize: 25,
   });
-  const [searchString, setSearchString] = useState(""); // Search input
+  const [searchString, setSearchString] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
 
   const { data, isLoading, isError } = useQuery({
