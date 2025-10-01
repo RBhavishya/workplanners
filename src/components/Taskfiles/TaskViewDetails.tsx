@@ -19,12 +19,11 @@ import {
 } from "@/https/services/tasks";
 import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils"; // utility for conditional classes
+import { cn } from "@/lib/utils";
 
 const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
   const queryClient = useQueryClient();
-
   const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -151,7 +150,6 @@ const TaskViewDetails = () => {
 
   return (
     <div className="p-4">
-      {/* Header with Back */}
       <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
         <button
           onClick={() => window.history.back()}
@@ -181,13 +179,9 @@ const TaskViewDetails = () => {
         </p>
       </div>
 
-      {/* Main Layout */}
       <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-3 flex gap-6">
-        {/* Project Details */}
         <div className="w-1/3 border border-gray-200 rounded-3xl p-4 ml-auto">
           <div className="text-2xl font-bold mb-4">Details</div>
-
-          {/* Created By */}
           <div className="h-[calc(100vh-410px)] overflow-y-auto">
           <div className="flex items-center gap-3 mb-4">
             {taskdata.createdByUser?.profile_pic ? (
@@ -202,14 +196,12 @@ const TaskViewDetails = () => {
               </div>
             )}
             <div>
-              {/* ✅ Task Title */}
               <p className="font-medium">
                 {taskdata.task_title || "Untitled Task"}
               </p>
               <p className="text-xs text-gray-500">Task Title</p>
             </div>
           </div>
-          {/* Status Selector */}
           <div className="mb-4">
             <strong>Status:</strong>{" "}
             <select
