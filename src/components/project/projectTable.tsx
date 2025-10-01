@@ -191,7 +191,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             className="flex items-center cursor-pointer select-none"
             onClick={() => handleSort("due_date")}
           >
-            End Date {renderSortIcon("due_date")}
+            Due Date {renderSortIcon("due_date")}
           </div>
         ),
         accessorFn: (row: any) => row.project_end_date,
