@@ -255,12 +255,6 @@ const AddTaskForm = ({
           {formError}
         </div>
       )}
-      {successMessage && (
-        <div className="mb-4 flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 animate-fade-in">
-          <CheckCircle className="w-5 h-5 text-green-500" />
-          <span>{successMessage}</span>
-        </div>
-      )}
 
       {/* Task Title */}
       <div className="flex flex-col gap-2 mb-4">

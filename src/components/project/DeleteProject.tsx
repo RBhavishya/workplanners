@@ -44,8 +44,6 @@ const DeleteProject = ({
         message = error.response.data.message;
       }
       toast.error(message);
-
-      // Close dialog even on error
       setOpen(false);
       onClose();
     },
@@ -71,8 +69,7 @@ const DeleteProject = ({
         <DialogHeader>
           <DialogTitle>Confirm Delete</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this project:{" "}
-            <b>{data.title}</b>?
+            Are you sure you want to delete this project: <b>{data.title}</b>?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -124,4 +121,3 @@ const DeleteProject = ({
 };
 
 export default DeleteProject;
-

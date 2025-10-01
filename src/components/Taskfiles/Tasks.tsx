@@ -49,14 +49,10 @@ const Tasks = () => {
   const initialEndDate = searchParams.get("to_date") || null;
   const initialSearch = searchParams.get("search") || "";
   const initialStatus = searchParams.get("task_status") || "";
-  const initialPrioritys = searchParams.get("priority") || "";
-  const intialProject = searchParams.get("project_id") || "";
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
-  const [selectedProject, setSelectedProject] = useState<any>(intialProject);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
-  const [selectedpriority, setSelectedpriority] = useState(initialPrioritys);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [del, setDel] = useState<any>(1);
@@ -75,7 +71,7 @@ const Tasks = () => {
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
-  const { isLoading, isError, data, error, isFetching } = useQuery({
+  const { isLoading,data,isFetching } = useQuery({
     queryKey: [
       "tasks",
       pagination,
@@ -83,8 +79,6 @@ const Tasks = () => {
       dateValue,
       del,
       selectedStatus,
-      selectedpriority,
-      selectedProject,
     ],
     queryFn: async () => {
       const response = await getAllPaginatedTasks({
@@ -93,8 +87,6 @@ const Tasks = () => {
         order_by: pagination.order_by,
         search_string: debouncedSearch,
         task_status: selectedStatus,
-        priority: selectedpriority,
-        project_id: selectedProject,
         from_date:
           dateValue?.length && dateValue[0]
             ? formatDate(dateValue[0])
@@ -122,8 +114,6 @@ const Tasks = () => {
                 ? formatDate(dateValue[1])
                 : undefined,
             task_status: selectedStatus || undefined,
-            project_id: selectedProject || undefined,
-            priority: selectedpriority || undefined,
           },
         });
       }
@@ -352,7 +342,7 @@ const Tasks = () => {
                       className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                       onClick={() => {
                         setSelectedStatus(option);
-                        setStatusPopoverOpen(false); // auto-close popover
+                        setStatusPopoverOpen(false);
                       }}
                     >
                       {option}

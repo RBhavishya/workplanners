@@ -237,12 +237,7 @@ const AddProjectForm = ({
           {formError}
         </div>
       )}
-      {successMessage && (
-        <div className="mb-4 flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 animate-fade-in">
-          <CheckCircle className="w-5 h-5 text-green-500" />
-          <span>{successMessage}</span>
-        </div>
-      )}
+
       <div className="flex flex-col gap-2 mb-4">
         <label className="text-sm font-medium">
           Project Title <span className="text-red-500">*</span>
@@ -345,12 +340,12 @@ const AddProjectForm = ({
               <Calendar
                 mode="single"
                 selected={dueDate}
-                month={visibleDueMonth || startDate || undefined} // open in startDate's month
-                onMonthChange={(month) => setVisibleDueMonth(month)} // allow navigation
+                month={visibleDueMonth || startDate || undefined}
+                onMonthChange={(month) => setVisibleDueMonth(month)}
                 onSelect={(date) => {
                   if (date) {
                     setDueDate(date);
-                    setVisibleDueMonth(date); // keep calendar on selected due date
+                    setVisibleDueMonth(date);
                     setDueDateOpen(false);
                   }
                 }}
