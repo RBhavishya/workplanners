@@ -109,7 +109,7 @@ const TanStackTable: FC<pageProps> = ({
         >
           <Table className="w-full text-sm border-collapse table-fixed">
             {/* Sticky Header */}
-            <TableHeader className="sticky top-0 z-20 bg-gray-50 text-gray-600 text-xs font-semibold">
+            <TableHeader className="sticky top-0 z-20 bg-white text-neutral-400 text-xs font-normal">
               {table?.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header: any, index: number) => (
@@ -120,7 +120,7 @@ const TanStackTable: FC<pageProps> = ({
                         minWidth: getWidth(header.id),
                         width: getWidth(header.id),
                       }}
-                      className="px-4 py-2 cursor-pointer"
+                      className="px-4 py-2 cursor-pointer text-sm 3xl:!text-base"
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -146,20 +146,33 @@ const TanStackTable: FC<pageProps> = ({
             </TableHeader>
           </Table>
 
-          {/* Scrollable body wrapped separately */}
-          <div className={` ${location.pathname.includes("tasks") ? "h-[calc(100vh-420px)] overflow-y-auto" : " h-[calc(100vh-290px)] overflow-y-auto"}`}>
+          {/* Scrollable body */}
+          <div
+            className={`${
+              location.pathname.includes("tasks")
+                ? "h-[calc(100vh-420px)] overflow-y-auto"
+                : "h-[calc(100vh-290px)] overflow-y-auto"
+            }`}
+          >
             <Table className="w-full text-sm border-collapse table-fixed">
-              <TableBody className="divide-y divide-gray-200">
+              <TableBody>
                 {data?.length ? (
-                  table?.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} className="hover:bg-gray-50">
+                  table?.getRowModel().rows.map((row, rowIndex) => (
+                    <TableRow
+                      key={row.id}
+                      className={`${
+                        rowIndex % 2 === 0 ? "bg-slate-50" : "bg-white"
+                      } hover:bg-gray-50`}
+                    >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="px-4 py-1"
-                           style={{
+                        <TableCell
+                          key={cell.id}
+                          className="px-4 py-2 text-sm 3xl:!text-base"
+                          style={{
                             minWidth: getWidth(cell.column.columnDef.id),
                             width: getWidth(cell.column.columnDef.id),
-
-                      }}>
+                          }}
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
