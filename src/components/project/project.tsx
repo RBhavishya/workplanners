@@ -35,13 +35,11 @@ const Projects = () => {
   const search = useSearch({ strict: false }) as {
     viewMode?: "table" | "grid";
   };
-
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const initialStatus = searchParams.get("project_status") || "";
   const initialSearch = searchParams.get("search") || "";
   const orderBY = searchParams.get("order_by") || "";
-
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
@@ -168,8 +166,8 @@ const Projects = () => {
                     size={16}
                     className="text-gray-400 hover:text-red-500"
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent popover from opening
-                      setSelectedStatus(""); // clear selected status
+                      e.stopPropagation(); 
+                      setSelectedStatus("");
                     }}
                   />
                 )}
@@ -185,7 +183,7 @@ const Projects = () => {
                       className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                       onClick={() => {
                         setSelectedStatus(option);
-                        setStatusPopoverOpen(false); // auto-close popover
+                        setStatusPopoverOpen(false);
                       }}
                     >
                       {option}

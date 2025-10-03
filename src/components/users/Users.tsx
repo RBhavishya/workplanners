@@ -139,7 +139,7 @@ const UsersDetais = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
-      if (searchString || orderBY) {
+      if (searchString) {
         getAllUsers({
           pageIndex: 1,
           pageSize: pageSizeParam,
@@ -156,7 +156,7 @@ const UsersDetais = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchString, orderBY]);
+  }, [searchString]);
 
   const userActions = [
     {
