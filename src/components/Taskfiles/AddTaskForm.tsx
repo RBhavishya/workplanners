@@ -31,6 +31,7 @@ import {
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
@@ -566,15 +567,17 @@ const AddTaskForm = ({
 
       {/* Buttons */}
       <div className="flex justify-end gap-2 mt-4">
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={handleNavigation}
           className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="default"
           onClick={handleSave}
           disabled={
             mode === "edit"
@@ -609,7 +612,7 @@ const AddTaskForm = ({
           ) : (
             "Save"
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

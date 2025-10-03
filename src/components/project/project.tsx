@@ -23,6 +23,7 @@ import { SearchIcon } from "../icons/SearchIcon";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TasksPagination from "../core/TasksPagination";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -211,12 +212,12 @@ const Projects = () => {
           </div>
 
           {/* New Project */}
-          <button
+          <Button
             onClick={handleNavigation}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg cursor-pointer"
           >
             + New Project
-          </button>
+          </Button>
         </div>
       </div>
 
