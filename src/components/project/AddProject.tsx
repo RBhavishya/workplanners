@@ -36,6 +36,7 @@ import {
 } from "@/https/services/project";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 export interface AddProjectFormProps {
   mode: "create" | "edit";
@@ -493,16 +494,18 @@ const AddProjectForm = ({
         )}
       </div>
       <div className="flex justify-end gap-2 mt-4">
-        <button
+        <Button
           onClick={handleNavigation}
+          variant="outline"
           className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           Cancel
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={handleSave}
+          variant={mode === "edit" ? "outline" : "default"}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
           disabled={mutation.isPending || updateMutation.isPending}
         >
@@ -535,7 +538,7 @@ const AddProjectForm = ({
             : mutation.isPending
               ? "Saving..."
               : "Save"}
-        </button>
+        </Button>
       </div>
     </div>
   );

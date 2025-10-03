@@ -14,6 +14,7 @@ import { deleteTasksAPI } from "@/https/services/tasks";
 import { toast } from "sonner";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import TasksPagination from "./TasksPagination";
+import { Button } from "../ui/button";
 
 interface TasksTableProps {
   projectId: number;
@@ -148,30 +149,33 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
         const rowData = info.row.original;
         return (
           <div className="flex gap-3 justify-center text-gray-500">
-            <button
+            <Button
               title="View"
-              className="hover:text-indigo-600 cursor-pointer"
+               variant="ghost"
+              className=" hover:text-indigo-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
               <Eye size={16} />
-            </button>
-            <button
+            </Button>
+            <Button
               title="Edit"
-              className="hover:text-green-600 cursor-pointer"
+               variant="ghost"
+              className=" hover:text-green-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
               <Edit size={16} />
-            </button>
-            <button
+            </Button>
+            <Button
               title="Delete"
-              className="hover:text-red-600 cursor-pointer"
+               variant="ghost"
+              className=" hover:text-red-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
               onClick={() => {
                 setTaskToDelete(rowData.id);
                 setDeleteDialogOpen(true);
               }}
             >
               <Trash2 size={16} />
-            </button>
+            </Button>
           </div>
         );
       },

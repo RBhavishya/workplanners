@@ -7,6 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { Button } from "../ui/button";
 
 const DeleteTaskDialog = ({
   openOrNot,
@@ -31,8 +32,9 @@ const DeleteTaskDialog = ({
 
         <DialogFooter>
           {/* Delete Button */}
-          <button
+          <Button
             type="button"
+            variant="destructive"
             className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={onOKClick}
             disabled={deleteLoading}
@@ -41,17 +43,18 @@ const DeleteTaskDialog = ({
               <Loader2 className="animate-spin h-4 w-4 text-white" />
             )}
             {deleteLoading ? "Deleting..." : "Yes! Delete"}
-          </button>
+          </Button>
 
           {/* Cancel Button */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
             onClick={onCancelClick}
             disabled={deleteLoading}
           >
             Cancel
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

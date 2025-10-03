@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import dayjs from "dayjs";
+import { Button } from "../ui/button";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -220,27 +221,30 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           const p = row.original;
           return (
             <div className="flex gap-2">
-              <button
+              <Button
                 title="View"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                variant="ghost"
                 onClick={() => navigate({ to: `/projects/${p.id}` })}
               >
                 <Eye size={16} />
-              </button>
-              <button
+              </Button>
+              <Button
                 title="Edit"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                variant="ghost"
                 onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
               >
                 <Edit size={16} />
-              </button>
-              <button
+              </Button>
+              <Button
                 title="Delete"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                variant="ghost"
                 onClick={() => onDelete(p)}
               >
                 <Trash size={16} />
-              </button>
+              </Button>
             </div>
           );
         },

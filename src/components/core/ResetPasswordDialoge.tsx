@@ -9,6 +9,7 @@ import {
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "../ui/button";
 
 const ResetPasswordDialog = ({
   open,
@@ -89,8 +90,9 @@ const ResetPasswordDialog = ({
 
         <DialogFooter>
           {/* Reset Button */}
-          <button
+          <Button
             type="button"
+            variant="default"
             className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={handleConfirm}
             disabled={resetLoading}
@@ -99,17 +101,18 @@ const ResetPasswordDialog = ({
               <Loader2 className="animate-spin h-4 w-4 text-white" />
             )}
             {resetLoading ? "Resetting..." : "Reset Password"}
-          </button>
+          </Button>
 
           {/* Cancel Button */}
-          <button
+          <Button
             type="button"
             className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
+            variant="outline"
             onClick={onCancelClick}
             disabled={resetLoading}
           >
             Cancel
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
