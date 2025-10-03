@@ -93,7 +93,7 @@ const TanStackTable: FC<pageProps> = ({
 
     getData({
       ...searchParams,
-      pageIndex: searchParams.get("current_page"),
+      pageIndex: searchParams.get("page"),
       pageSize: searchParams.get("page_size"),
       order_by: orderBy,
     });

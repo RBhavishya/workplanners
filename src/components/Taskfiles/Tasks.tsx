@@ -221,7 +221,7 @@ const Tasks = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
-      if (searchString || selectedStatus || dateValue || orderBY) {
+      if (searchString || selectedStatus || dateValue) {
         getAllTasks({
           pageIndex: 1,
           pageSize: pageSizeParam,
@@ -238,7 +238,7 @@ const Tasks = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchString, selectedStatus, dateValue, orderBY]);
+  }, [searchString, selectedStatus, dateValue]);
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
