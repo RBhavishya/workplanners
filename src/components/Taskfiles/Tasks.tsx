@@ -71,7 +71,7 @@ const Tasks = () => {
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
-  const { isLoading,  data,isFetching } = useQuery({
+  const { isLoading, data, isFetching } = useQuery({
     queryKey: [
       "tasks",
       pagination,
@@ -186,32 +186,35 @@ const Tasks = () => {
 
         return (
           <div className="flex gap-2">
-            <button
+            <Button
               title="View"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              variant={"ghost"}
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
               <Eye size={16} />
-            </button>
+            </Button>
 
-            <button
+            <Button
               title="Edit"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              variant={"ghost"}
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
               <Edit size={16} />
-            </button>
+            </Button>
 
-            <button
+            <Button
               title="Delete"
               className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              variant={"ghost"}
               onClick={() => {
                 setTaskToDelete(rowData.id);
                 setDeleteDialogOpen(true);
               }}
             >
               <Trash size={16} />
-            </button>
+            </Button>
           </div>
         );
       },
@@ -310,7 +313,7 @@ const Tasks = () => {
             value={dateValue}
             onChange={(range) => setDateValue(range)}
             placeholder="Select Date Range"
-            className="h-8 text-sm "
+            className="h-8 text-sm"
           />
           <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
             <PopoverTrigger asChild>
