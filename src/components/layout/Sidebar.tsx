@@ -52,7 +52,7 @@ const Sidebar = () => {
       {user_type !== 'EMPLOYEE' && (
          <Link
           to="/users"
-          className="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors"
+          className="flex items-center px-3 py-1 rounded-none text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors"
           activeProps={{ className: 'bg-violet-100 text-violet-600 font-normal' }}
         >
           <UsersIcon className="mr-3 w-4 h-4" />
