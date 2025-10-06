@@ -63,6 +63,7 @@ const Projects = () => {
     COMPLETED: "bg-green-100 text-green-600",
   };
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const { isLoading, isError, error, data, isFetching } = useQuery({
     queryKey: [
       "projects",
@@ -167,7 +168,7 @@ const Projects = () => {
                     size={16}
                     className="text-gray-400 hover:text-red-500"
                     onClick={(e) => {
-                      e.stopPropagation(); 
+                      e.stopPropagation();
                       setSelectedStatus("");
                     }}
                   />
@@ -212,12 +213,14 @@ const Projects = () => {
           </div>
 
           {/* New Project */}
-          <Button
-            onClick={handleNavigation}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg cursor-pointer"
-          >
-            + New Project
-          </Button>
+          {user?.user_type !== "EMPLOYEE" && (
+            <Button
+              onClick={handleNavigation}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg cursor-pointer"
+            >
+              + New Project
+            </Button>
+          )}
         </div>
       </div>
 
@@ -247,36 +250,38 @@ const Projects = () => {
                   onClick={() => navigate({ to: `/projects/${project.id}` })}
                 >
                   {/* Menu */}
-                  <div className="absolute top-3 right-3">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
-                          <MoreVertical size={18} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                        className="cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate({ to: `/projects/edit/${project.id}` });
-                          }}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                        className="cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteTarget(project);
-                            setShowDeleteDialog(true);
-                          }}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  {user?.user_type !== "EMPLOYEE" && (
+                    <div className="absolute top-3 right-3">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
+                            <MoreVertical size={18} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate({ to: `/projects/edit/${project.id}` });
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteTarget(project);
+                              setShowDeleteDialog(true);
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
 
                   {/* Card Content */}
                   <CardContent className="flex flex-col items-center text-center">
