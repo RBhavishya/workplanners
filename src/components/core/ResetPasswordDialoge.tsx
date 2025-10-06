@@ -93,7 +93,7 @@ const ResetPasswordDialog = ({
           <Button
             type="button"
             variant="default"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 cursor-pointer"
             onClick={handleConfirm}
             disabled={resetLoading}
           >

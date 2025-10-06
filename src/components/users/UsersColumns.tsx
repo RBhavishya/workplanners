@@ -1,4 +1,5 @@
 import { updateUserStatusAPI } from "@/https/services/users";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -139,9 +140,11 @@ export const usersColumns = [
       const popoverRef = useRef<HTMLDivElement>(null);
       const userId = info.row.original.id;
       const togglePopover = () => setIsOpen(!isOpen);
-
+      const queryClient = useQueryClient();
+      const [loading, setLoading] = useState(false);
       const updateUserStatus = async (status: boolean) => {
         try {
+          setLoading(true);
           const body = {
             user_status: status ? "ACTIVE" : "INACTIVE",
           };
@@ -154,6 +157,7 @@ export const usersColumns = [
                 : "User deactivated successfully"
             );
             setIsActive(status);
+            queryClient.invalidateQueries({ queryKey: ["users"] });
           } else {
             toast.error("Failed to change status");
           }
@@ -161,10 +165,10 @@ export const usersColumns = [
           toast.error(err?.message || "Something went wrong");
           console.error(err);
         } finally {
+          setLoading(false);
           setIsOpen(false);
         }
       };
-
       useEffect(() => {
         setIsActive(info.getValue() === "ACTIVE");
       }, [info.getValue()]);
