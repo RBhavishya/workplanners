@@ -10,7 +10,7 @@ import { getDashboardStatistics } from "@/https/services/dashboard";
 import TasksPagination from "../core/TasksPagination";
 import { addSerial } from "@/lib/helpers/addSerial";
 import TaskSearchFilter from "../core/TasksSearchFilter";
-import { SquarePen, Trash2 } from "lucide-react";
+
 
 type TaskStats = {
   id: number;
