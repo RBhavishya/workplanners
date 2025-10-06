@@ -91,16 +91,6 @@ const Statisticstable = () => {
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
       header: () => <span className="font-medium text-black">Pending</span>,
     },
-    {
-      id: "actions",
-      header: () => <span className="font-medium text-black">Actions</span>,
-      cell: () => (
-        <div className="flex items-center gap-3">
-          <SquarePen className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5} />
-          <Trash2 className="w-3.5 h-3.5 cursor-pointer" strokeWidth={1.5} />
-        </div>
-      ),
-    },
   ];
   const table = useReactTable({
     data: statsData,
