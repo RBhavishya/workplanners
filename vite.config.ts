@@ -13,7 +13,7 @@ export default defineConfig({
     tsConfigPaths(),
     tanstackStart({ customViteReactPlugin: true }),
     viteReact(),
-    nitroV2Plugin(),
+     nitroV2Plugin(),
   ],
   build: {
     assetsDir: 'assets', 
