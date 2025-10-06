@@ -22,6 +22,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@reduxjs/toolkit": "^2.9.0",
     "@tailwindcss/postcss": "^4.1.12",
+    "@tanstack/nitro-v2-vite-plugin": "^1.132.40",
     "@tanstack/react-query": "^5.86.0",
     "@tanstack/react-router": "^1.131.28",
     "@tanstack/react-start": "^1.131.28",
