@@ -53,7 +53,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
     setUser(storedUser);
@@ -134,48 +134,54 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           );
         },
       },
-      {
-        header: "Assigned Users",
-        accessorKey: "users",
-        cell: ({ row }) => {
-          const users = row.original.users || [];
-          if (users.length === 0)
-            return <span className="text-black-400 text-sm">-</span>;
-          const visibleUsers = users.slice(0, 3);
-          const remainingUsers = users.slice(3);
-          return (
-            <div className="flex -space-x-2 items-center">
-              {visibleUsers.map((u: any) => (
-                <div
-                  key={u.user_id}
-                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
-                  title={u.display_name}
-                >
-                  {u.display_name.charAt(0).toUpperCase()}
+     {
+  header: "Assigned Users",
+  accessorKey: "users",
+  cell: ({ row }) => {
+    const users = row.original.users || [];
+    if (users.length === 0)
+      return <span className="text-black-400 text-sm">-</span>;
+
+    const visibleUsers = users.slice(0, 3);
+    const remainingUsers = users.slice(3);
+
+    return (
+      <div className="flex -space-x-2 items-center">
+        {visibleUsers.map((u: any) => (
+          <div
+            key={u.user_id}
+            className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
+            title={u.display_name}
+          >
+            {u.display_name.charAt(0).toUpperCase()}
+          </div>
+        ))}
+
+        {remainingUsers.length > 0 && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
+                  +{remainingUsers.length}
                 </div>
-              ))}
-              {remainingUsers.length > 0 && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
-                        +{remainingUsers.length}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="flex flex-col gap-1">
-                        {remainingUsers.map((u: any) => (
-                          <span key={u.user_id}>{u.display_name}</span>
-                        ))}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          );
-        },
-      },
+              </TooltipTrigger>
+              <TooltipContent
+                className="max-h-[150px] overflow-y-auto bg-white text-gray-700 rounded-md shadow-md p-2"
+                side="top"
+              >
+                <div className="flex flex-col gap-1">
+                  {remainingUsers.map((u: any) => (
+                    <span key={u.user_id}>{u.display_name}</span>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
+    );
+  },
+},
       {
         header: () => (
           <div
