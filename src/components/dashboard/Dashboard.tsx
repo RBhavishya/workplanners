@@ -20,14 +20,16 @@ import Statisticstable from "./Statisticstable";
 const Dashboard = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search as string);
-  const pageIndexParam = Number(searchParams.get("current_page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
-  const observer = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const [time, setTime] = useState(new Date());
-  const [open, setOpen] = useState(false);
+  const [todayFilter, setTodayFilter] = useState<string>("");
 
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update clock every second
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -42,6 +44,7 @@ const Dashboard = () => {
   const parts = time.toLocaleDateString("en-GB", options).split(" ");
   const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
 
+  // Dashboard Stats
   const { data: stats, isError } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: async () => {
@@ -50,6 +53,7 @@ const Dashboard = () => {
     },
   });
 
+  // Today Stats
   const { data: todaystats } = useQuery({
     queryKey: ["todayStats"],
     queryFn: async () => {
@@ -58,24 +62,28 @@ const Dashboard = () => {
     },
   });
 
+  // Today Tasks with Infinite Scroll
   const {
     data: todaytasksPages,
     fetchNextPage,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery({
-    queryKey: ["todayTasks"],
+    queryKey: ["todayTasks", todayFilter],
     queryFn: async ({ pageParam = 1 }) => {
       const queryParams: SettingsHistoryQueryParams = {
         pageIndex: pageParam,
         pageSize: pageSizeParam,
+        task_status: todayFilter,
       };
       const response = await getTodayTasksAPI(queryParams);
       const tasks = response?.data?.data?.records || [];
       const pagination = response?.data?.data?.pagination_info || {
         current_page: pageParam,
         page_size: pageSizeParam,
+        task_status: todayFilter || "",
         total_pages: 1,
         total_records: 0,
       };
@@ -95,27 +103,22 @@ const Dashboard = () => {
   });
 
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
-  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Intersection Observer for Infinite Scroll
   const setupObserver = useCallback(() => {
     if (isFetchingNextPage || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
+
     observer.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
-      {
-        root: containerRef.current,
-        rootMargin: "100px",
-        threshold: 0.5,
-      }
+      { root: containerRef.current, rootMargin: "100px", threshold: 0.5 }
     );
 
-    if (loadMoreRef.current) {
-      observer.current.observe(loadMoreRef.current);
-    }
+    if (loadMoreRef.current) observer.current.observe(loadMoreRef.current);
 
     return () => {
       if (observer.current) observer.current.disconnect();
@@ -124,15 +127,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     const cleanup = setupObserver();
-    if (!isFetchingNextPage && open) {
-      const timer = setTimeout(() => setupObserver(), 300);
-      return () => {
-        clearTimeout(timer);
-        cleanup && cleanup();
-      };
-    }
     return cleanup;
-  }, [setupObserver, isFetchingNextPage]);
+  }, [setupObserver]);
 
   const dashboardCards = [
     {
@@ -145,24 +141,25 @@ const Dashboard = () => {
       title: "Completed Tasks",
       value: stats?.completed_tasks ?? 0,
       icon: <CompletedIcon />,
-      status: "Completed",
+      status: "COMPLETED",
     },
     {
       title: "In Progress Task",
       value: stats?.in_progress_tasks ?? 0,
       icon: <ProgressIcon />,
-      status: "in_progress",
+      status: "IN_PROGRESS",
     },
     {
       title: "Pending Tasks",
       value: stats?.overdue_TasksCount ?? 0,
       icon: <PendingIcon />,
-      status: "Overdue",
+      status: "OVERDUE",
     },
   ];
 
   return (
     <div className="p-0 flex gap-2">
+      {/* Left Side - Cards & Table */}
       <div className="w-3/4 m-2">
         <div className="bg-white p-2 rounded-sm shadow-none mb-2">
           <div className="flex flex-wrap gap-3">
@@ -170,11 +167,11 @@ const Dashboard = () => {
               <p className="text-red-500">Error loading stats</p>
             ) : (
               dashboardCards.map((card) => {
-                const isActive =
-                  card.status &&
-                  new URLSearchParams(location.search as string).get(
-                    "task_status"
-                  ) === card.status;
+                const isActive = card.status
+                  ? new URLSearchParams(location.search as string).get(
+                      "task_status"
+                    ) === card.status
+                  : false;
 
                 return (
                   <div
@@ -182,7 +179,7 @@ const Dashboard = () => {
                     className={`cursor-pointer ${
                       isActive ? "border border-purple-600 rounded-md" : ""
                     }`}
-                    onClick={() => {
+                    onClick={() =>
                       navigate({
                         to: "/tasks",
                         search: {
@@ -190,8 +187,8 @@ const Dashboard = () => {
                           page_size: pageSizeParam,
                           task_status: card.status || undefined,
                         },
-                      });
-                    }}
+                      })
+                    }
                   >
                     <BigCard
                       title={card.title}
@@ -207,89 +204,117 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Table */}
         <Statisticstable />
       </div>
 
-      {/* Right side - Today’s Task */}
-      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col overflow-auto ">
+      {/* Right Side - Today’s Task */}
+      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col overflow-auto">
         <h2 className="text-lg font-semibold mb-1">Today’s Task</h2>
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
+
+        {/* Filters */}
         <div className="flex items-center gap-3 mb-4 text-sm font-medium">
-          <span className="text-purple-600 font-normal">
-            All{" "}
-            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
-              <CountUp end={todaystats?.total_tasks_count ?? 0} duration={1} />
-            </span>
-          </span>
-          <span className="text-gray-600 font-normal">
-            InProgress{" "}
-            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
-              <CountUp end={todaystats?.in_progress_tasks ?? 0} duration={1} />
-            </span>
-          </span>
-          <span className="text-gray-600 font-normal">
-            Completed{" "}
-            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
-              <CountUp end={todaystats?.completed_tasks ?? 0} duration={1} />
-            </span>
-          </span>
-          <span className="text-gray-600 font-normal">
-            Pending{" "}
-            <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
-              <CountUp end={todaystats?.overdue_TasksCount ?? 0} duration={1} />
-            </span>
-          </span>
+          {[
+            {
+              label: "All",
+              count: todaystats?.total_tasks_count ?? 0,
+              status: "",
+            },
+            {
+              label: "InProgress",
+              count: todaystats?.in_progress_tasks ?? 0,
+              status: "IN_PROGRESS",
+            },
+            {
+              label: "Pending",
+              count: todaystats?.overdue_TasksCount ?? 0,
+              status: "OVERDUE",
+            },
+            {
+              label: "Completed",
+              count: todaystats?.completed_tasks ?? 0,
+              status: "COMPLETED",
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={`cursor-pointer px-3 py-1 rounded-md ${
+                todayFilter === item.status
+                  ? "bg-purple-100 text-purple-600 font-semibold"
+                  : "bg-gray-100 text-gray-600 font-normal"
+              }`}
+              onClick={() => {
+                setTodayFilter(item.status);
+                refetch();
+              }}
+            >
+              {item.label}{" "}
+              <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
+                <CountUp end={item.count} duration={1} />
+              </span>
+            </div>
+          ))}
         </div>
 
+        {/* Tasks List */}
         <div ref={containerRef} className="space-y-4 overflow-y-auto pr-2">
           {isFetching && !isFetchingNextPage ? (
             <div className="flex items-center justify-center py-6">
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
               <p className="ml-2 text-sm text-gray-500">Loading tasks...</p>
             </div>
-          ) : !todaytasks?.length ? (
+          ) : todaytasks.filter((task) =>
+              todayFilter ? task.task_status === todayFilter : true
+            ).length === 0 ? (
             <p className="text-sm text-gray-500 text-center">
-              No tasks for today
+              {todayFilter
+                ? `No ${todayFilter.toLowerCase()} tasks today`
+                : "No tasks for today"}
             </p>
           ) : (
-            todaytasks.map((task: any, index: number) => (
-              <div key={index} className="flex items-start gap-3">
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800">{task.task_title}</p>
-                  <p className="text-xs font-medium text-gray-700">
-                    Due Date:{" "}
-                    <span className="text-gray-500 font-normal">
-                      {task.end_date
-                        ? new Date(task.end_date).toLocaleString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "No due date"}
-                    </span>
-                  </p>
+            todaytasks
+              .filter((task) =>
+                todayFilter ? task.task_status === todayFilter : true
+              )
+              .map((task, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-800">
+                      {task.task_title}
+                    </p>
+                    <p className="text-xs font-medium text-gray-700">
+                      Due Date:{" "}
+                      <span className="text-gray-500 font-normal">
+                        {task.end_date
+                          ? new Date(task.end_date).toLocaleString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "No due date"}
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    className={
+                      task.task_status === "COMPLETED"
+                        ? "text-green-500"
+                        : task.task_status === "IN_PROGRESS" ||
+                            task.task_status === "OVERDUE" ||
+                            task.task_status === "REVIEW" ||
+                            task.task_status === "NEW"
+                          ? "text-yellow-500"
+                          : "text-gray-400"
+                    }
+                  >
+                    {task.task_status === "COMPLETED" ? (
+                      <GreenThickIcon className="w-4 h-4" />
+                    ) : (
+                      <ClockIcon className="w-4 h-4" />
+                    )}
+                  </div>
                 </div>
-                <div
-                  className={
-                    task.task_status === "COMPLETED"
-                      ? "text-green-500"
-                      : task.task_status === "IN PROGRESS" ||
-                          task.task_status === "OVERDUE" ||
-                          task.task_status === "REVIEW" ||
-                          task.task_status === "NEW"
-                        ? "text-yellow-500"
-                        : "text-gray-400"
-                  }
-                >
-                  {task.task_status === "COMPLETED" ? (
-                    <GreenThickIcon className="w-4 h-4" />
-                  ) : (
-                    <ClockIcon className="w-4 h-4" />
-                  )}
-                </div>
-              </div>
-            ))
+              ))
           )}
 
           <div

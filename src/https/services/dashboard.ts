@@ -47,17 +47,19 @@ export const getTodayStatsAPI = async () => {
 export interface SettingsHistoryQueryParams {
   pageIndex: number;
   pageSize: number;
+  task_status?: string;
 }
 
 export const getTodayTasksAPI = async ({
   pageIndex,
   pageSize,
+  task_status
 }: SettingsHistoryQueryParams) => {
   try {
     const queryParams = {
       page: pageIndex,
       page_size: pageSize,
-
+      task_status: task_status
     };
     return await $fetch.get(`/dash-board/today-tasks`, queryParams);
   } catch (err) {
