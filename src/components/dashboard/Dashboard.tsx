@@ -19,7 +19,7 @@ import Statisticstable from "./Statisticstable";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = new URLSearchParams(location.search as string);
   const pageIndexParam = Number(searchParams.get("current_page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const observer = useRef<IntersectionObserver | null>(null);
@@ -35,18 +35,14 @@ const Dashboard = () => {
 
   const formattedTime = time.toLocaleTimeString("en-GB");
   const options: Intl.DateTimeFormatOptions = {
-  weekday: "long",
-  day: "2-digit",
-  month: "short",
-};
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+  };
+  const parts = time.toLocaleDateString("en-GB", options).split(" ");
+  const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
 
-const parts = time.toLocaleDateString("en-GB", options).split(" ");
-const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
-
-  const {
-    data: stats,
-    isError,
-  } = useQuery({
+  const { data: stats, isError } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: async () => {
       const response = await getetDashboardStatsAPI();
@@ -100,6 +96,7 @@ const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
 
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
   const containerRef = useRef<HTMLDivElement>(null);
+
   const setupObserver = useCallback(() => {
     if (isFetchingNextPage || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
@@ -121,27 +118,48 @@ const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
     }
 
     return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
+      if (observer.current) observer.current.disconnect();
     };
   }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   useEffect(() => {
     const cleanup = setupObserver();
     if (!isFetchingNextPage && open) {
-      const timer = setTimeout(() => {
-        setupObserver();
-      }, 300);
-
+      const timer = setTimeout(() => setupObserver(), 300);
       return () => {
         clearTimeout(timer);
         cleanup && cleanup();
       };
     }
-
     return cleanup;
   }, [setupObserver, isFetchingNextPage]);
+
+  const dashboardCards = [
+    {
+      title: "Total Tasks",
+      value: stats?.total_tasks_count ?? 0,
+      icon: <TotalTaskIcon />,
+      status: "",
+    },
+    {
+      title: "Completed Tasks",
+      value: stats?.completed_tasks ?? 0,
+      icon: <CompletedIcon />,
+      status: "Completed",
+    },
+    {
+      title: "In Progress Task",
+      value: stats?.in_progress_tasks ?? 0,
+      icon: <ProgressIcon />,
+      status: "in_progress",
+    },
+    {
+      title: "Pending Tasks",
+      value: stats?.overdue_TasksCount ?? 0,
+      icon: <PendingIcon />,
+      status: "Overdue",
+    },
+  ];
 
   return (
     <div className="p-0 flex gap-2">
@@ -151,52 +169,40 @@ const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
             {isError ? (
               <p className="text-red-500">Error loading stats</p>
             ) : (
-              <>
-                <BigCard
-                  title="Total Tasks"
-                  value={
-                    <CountUp
-                      start={0}
-                      end={stats?.total_tasks_count ?? 0}
-                      duration={1.5}
+              dashboardCards.map((card) => {
+                const isActive =
+                  card.status &&
+                  new URLSearchParams(location.search as string).get(
+                    "task_status"
+                  ) === card.status;
+
+                return (
+                  <div
+                    key={card.title}
+                    className={`cursor-pointer ${
+                      isActive ? "border border-purple-600 rounded-md" : ""
+                    }`}
+                    onClick={() => {
+                      navigate({
+                        to: "/tasks",
+                        search: {
+                          page: 1,
+                          page_size: pageSizeParam,
+                          task_status: card.status || undefined,
+                        },
+                      });
+                    }}
+                  >
+                    <BigCard
+                      title={card.title}
+                      value={
+                        <CountUp start={0} end={card.value} duration={1.5} />
+                      }
+                      icon={card.icon}
                     />
-                  }
-                  icon={<TotalTaskIcon />}
-                />
-                <BigCard
-                  title="Completed Tasks"
-                  value={
-                    <CountUp
-                      start={0}
-                      end={stats?.completed_tasks ?? 0}
-                      duration={1.5}
-                    />
-                  }
-                  icon={<CompletedIcon />}
-                />
-                <BigCard
-                  title="In Progress Task"
-                  value={
-                    <CountUp
-                      start={0}
-                      end={stats?.in_progress_tasks ?? 0}
-                      duration={1.5}
-                    />
-                  }
-                  icon={<ProgressIcon />}
-                />
-                <BigCard
-                  title="Pending Tasks"
-                  value={
-                    <CountUp
-                      start={0}
-                      end={stats?.overdue_TasksCount ?? 0}
-                      duration={1.5}
-                    />
-                  }
-                  icon={<PendingIcon />}
-                />
-              </>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -216,21 +222,18 @@ const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
               <CountUp end={todaystats?.total_tasks_count ?? 0} duration={1} />
             </span>
           </span>
-
           <span className="text-gray-600 font-normal">
             InProgress{" "}
             <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.in_progress_tasks ?? 0} duration={1} />
             </span>
           </span>
-
           <span className="text-gray-600 font-normal">
             Completed{" "}
             <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
               <CountUp end={todaystats?.completed_tasks ?? 0} duration={1} />
             </span>
           </span>
-
           <span className="text-gray-600 font-normal">
             Pending{" "}
             <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
@@ -267,7 +270,6 @@ const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
                     </span>
                   </p>
                 </div>
-
                 <div
                   className={
                     task.task_status === "COMPLETED"
