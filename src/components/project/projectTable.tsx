@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   useReactTable,
   ColumnDef,
@@ -52,6 +52,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    setUser(storedUser);
+  }, []);
 
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: [
@@ -80,7 +86,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     if (selectedSort === `${column}:asc`) {
       setSelectedSort(`${column}:desc`);
     } else if (selectedSort === `${column}:desc`) {
-      setSelectedSort(""); // clear sort
+      setSelectedSort("");
     } else {
       setSelectedSort(`${column}:asc`);
     }
@@ -219,8 +225,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         header: "Actions",
         cell: ({ row }) => {
           const p = row.original;
+
+          // Wait until user is loaded
+          if (!user) return null;
+
           return (
             <div className="flex gap-2">
+              {/* Always show View */}
               <Button
                 title="View"
                 className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
@@ -229,28 +240,35 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               >
                 <Eye size={16} />
               </Button>
-              <Button
-                title="Edit"
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
-                variant="ghost"
-                onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
-              >
-                <Edit size={16} />
-              </Button>
-              <Button
-                title="Delete"
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
-                variant="ghost"
-                onClick={() => onDelete(p)}
-              >
-                <Trash size={16} />
-              </Button>
+
+              {/* ✅ Only show Edit/Delete if MANAGER */}
+              {user?.user_type === "MANAGER" && (
+                <>
+                  <Button
+                    title="Edit"
+                    className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                    variant="ghost"
+                    onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
+                  >
+                    <Edit size={16} />
+                  </Button>
+
+                  <Button
+                    title="Delete"
+                    className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                    variant="ghost"
+                    onClick={() => onDelete(p)}
+                  >
+                    <Trash size={16} />
+                  </Button>
+                </>
+              )}
             </div>
           );
         },
       },
     ];
-  }, [navigate, page, pageSize, selectedSort, onDelete]);
+  }, [navigate, page, pageSize, selectedSort, onDelete, user]);
 
   const table = useReactTable({
     data: projects,
@@ -407,3 +425,4 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 };
 
 export default ProjectsTable;
+
