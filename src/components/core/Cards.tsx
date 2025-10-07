@@ -20,7 +20,7 @@ const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
     bg: "bg-red-50",
     icon: <ListTodo className="text-orange-500" size={28} />,
   },
-  "Pending Tasks": {
+  "Overdue Tasks": {
     bg: "bg-emerald-50",
     icon: <RefreshCw className="text-green-500" size={28} />,
   },

@@ -150,7 +150,7 @@ const Dashboard = () => {
       status: "IN_PROGRESS",
     },
     {
-      title: "Pending Tasks",
+      title: "Overdue Tasks",
       value: stats?.overdue_TasksCount ?? 0,
       icon: <PendingIcon />,
       status: "OVERDUE",
@@ -226,7 +226,7 @@ const Dashboard = () => {
               status: "IN_PROGRESS",
             },
             {
-              label: "Pending",
+              label: "Overdue",
               count: todaystats?.overdue_TasksCount ?? 0,
               status: "OVERDUE",
             },
@@ -245,7 +245,6 @@ const Dashboard = () => {
               }`}
               onClick={() => {
                 setTodayFilter(item.status);
-                refetch();
               }}
             >
               {item.label}{" "}

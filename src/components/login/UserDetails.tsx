@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface User {
   id: number;
@@ -46,28 +47,40 @@ const UserDetails: React.FC = () => {
   return (
    <div className="w-full flex justify-start">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="flex items-center space-x-3 focus:outline-none">
-            <img
-              src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
-              alt={user.display_name || "User"}
-              className="h-12 w-12 rounded-full object-cover shadow-md"
-            />
-            <div className="text-left"> 
-              <p className="font-semibold">{user.display_name || "User"}</p>
-            </div>
-          </button>
-        </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center space-x-3 focus:outline-none cursor-pointer">
+          {/* Profile Image */}
+          <img
+            src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
+            alt={user.display_name || "User"}
+            className="h-12 w-12 rounded-full object-cover shadow-md"
+          />
 
-        <DropdownMenuContent className="w-50 bg-white border-none shadow-[0px_0px_10px_0px_rgba(0,0,0,0.1)] p-2" side="bottom" align="start">
-          <DropdownMenuItem className="p-3">
-            <span className="font-medium">Email:</span>&nbsp; {user.email}
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-3">
-            <span className="font-medium">Phone:</span>&nbsp; {user.phone}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          {/* User Info with Down Arrow */}
+          <div className="flex items-center gap-25 text-left">
+            <p className="font-semibold">{user.display_name || "User"}</p>
+            <ChevronDown size={18} className="text-gray-600 cursor-pointer" />
+          </div>
+        </button>
+      </DropdownMenuTrigger>
+
+      {/* Dropdown Content */}
+      <DropdownMenuContent
+        className="w-60 bg-white border-none shadow-[0px_0px_10px_0px_rgba(0,0,0,0.1)] p-2 rounded-lg"
+        side="bottom"
+        align="start"
+      >
+        <DropdownMenuItem className="p-3 cursor-default flex flex-col items-start">
+          <span className="font-medium text-gray-700">Email:</span>
+          <span className="text-gray-600 text-sm">{user.email || "N/A"}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="p-3 cursor-default flex flex-col items-start">
+          <span className="font-medium text-gray-700">Phone:</span>
+          <span className="text-gray-600 text-sm">{user.phone || "N/A"}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
     </div>
   );
 };

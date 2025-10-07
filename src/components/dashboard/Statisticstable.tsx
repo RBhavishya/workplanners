@@ -89,7 +89,7 @@ const Statisticstable = () => {
       accessorFn: (row: any) => row.pending_tasks,
       id: "pending",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span className="font-medium text-black">Pending</span>,
+      header: () => <span className="font-medium text-black">Overdue</span>,
     },
   ];
   const table = useReactTable({

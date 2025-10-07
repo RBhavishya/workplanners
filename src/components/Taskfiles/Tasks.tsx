@@ -286,7 +286,7 @@ const Tasks = () => {
                 icon={<ClipboardPenLine />}
               />
               <BigCard
-                title="Pending Tasks"
+                title="Overdue Tasks"
                 value={
                   <CountUp
                     start={0}

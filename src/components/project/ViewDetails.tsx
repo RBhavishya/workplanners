@@ -220,7 +220,7 @@ const Viewdetails = () => {
         </div>
 
         {/* Project Details */}
-        <div className="w-1/3 border border-gray-200 rounded-3xl p-4">
+        <div className="w-1/3 border border-gray-200 rounded-3xl p-11">
           <div className="text-2xl font-bold mb-4">Details</div>
           <div className="h-[calc(100vh-500px)] overflow-y-auto">
             {/* Created By */}
