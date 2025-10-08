@@ -5,9 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ChevronDown, Key, LogOutIcon, User } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router"; // adjust based on your router
+import { useNavigate } from "@tanstack/react-router"; // adjust router
 import { Avatar, AvatarFallback } from "../ui/avtatar";
 
 interface User {
@@ -29,15 +28,21 @@ const UserDetails: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const loadUser = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+    };
+
+    loadUser();
+
+    // Listen for profile updates
+    const handleUserUpdate = () => loadUser();
+    window.addEventListener("userUpdated", handleUserUpdate);
+
+    return () => window.removeEventListener("userUpdated", handleUserUpdate);
   }, []);
 
-  if (!user) {
-    return <p className="text-gray-500">No user data found</p>;
-  }
+  if (!user) return <p className="text-gray-500">No user data found</p>;
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -54,15 +59,9 @@ const UserDetails: React.FC = () => {
               alt={user.display_name || "User"}
               className="h-12 w-12 rounded-full object-cover shadow-md"
             />
-            <AvatarFallback>
-              {user.display_name
-                ? user.display_name.charAt(0).toUpperCase()
-                : "U"}
-            </AvatarFallback>
+            <AvatarFallback>{user.display_name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
           </Avatar>
-          <span className="font-semibold text-gray-800">
-            {user.display_name || "User"}
-          </span>
+          <span className="font-semibold text-gray-800">{user.display_name || "User"}</span>
           <ChevronDown size={18} className="text-gray-600" />
         </DropdownMenuTrigger>
 
@@ -78,13 +77,14 @@ const UserDetails: React.FC = () => {
             <User size={16} />
             <span>View Profile</span>
           </DropdownMenuItem>
+
           <DropdownMenuItem
             className="cursor-pointer flex items-center gap-2 text-gray-700 hover:bg-violet-100 transition-colors"
-            // onClick={() => navigate({ to: "/view-profile" })}
           >
             <Key size={16} />
             <span>Update Password</span>
           </DropdownMenuItem>
+
           <DropdownMenuItem
             className="cursor-pointer flex items-center gap-2 text-gray-600 hover:text-white hover:bg-red-600 transition-colors"
             onClick={handleLogout}
@@ -99,3 +99,4 @@ const UserDetails: React.FC = () => {
 };
 
 export default UserDetails;
+

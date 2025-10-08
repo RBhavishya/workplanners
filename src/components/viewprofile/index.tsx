@@ -1,12 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { toast } from "sonner";
 import { Pencil, Loader, X } from "lucide-react";
 import { getusersByIdAPI, UserUpdateAPI } from "@/https/services/users";
@@ -30,6 +24,7 @@ function ViewProfile() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Fetch user data
   const { isLoading } = useQuery({
     queryKey: ["users", userId],
     enabled: !!userId,
@@ -46,9 +41,7 @@ function ViewProfile() {
             profile_pic: data?.profile_pic,
             disignation: data?.designation,
           });
-          setUserType({
-            user_type: data?.user_type,
-          });
+          setUserType({ user_type: data?.user_type });
         } else {
           throw response;
         }
@@ -61,25 +54,36 @@ function ViewProfile() {
     },
   });
 
-  const { mutate: updateUser, isPending } = useMutation({
-    mutationFn: async (payload: any) => {
-      return await UserUpdateAPI(userId, payload);
-    },
-    onSuccess: async (res: any) => {
+  // Update user
+  const { mutate: updateUser } = useMutation({
+    mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
+    onSuccess: (res: any) => {
       if (res?.success) {
         toast.success("Profile updated successfully!");
         setIsEditing(false);
+
+        // Update localStorage
+        const updatedUser = {
+          ...storedUser,
+          display_name: userData.name,
+          email: userData.email,
+          phone: userData.phone_number,
+          designation: userData.disignation,
+          profile_pic: previewUrl || userData.profile_pic,
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        // Dispatch event for header update
+        window.dispatchEvent(new Event("userUpdated"));
       } else {
         toast.error(res?.message || "Failed to update profile");
       }
     },
-    onError: (err) => {
-      errPopper(err);
-    },
+    onError: (err) => errPopper(err),
   });
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
     if (file) {
       setPreviewUrl(URL.createObjectURL(file));
       setIsUploading(true);
@@ -88,17 +92,11 @@ function ViewProfile() {
 
   const handleRemoveFile = () => {
     setPreviewUrl(null);
-    setUserData((prev: any) => ({
-      ...prev,
-      profile_pic: "",
-    }));
+    setUserData((prev: any) => ({ ...prev, profile_pic: "" }));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData((prev: any) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setUserData((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSave = () => {
@@ -108,13 +106,10 @@ function ViewProfile() {
       phone: userData.phone_number,
       designation: userData.disignation,
     };
-
     updateUser(payload);
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
+  const handleCancel = () => setIsEditing(false);
 
   if (isLoading) {
     return (
@@ -126,12 +121,12 @@ function ViewProfile() {
   }
 
   return (
-    <Card className="flex flex-col p-4 shadow-lg rounded-lg bg-transparent shadow-none border-0">
+    <Card className="flex flex-col p-4 shadow-lg rounded-lg bg-transparent border-0">
       <CardHeader className="flex-none mb-4 md:mb-0 md:mr-4 relative bg-white border shadow p-0 rounded-md divide-y divide-gray-300 space-y-2">
         <CardTitle className="text-xl font-semibold p-2 relative">
           {!isEditing ? (
             <Button
-              className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition right-2 top-1 absolute cursor-pointer"
+              className="bg-red-600 text-white px-4 py-2 rounded-md text-sm absolute right-2 top-1 hover:bg-red-700 cursor-pointer"
               onClick={() => setIsEditing(true)}
             >
               Edit Profile
@@ -139,13 +134,13 @@ function ViewProfile() {
           ) : (
             <div className="absolute right-2 top-1 flex gap-2">
               <Button
-                className="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 transition cursor-pointer"
+                className="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 cursor-pointer"
                 onClick={handleCancel}
               >
                 Cancel
               </Button>
               <Button
-                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition cursor-pointer"
+                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 cursor-pointer"
                 onClick={handleSave}
               >
                 Save
@@ -164,10 +159,7 @@ function ViewProfile() {
             className="hidden"
           />
 
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer relative w-32 h-32"
-          >
+          <label htmlFor="file-upload" className="cursor-pointer relative w-32 h-32">
             {previewUrl ? (
               <div className="relative">
                 <img
@@ -186,21 +178,22 @@ function ViewProfile() {
                 >
                   <X className="text-white w-4 h-4" />
                 </button>
+                <span className="absolute inset-0 flex items-center justify-center w-10 h-10 bg-blue-500 text-white rounded-full">
+                  <Pencil className="w-4 h-4" />
+                </span>
               </div>
             ) : (
-              <img
-                src={
-                  userData.profile_pic && userData.profile_pic.trim() !== ""
-                    ? userData.profile_pic
-                    : "/table/profile.webp"
-                }
-                alt="User Profile"
-                className="w-32 h-32 rounded-full object-cover flex items-center justify-center border-2 border-gray-300 shadow"
-              />
+              <div className="relative">
+                <img
+                  src={userData.profile_pic?.trim() ? userData.profile_pic : "/table/profile.webp"}
+                  alt="User Profile"
+                  className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 shadow"
+                />
+                <span className="absolute inset-0 flex items-center justify-center w-10 h-10 bg-blue-500 text-white rounded-full">
+                  <Pencil className="w-4 h-4" />
+                </span>
+              </div>
             )}
-             <span className="absolute bottom-2 left-3 bg-blue-700 text-white rounded-full p-1">
-            <Pencil className="w-4 h-4" />
-          </span>
           </label>
         </div>
       </CardHeader>
@@ -211,61 +204,29 @@ function ViewProfile() {
           <div>
             <strong>Full Name:</strong>
             {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={userData.name}
-                onChange={handleInputChange}
-                className="border p-1 rounded w-full mt-1"
-              />
-            ) : (
-              <p>{userData.name || "-"}</p>
-            )}
+              <input type="text" name="name" value={userData.name} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
+            ) : <p>{userData.name || "-"}</p>}
           </div>
 
           <div>
             <strong>Email:</strong>
             {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
-                onChange={handleInputChange}
-                className="border p-1 rounded w-full mt-1"
-              />
-            ) : (
-              <p>{userData.email || "-"}</p>
-            )}
+              <input type="email" name="email" value={userData.email} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
+            ) : <p>{userData.email || "-"}</p>}
           </div>
 
           <div>
             <strong>Phone Number:</strong>
             {isEditing ? (
-              <input
-                type="text"
-                name="phone_number"
-                value={userData.phone_number}
-                onChange={handleInputChange}
-                className="border p-1 rounded w-full mt-1"
-              />
-            ) : (
-              <p>{userData.phone_number || "-"}</p>
-            )}
+              <input type="text" name="phone_number" value={userData.phone_number} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
+            ) : <p>{userData.phone_number || "-"}</p>}
           </div>
 
           <div>
             <strong>Designation:</strong>
             {isEditing ? (
-              <input
-                type="text"
-                name="disignation"
-                value={userData.disignation}
-                onChange={handleInputChange}
-                className="border p-1 rounded w-full mt-1"
-              />
-            ) : (
-              <p>{userData.disignation || "-"}</p>
-            )}
+              <input type="text" name="disignation" value={userData.disignation} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
+            ) : <p>{userData.disignation || "-"}</p>}
           </div>
 
           <div>
@@ -281,3 +242,4 @@ function ViewProfile() {
 }
 
 export default ViewProfile;
+
