@@ -1,6 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { toast } from "sonner";
 import { Pencil, Loader, X } from "lucide-react";
 import { getusersByIdAPI, UserUpdateAPI } from "@/https/services/users";
@@ -159,7 +165,10 @@ function ViewProfile() {
             className="hidden"
           />
 
-          <label htmlFor="file-upload" className="cursor-pointer relative w-32 h-32">
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer relative w-32 h-32"
+          >
             {previewUrl ? (
               <div className="relative">
                 <img
@@ -185,12 +194,17 @@ function ViewProfile() {
             ) : (
               <div className="relative">
                 <img
-                  src={userData.profile_pic?.trim() ? userData.profile_pic : "/table/profile.webp"}
+                  src={
+                    userData.profile_pic?.trim()
+                      ? userData.profile_pic
+                      : "/table/profile.webp"
+                  }
                   alt="User Profile"
                   className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 shadow"
                 />
-                <span className="absolute inset-0 flex items-center justify-center w-10 h-10 bg-blue-500 text-white rounded-full">
-                  <Pencil className="w-4 h-4" />
+                <span className="absolute bottom-2 left-3 bg-blue-700 text-white rounded-full p-1">
+                  {" "}
+                  <Pencil className="w-4 h-4" />{" "}
                 </span>
               </div>
             )}
@@ -204,29 +218,61 @@ function ViewProfile() {
           <div>
             <strong>Full Name:</strong>
             {isEditing ? (
-              <input type="text" name="name" value={userData.name} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
-            ) : <p>{userData.name || "-"}</p>}
+              <input
+                type="text"
+                name="name"
+                value={userData.name}
+                onChange={handleInputChange}
+                className="border p-1 rounded w-full mt-1"
+              />
+            ) : (
+              <p>{userData.name || "-"}</p>
+            )}
           </div>
 
           <div>
             <strong>Email:</strong>
             {isEditing ? (
-              <input type="email" name="email" value={userData.email} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
-            ) : <p>{userData.email || "-"}</p>}
+              <input
+                type="email"
+                name="email"
+                value={userData.email}
+                onChange={handleInputChange}
+                className="border p-1 rounded w-full mt-1"
+              />
+            ) : (
+              <p>{userData.email || "-"}</p>
+            )}
           </div>
 
           <div>
             <strong>Phone Number:</strong>
             {isEditing ? (
-              <input type="text" name="phone_number" value={userData.phone_number} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
-            ) : <p>{userData.phone_number || "-"}</p>}
+              <input
+                type="text"
+                name="phone_number"
+                value={userData.phone_number}
+                onChange={handleInputChange}
+                className="border p-1 rounded w-full mt-1"
+              />
+            ) : (
+              <p>{userData.phone_number || "-"}</p>
+            )}
           </div>
 
           <div>
             <strong>Designation:</strong>
             {isEditing ? (
-              <input type="text" name="disignation" value={userData.disignation} onChange={handleInputChange} className="border p-1 rounded w-full mt-1" />
-            ) : <p>{userData.disignation || "-"}</p>}
+              <input
+                type="text"
+                name="disignation"
+                value={userData.disignation}
+                onChange={handleInputChange}
+                className="border p-1 rounded w-full mt-1"
+              />
+            ) : (
+              <p>{userData.disignation || "-"}</p>
+            )}
           </div>
 
           <div>
@@ -242,4 +288,3 @@ function ViewProfile() {
 }
 
 export default ViewProfile;
-
