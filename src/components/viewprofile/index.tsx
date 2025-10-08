@@ -69,7 +69,6 @@ function ViewProfile() {
       if (res?.success) {
         toast.success("Profile updated successfully!");
         setIsEditing(false);
-        // refetch();
       } else {
         toast.error(res?.message || "Failed to update profile");
       }
@@ -140,13 +139,13 @@ function ViewProfile() {
           ) : (
             <div className="absolute right-2 top-1 flex gap-2">
               <Button
-                className="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 transition"
+                className="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 transition cursor-pointer"
                 onClick={handleCancel}
               >
                 Cancel
               </Button>
               <Button
-                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition"
+                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition cursor-pointer"
                 onClick={handleSave}
               >
                 Save
@@ -199,6 +198,9 @@ function ViewProfile() {
                 className="w-32 h-32 rounded-full object-cover flex items-center justify-center border-2 border-gray-300 shadow"
               />
             )}
+             <span className="absolute bottom-2 left-3 bg-blue-700 text-white rounded-full p-1">
+            <Pencil className="w-4 h-4" />
+          </span>
           </label>
         </div>
       </CardHeader>
