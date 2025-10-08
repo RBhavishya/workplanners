@@ -146,6 +146,16 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
     }
   }, [userResp, mode]);
 
+  const clearFieldError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -191,7 +201,10 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           type="text"
           placeholder="Enter Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            clearFieldError("display_name");
+          }}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.display_name && (
@@ -211,7 +224,10 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             id="email"
             placeholder="Enter Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clearFieldError("email");
+            }}
             className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
           />
           {errors.email && (
@@ -232,6 +248,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             onChange={(e) => {
               const value = e.target.value.replace(/\D/g, "").slice(0, 10);
               setPhone(value);
+              clearFieldError("phone");
             }}
             className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
           />
@@ -254,7 +271,10 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               placeholder="Enter Password"
               value={password}
               name="password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                clearFieldError("password");
+              }}
               type="text"
               autoComplete="off"
               style={
@@ -323,6 +343,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
                   onClick={() => {
                     setDesignation(option);
                     setDesignationPopoverOpen(false);
+                    clearFieldError("designation");
                   }}
                 >
                   <span>{option}</span>

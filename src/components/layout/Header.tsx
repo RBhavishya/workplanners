@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Bell } from 'lucide-react';
-import UserDetails from '../login/UserDetails';
-import { useLocation } from '@tanstack/react-router';
-
-
+import React, { useEffect, useState } from "react";
+import { Search, Bell } from "lucide-react";
+import UserDetails from "../login/UserDetails";
+import { useLocation } from "@tanstack/react-router";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
 };
 
 const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
-  const [time, setTime] = useState(new Date('2025-09-12T13:43:00+05:30'));
+  const [time, setTime] = useState(new Date("2025-09-12T13:43:00+05:30"));
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -18,24 +16,25 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
 
   const location = useLocation();
 
-  const formattedTime = time.toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  const formattedTime = time.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: false,
-    timeZone: 'Asia/Kolkata',
+    timeZone: "Asia/Kolkata",
   });
-  const formattedDate = time.toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'Asia/Kolkata',
+  const formattedDate = time.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    timeZone: "Asia/Kolkata",
   });
 
   const defaultCenter =
-  location.pathname === "/dashboard" ? (
-    <div className="flex-1 max-w-md mx-2">
-      {/* <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
+    location.pathname === "/dashboard" ? (
+      <div className="flex-1 max-w-md mx-2">
+        {/* <div className='border-b p-3'> <UserDetails/></div> */}
+        {/* <div className="flex items-center bg-purple-50 border border-purple-200 rounded-full p-2">
         <Search className="w-5 h-5 text-purple-500 mr-2" />
         <input
           type="text"
@@ -43,8 +42,8 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
           className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500"
         />
       </div> */}
-    </div>
-  ) : null;
+      </div>
+    ) : null;
 
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
@@ -57,17 +56,19 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
       "
     >
       {centerContent}
-      <div className="flex items-center space-x-6">
-        {/* <div className="text-right border-r-2 border-gray-200 pr-4 border-l-2 pl-4">
-          <p className="text-lg font-semibold text-gray-800">{formattedTime}</p>
-          <p className="text-sm text-gray-500">{formattedDate}</p>
-        </div> */}
-        {/* <div className="relative">
-          <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
-          <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">
-            33
-          </span>
-        </div> */}
+      <div className="flex items-center justify-end w-full pr-6">
+        <div className="flex items-center space-x-6">
+          {/* Optional: Notification / Date / Time sections */}
+          {/* <div className="relative">
+      <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
+      <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">
+        33
+      </span>
+    </div> */}
+
+          {/* User Profile Dropdown */}
+          <UserDetails />
+        </div>
       </div>
     </header>
   );

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LayoutViewProfileIndexRouteImport } from './routes/_layout/view-profile/index'
 import { Route as LayoutUsersIndexRouteImport } from './routes/_layout/users/index'
 import { Route as LayoutTasksIndexRouteImport } from './routes/_layout/tasks/index'
 import { Route as LayoutProjectsIndexRouteImport } from './routes/_layout/projects/index'
@@ -33,6 +34,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutViewProfileIndexRoute = LayoutViewProfileIndexRouteImport.update({
+  id: '/view-profile/',
+  path: '/view-profile/',
+  getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutUsersIndexRoute = LayoutUsersIndexRouteImport.update({
   id: '/users/',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof LayoutProjectsIndexRoute
   '/tasks': typeof LayoutTasksIndexRoute
   '/users': typeof LayoutUsersIndexRoute
+  '/view-profile': typeof LayoutViewProfileIndexRoute
   '/projects/$id': typeof LayoutProjectsIdIndexRoute
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/projects': typeof LayoutProjectsIndexRoute
   '/tasks': typeof LayoutTasksIndexRoute
   '/users': typeof LayoutUsersIndexRoute
+  '/view-profile': typeof LayoutViewProfileIndexRoute
   '/projects/$id': typeof LayoutProjectsIdIndexRoute
   '/projects/add': typeof LayoutProjectsAddIndexRoute
   '/projects/table': typeof LayoutProjectsTableIndexRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/_layout/projects/': typeof LayoutProjectsIndexRoute
   '/_layout/tasks/': typeof LayoutTasksIndexRoute
   '/_layout/users/': typeof LayoutUsersIndexRoute
+  '/_layout/view-profile/': typeof LayoutViewProfileIndexRoute
   '/_layout/projects/$id/': typeof LayoutProjectsIdIndexRoute
   '/_layout/projects/add/': typeof LayoutProjectsAddIndexRoute
   '/_layout/projects/table/': typeof LayoutProjectsTableIndexRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/tasks'
     | '/users'
+    | '/view-profile'
     | '/projects/$id'
     | '/projects/add'
     | '/projects/table'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/tasks'
     | '/users'
+    | '/view-profile'
     | '/projects/$id'
     | '/projects/add'
     | '/projects/table'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/_layout/projects/'
     | '/_layout/tasks/'
     | '/_layout/users/'
+    | '/_layout/view-profile/'
     | '/_layout/projects/$id/'
     | '/_layout/projects/add/'
     | '/_layout/projects/table/'
@@ -224,6 +236,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_layout/view-profile/': {
+      id: '/_layout/view-profile/'
+      path: '/view-profile'
+      fullPath: '/view-profile'
+      preLoaderRoute: typeof LayoutViewProfileIndexRouteImport
+      parentRoute: typeof LayoutRoute
     }
     '/_layout/users/': {
       id: '/_layout/users/'
@@ -324,6 +343,7 @@ interface LayoutRouteChildren {
   LayoutProjectsIndexRoute: typeof LayoutProjectsIndexRoute
   LayoutTasksIndexRoute: typeof LayoutTasksIndexRoute
   LayoutUsersIndexRoute: typeof LayoutUsersIndexRoute
+  LayoutViewProfileIndexRoute: typeof LayoutViewProfileIndexRoute
   LayoutProjectsIdIndexRoute: typeof LayoutProjectsIdIndexRoute
   LayoutProjectsAddIndexRoute: typeof LayoutProjectsAddIndexRoute
   LayoutProjectsTableIndexRoute: typeof LayoutProjectsTableIndexRoute
@@ -340,6 +360,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutProjectsIndexRoute: LayoutProjectsIndexRoute,
   LayoutTasksIndexRoute: LayoutTasksIndexRoute,
   LayoutUsersIndexRoute: LayoutUsersIndexRoute,
+  LayoutViewProfileIndexRoute: LayoutViewProfileIndexRoute,
   LayoutProjectsIdIndexRoute: LayoutProjectsIdIndexRoute,
   LayoutProjectsAddIndexRoute: LayoutProjectsAddIndexRoute,
   LayoutProjectsTableIndexRoute: LayoutProjectsTableIndexRoute,

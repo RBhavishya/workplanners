@@ -208,7 +208,7 @@ const Dashboard = () => {
       </div>
 
       {/* Right Side - Today’s Task */}
-      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col overflow-auto">
+      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-80px)] overflow-auto">
         <h2 className="text-lg font-semibold mb-1">Today’s Task</h2>
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
 
@@ -256,7 +256,10 @@ const Dashboard = () => {
         </div>
 
         {/* Tasks List */}
-        <div ref={containerRef} className="space-y-4 overflow-y-auto pr-2">
+        <div
+          ref={containerRef}
+          className="space-y-4 h-[calc(100vh-250px)] overflow-y-auto pr-2"
+        >
           {isFetching && !isFetchingNextPage ? (
             <div className="flex items-center justify-center py-6">
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
