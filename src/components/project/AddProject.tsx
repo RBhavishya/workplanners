@@ -151,6 +151,16 @@ const AddProjectForm = ({
     }
   }, [open]);
 
+  const clearFieldError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
   const toggleUser = (id: number) => {
     setAssignedUsers((prev) =>
       prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
@@ -247,7 +257,10 @@ const AddProjectForm = ({
           type="text"
           placeholder="Enter Project Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            clearFieldError("title");
+          }}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.title && (
@@ -261,7 +274,11 @@ const AddProjectForm = ({
         <textarea
           placeholder="Enter Project Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          // onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            setDescription(e.target.value);
+            clearFieldError("description"); // <-- remove error as user types
+          }}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.description && (
@@ -301,8 +318,10 @@ const AddProjectForm = ({
                     setVisibleMonth(date);
                     setStartDateOpen(false);
 
+                    clearFieldError("start_date");
                     if (dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
                       setDueDate(undefined);
+                      clearFieldError("end_date");
                     }
                   }
                 }}
@@ -348,6 +367,7 @@ const AddProjectForm = ({
                     setDueDate(date);
                     setVisibleDueMonth(date);
                     setDueDateOpen(false);
+                    clearFieldError("due_date");
                   }
                 }}
                 disabled={(date) =>

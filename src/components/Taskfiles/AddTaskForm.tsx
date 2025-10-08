@@ -234,6 +234,16 @@ const AddTaskForm = ({
     }
   }, [taskResp, mode]);
 
+  const clearFieldError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
   return (
     <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
       {/* Header */}
@@ -266,7 +276,10 @@ const AddTaskForm = ({
           type="text"
           placeholder="Enter Task Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            clearFieldError("task_title"); // <-- remove error as user types
+          }}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.task_title && (
@@ -284,7 +297,11 @@ const AddTaskForm = ({
         <textarea
           placeholder="Enter Task Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          // onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            setDescription(e.target.value);
+            clearFieldError("description"); // <-- remove error as user types
+          }}
           className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.description && (
@@ -316,8 +333,8 @@ const AddTaskForm = ({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                month={visibleMonth} // control the visible month
-                onMonthChange={setVisibleMonth} // update when user navigates months
+                month={visibleMonth}
+                onMonthChange={setVisibleMonth}
                 selected={startDate}
                 onSelect={(date) => {
                   if (date) {
@@ -325,8 +342,10 @@ const AddTaskForm = ({
                     setVisibleMonth(date);
                     setStartDateOpen(false);
 
+                    clearFieldError("start_date");
                     if (dueDate && dayjs(dueDate).isBefore(dayjs(date))) {
                       setDueDate(undefined);
+                      clearFieldError("end_date");
                     }
                   }
                 }}
@@ -371,6 +390,7 @@ const AddTaskForm = ({
                     setDueDate(date);
                     setVisibleDueMonth(date); // keep calendar on selected due date
                     setDueDateOpen(false);
+                    clearFieldError("end_date");
                   }
                 }}
                 disabled={(date) =>
@@ -447,7 +467,10 @@ const AddTaskForm = ({
                       {projects.map((p: any) => (
                         <CommandItem
                           key={p.id}
-                          onSelect={() => setSelectedProject(p.id)}
+                          onSelect={() => {
+                            setSelectedProject(p.id);
+                            clearFieldError("project_id");
+                          }}
                         >
                           <span>{p.title}</span>
                           <Check
