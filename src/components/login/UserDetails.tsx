@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { ChevronDown, Key, LogOutIcon, User } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router"; // adjust based on your router
+import { Avatar, AvatarFallback } from "../ui/avtatar";
 
 interface User {
   id: number;
@@ -24,6 +26,7 @@ interface User {
 
 const UserDetails: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -36,51 +39,61 @@ const UserDetails: React.FC = () => {
     return <p className="text-gray-500">No user data found</p>;
   }
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 4 && hour < 12) return "Good Morning";
-    if (hour >= 12 && hour < 16) return "Good Afternoon";
-    if (hour >= 16 && hour < 20) return "Good Evening";
-    return "Good Night";
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate({ to: "/" });
   };
 
   return (
-   <div className="w-full flex justify-start">
+    <div className="flex justify-end w-full pr-6">
       <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="flex items-center space-x-3 focus:outline-none cursor-pointer">
-          {/* Profile Image */}
-          <img
-            src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
-            alt={user.display_name || "User"}
-            className="h-12 w-12 rounded-full object-cover shadow-md"
-          />
+        <DropdownMenuTrigger className="flex gap-2 items-center hover:cursor-pointer">
+          <Avatar>
+            <img
+              src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
+              alt={user.display_name || "User"}
+              className="h-12 w-12 rounded-full object-cover shadow-md"
+            />
+            <AvatarFallback>
+              {user.display_name
+                ? user.display_name.charAt(0).toUpperCase()
+                : "U"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="font-semibold text-gray-800">
+            {user.display_name || "User"}
+          </span>
+          <ChevronDown size={18} className="text-gray-600" />
+        </DropdownMenuTrigger>
 
-          {/* User Info with Down Arrow */}
-          <div className="flex items-center gap-25 text-left">
-            <p className="font-semibold">{user.display_name || "User"}</p>
-            <ChevronDown size={18} className="text-gray-600 cursor-pointer" />
-          </div>
-        </button>
-      </DropdownMenuTrigger>
-
-      {/* Dropdown Content */}
-      <DropdownMenuContent
-        className="w-60 bg-white border-none shadow-[0px_0px_10px_0px_rgba(0,0,0,0.1)] p-2 rounded-lg"
-        side="bottom"
-        align="start"
-      >
-        <DropdownMenuItem className="p-3 cursor-default flex flex-col items-start">
-          <span className="font-medium text-gray-700">Email:</span>
-          <span className="text-gray-600 text-sm">{user.email || "N/A"}</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="p-3 cursor-default flex flex-col items-start">
-          <span className="font-medium text-gray-700">Phone:</span>
-          <span className="text-gray-600 text-sm">{user.phone || "N/A"}</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent
+          className="bg-white shadow-[0_0_10px_rgba(0,0,0,0.1)] border-none p-2 rounded-md w-44"
+          align="end"
+          side="bottom"
+        >
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 text-gray-700 hover:bg-violet-100 transition-colors"
+            onClick={() => navigate({ to: "/view-profile" })}
+          >
+            <User size={16} />
+            <span>View Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 text-gray-700 hover:bg-violet-100 transition-colors"
+            // onClick={() => navigate({ to: "/view-profile" })}
+          >
+            <Key size={16} />
+            <span>Update Password</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 text-gray-600 hover:text-white hover:bg-red-600 transition-colors"
+            onClick={handleLogout}
+          >
+            <LogOutIcon size={16} />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

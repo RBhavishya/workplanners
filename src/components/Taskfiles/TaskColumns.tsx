@@ -1,5 +1,11 @@
 import dayjs from "dayjs";
 import { Edit, Eye, Trash } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -31,13 +37,29 @@ export const taskColumns = [
       </div>
     ),
     cell: (info: any) => {
-      const title = info.getValue() || "-"; // fallback
+      const title = info.getValue() || "-";
       return (
-        <div className="flex items-center gap-2" style={{ textAlign: "left" }}>
-          <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold shrink-0">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
-          <span className="capitalize font-medium">{title}</span>
+
+          {/* Tooltip for long text */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className="capitalize font-medium truncate max-w-[150px] cursor-default"
+                  title={title} // fallback for browsers without tooltip lib
+                >
+                  {title}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{title}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       );
     },

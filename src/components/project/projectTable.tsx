@@ -124,64 +124,82 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         accessorKey: "project_name",
         cell: ({ row }) => {
           const p = row.original;
+          const name = p.project_name || "-";
+
           return (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
-                {p.project_name?.charAt(0).toUpperCase()}
+              <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold shrink-0">
+                {name !== "-" ? name.charAt(0).toUpperCase() : "-"}
               </div>
-              <span className="font-medium">{p.project_name}</span>
+
+              {/* Tooltip for long project names */}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="font-medium truncate max-w-[160px] cursor-default"
+                      title={name} // fallback native tooltip
+                    >
+                      {name}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           );
         },
       },
-     {
-  header: "Assigned Users",
-  accessorKey: "users",
-  cell: ({ row }) => {
-    const users = row.original.users || [];
-    if (users.length === 0)
-      return <span className="text-black-400 text-sm">-</span>;
+      {
+        header: "Assigned Users",
+        accessorKey: "users",
+        cell: ({ row }) => {
+          const users = row.original.users || [];
+          if (users.length === 0)
+            return <span className="text-black-400 text-sm">-</span>;
 
-    const visibleUsers = users.slice(0, 3);
-    const remainingUsers = users.slice(3);
+          const visibleUsers = users.slice(0, 3);
+          const remainingUsers = users.slice(3);
 
-    return (
-      <div className="flex -space-x-2 items-center">
-        {visibleUsers.map((u: any) => (
-          <div
-            key={u.user_id}
-            className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
-            title={u.display_name}
-          >
-            {u.display_name.charAt(0).toUpperCase()}
-          </div>
-        ))}
-
-        {remainingUsers.length > 0 && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
-                  +{remainingUsers.length}
+          return (
+            <div className="flex -space-x-2 items-center">
+              {visibleUsers.map((u: any) => (
+                <div
+                  key={u.user_id}
+                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
+                  title={u.display_name}
+                >
+                  {u.display_name.charAt(0).toUpperCase()}
                 </div>
-              </TooltipTrigger>
-              <TooltipContent
-                className="max-h-[150px] overflow-y-auto bg-white text-gray-700 rounded-md shadow-md p-2"
-                side="top"
-              >
-                <div className="flex flex-col gap-1">
-                  {remainingUsers.map((u: any) => (
-                    <span key={u.user_id}>{u.display_name}</span>
-                  ))}
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-    );
-  },
-},
+              ))}
+
+              {remainingUsers.length > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
+                        +{remainingUsers.length}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="max-h-[150px] overflow-y-auto bg-white text-gray-700 rounded-md shadow-md p-2"
+                      side="top"
+                    >
+                      <div className="flex flex-col gap-1">
+                        {remainingUsers.map((u: any) => (
+                          <span key={u.user_id}>{u.display_name}</span>
+                        ))}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          );
+        },
+      },
       {
         header: () => (
           <div
@@ -431,4 +449,3 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 };
 
 export default ProjectsTable;
-

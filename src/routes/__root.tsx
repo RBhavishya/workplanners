@@ -1,13 +1,13 @@
 /// <reference types="vite/client" />;
-import type { ReactNode } from 'react'
+import appCss from '@/styles/app.css?url'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
-  Outlet,
   createRootRoute,
   HeadContent,
+  Outlet,
   Scripts,
 } from '@tanstack/react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import appCss from '@/styles/app.css?url'
+import type { ReactNode } from 'react'
 import { Toaster } from 'sonner'
 
 const queryClient = new QueryClient()
@@ -27,7 +27,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient} >
         <Outlet />
        <Toaster richColors closeButton position="top-right" />
       </QueryClientProvider>
