@@ -67,6 +67,8 @@ const UsersDetais = () => {
 
       return response;
     },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
   const users =
     addSerial(
@@ -169,21 +171,21 @@ const UsersDetais = () => {
         const isActive = rowData.user_status === "ACTIVE"; // check user status
 
         return (
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {/* Edit button */}
             <Button
               title="Edit"
               size="sm"
               variant="ghost"
               disabled={!isActive} // disabled if INACTIVE
-              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
             >
               <img
                 src="/table/editicon.svg"
                 alt="edit"
-                height={18}
-                width={18}
+                height={16}
+                width={16}
               />
             </Button>
 
@@ -193,7 +195,7 @@ const UsersDetais = () => {
               size="sm"
               variant="ghost"
               disabled={!isActive} // disabled if INACTIVE
-              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => {
                 setUserToResetPassword(rowData.id);
                 setResetPasswordDialogOpen(true);
@@ -202,8 +204,8 @@ const UsersDetais = () => {
               <img
                 src="/table/resetpassword.svg"
                 alt="reset"
-                height={18}
-                width={18}
+                height={16}
+                width={16}
               />
             </Button>
 
@@ -212,7 +214,7 @@ const UsersDetais = () => {
               title="Delete"
               size="sm"
               variant="ghost"
-              className="p-0 rounded-md w-[27px] h-[27px] border flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
+              className="p-0 rounded-md  border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
               onClick={() => {
                 setUserToDelete(rowData.id);
                 setDeleteDialogOpen(true);
@@ -221,8 +223,8 @@ const UsersDetais = () => {
               <img
                 src="/table/deleteicon.svg"
                 alt="delete"
-                height={18}
-                width={18}
+                height={16}
+                width={16}
               />
             </Button>
           </div>
@@ -231,7 +233,7 @@ const UsersDetais = () => {
     },
   ];
   return (
-    <div className="card-container shadow-all border p-3 rounded-xl bg-white">
+    <div className="card-container shadow-all border-none p-2 rounded-xl bg-white m-2">
       <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center my-2 gap-3">
           <TaskSearchFilter

@@ -105,7 +105,7 @@ const TanStackTable: FC<pageProps> = ({
         {/* Scroll container */}
         <div
           className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
-      ${location.pathname.includes("tasks") ? "h-[calc(100vh-293px)]" : "h-[calc(100vh-240px)]"}`}
+      ${location.pathname.includes("tasks") ? "h-[calc(100vh-293px)]" : "h-[calc(100vh-185px)]"}`}
         >
           <Table className="w-full text-sm table-fixed">
             {/* Sticky Header */}
@@ -151,7 +151,7 @@ const TanStackTable: FC<pageProps> = ({
             className={`${
               location.pathname.includes("tasks")
                 ? "h-[calc(100vh-340px)] overflow-y-auto"
-                : "h-[calc(100vh-290px)] overflow-y-auto"
+                : "h-[calc(100vh-230px)] overflow-y-auto"
             }`}
           >
             <Table className="w-full text-sm  table-fixed">
@@ -161,13 +161,13 @@ const TanStackTable: FC<pageProps> = ({
                     <TableRow
                       key={row.id}
                       className={`${
-                        rowIndex % 2 === 0 ? "bg-slate-50" : "bg-white"
+                        rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
                       } hover:bg-gray-50 border-none`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className="text-sm 3xl:!text-base p-0.5 px-2"
+                          className="text-sm 3xl:!text-base p-0.5 px-2 !h-9"
                           style={{
                             minWidth: getWidth(cell.column.columnDef.id),
                             width: getWidth(cell.column.columnDef.id),

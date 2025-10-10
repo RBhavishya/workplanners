@@ -179,7 +179,7 @@ const Statisticstable = () => {
                     <tr
                       key={row.id}
                       className={`rounded-md shadow-none ${
-                        row.index % 2 === 0 ? "bg-slate-50" : "bg-white"
+                        row.index % 2 === 0 ? "bg-slate-100" : "bg-white"
                       }`}
                     >
                       {row.getVisibleCells().map((cell) => (

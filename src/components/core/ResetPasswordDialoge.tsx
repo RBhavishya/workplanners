@@ -89,7 +89,7 @@ const ResetPasswordDialog = ({
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800"
             >
-              {passwordVisible ? <Eye /> : <EyeOff />}
+              {passwordVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
             </button>
           </div>
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -100,7 +100,7 @@ const ResetPasswordDialog = ({
             <Button
             type="button"
             variant="default"
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-sm flex items-center gap-2 cursor-pointer font-normal"
             onClick={handleConfirm}
             disabled={resetLoading}
           >
@@ -113,7 +113,7 @@ const ResetPasswordDialog = ({
           {/* Cancel Button */}
           <Button
             type="button"
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2 border rounded-sm hover:bg-gray-100 disabled:opacity-50 cursor-pointer shadow-none font-normal"
             variant="outline"
             onClick={onCancelClick}
             disabled={resetLoading}

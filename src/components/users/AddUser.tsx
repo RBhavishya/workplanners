@@ -8,6 +8,7 @@ import {
   UserUpdateAPI,
 } from "@/https/services/users"; // <-- make sure updateUserAPI exists
 import {
+  ArrowLeft,
   Check,
   CheckCircle,
   ChevronDown,
@@ -165,20 +166,20 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   };
 
   return (
-    <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
-      <div className="flex items-center justify-start gap-3 mb-4">
-        <span>
+    <div className="mt-6 p-4 bg-white shadow rounded-xl border-none max-w-120 mx-auto">
+      <div className="flex items-center justify-start mb-4">
+      <span className="flex items-center">
           <button
             onClick={handleNavigation}
-            className="px-2 py-2 text-gray rounded cursor-pointer"
+            className="text-gray rounded cursor-pointer mr-2"
           >
-            <MoveLeft className="mr-2" size={20} />
+            <ArrowLeft size={20} />
           </button>
         </span>
         <span>
           <h2
-            className={`text-lg font-semibold ml-30 ${
-              mode === "edit" ? "text-gray-800" : "text-purple-600"
+            className={`text-lg font-medium ${
+              mode === "edit" ? "text-gray-800" : "text-purple-500"
             }`}
           >
             {mode === "edit" ? "Edit User" : "Add User"}
@@ -194,18 +195,18 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
 
       {/* Name */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className="text-sm font-normal text-neutral-500">
           Name <span className="text-red-500">*</span>
         </label>
         <Input
           type="text"
-          placeholder="Enter Name"
+          placeholder="Enter name"
           value={name}
           onChange={(e) => {
             setName(e.target.value);
             clearFieldError("display_name");
           }}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
         />
         {errors.display_name && (
           <p className="text-red-500 text-xs mt-1">
@@ -217,7 +218,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       {/* Email + Phone */}
       <div className="flex gap-4 mb-4">
         <div className="flex flex-col gap-2 w-1/2">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-normal text-neutral-500">
             Email <span className="text-red-500">*</span>
           </label>
           <Input
@@ -228,7 +229,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               setEmail(e.target.value);
               clearFieldError("email");
             }}
-            className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
           />
           {errors.email && (
             <p className="text-red-500 text-xs mt-1">
@@ -238,7 +239,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </div>
 
         <div className="flex flex-col gap-2 w-1/2">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-normal text-neutral-500">
             Phone <span className="text-red-500">*</span>
           </label>
           <Input
@@ -250,7 +251,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               setPhone(value);
               clearFieldError("phone");
             }}
-            className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
           />
           {errors.phone && (
             <p className="text-red-500 text-xs mt-1">
@@ -261,12 +262,12 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       </div>
       {mode === "create" && (
         <div className="mb-4">
-          <label className="block text-sm mb-1">
+          <label className="block text-sm mb-1 font-normal text-neutral-500">
             Password <span className="text-red-500">*</span>
           </label>
           <div className="relative w-full">
             <Input
-              className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
               id="password"
               placeholder="Enter Password"
               value={password}
@@ -288,7 +289,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800 cursor-pointer"
             >
-              {passwordVisible ? <Eye /> : <EyeOff />}
+              {passwordVisible ? <Eye className="w-4 h-4 text-purple-300"/> : <EyeOff className="w-4 h-4 text-purple-300"/>}
             </button>
           </div>
           {errors?.password && (
@@ -297,7 +298,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </div>
       )}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className="text-sm font-normal text-neutral-500">
           Designation <span className="text-red-500">*</span>
         </label>
 
@@ -308,7 +309,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           <PopoverTrigger asChild>
             <div
               ref={triggerRef}
-              className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+              className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer"
             >
               {designation ? (
                 <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
@@ -319,27 +320,22 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
                   </button>
                 </div>
               ) : (
-                <span className="text-gray-400">Select designation...</span>
+                <span className="text-purple-300 !font-normal">Select designation...</span>
               )}
-              <ChevronDown />
+              <ChevronDown className="text-purple-300"/>
             </div>
           </PopoverTrigger>
 
           <PopoverContent
             align="start" // align left to the trigger
             sideOffset={4} // optional spacing from trigger
-            style={{
-              width: designationTriggerWidth
-                ? `${designationTriggerWidth}px`
-                : "auto",
-            }}
-            className="p-0"
+            className="p-2 max-w-150"
           >
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-40 overflow-y-auto">
               {["FrontendDeveloper", "BackendDeveloper", "QA"].map((option) => (
                 <div
                   key={option}
-                  className="cursor-pointer p-2 rounded hover:bg-gray-100 flex items-center justify-between"
+                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
                   onClick={() => {
                     setDesignation(option);
                     setDesignationPopoverOpen(false);
@@ -363,11 +359,11 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         )}
       </div>
       {/* Buttons */}
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end gap-2 mt-8">
         <Button
           onClick={handleNavigation}
           variant="outline"
-          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 border border-purple-300 rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer shadow-none font-normal"
           disabled={createMutation.isPending || updateMutation.isPending}
         >
           Cancel
@@ -376,7 +372,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         <Button
           onClick={handleSave}
           variant="default"
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
+          className="px-6 py-2 bg-purple-600 text-white rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 shadow-none font-normal"
           disabled={createMutation.isPending || updateMutation.isPending}
         >
           {(createMutation.isPending || updateMutation.isPending) && (

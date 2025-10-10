@@ -77,6 +77,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         project_status: selectedStatus,
         search_string: debouncedSearch,
       }),
+      retry: false,
+      refetchOnWindowFocus: false,
   });
 
   const projects = data?.data?.data?.records || [];
@@ -128,7 +130,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
           return (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold shrink-0">
+              <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
                 {name !== "-" ? name.charAt(0).toUpperCase() : "-"}
               </div>
 
@@ -168,7 +170,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               {visibleUsers.map((u: any) => (
                 <div
                   key={u.user_id}
-                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white border-2 border-white"
+                  className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-[11px] font-medium text-white border-2 border-white"
                   title={u.display_name}
                 >
                   {u.display_name.charAt(0).toUpperCase()}
@@ -179,7 +181,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-bold text-white border-2 border-white cursor-pointer">
+                      <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-medium text-white border-2 border-white cursor-pointer">
                         +{remainingUsers.length}
                       </div>
                     </TooltipTrigger>
@@ -258,7 +260,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               {/* Always show View */}
               <Button
                 title="View"
-                className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                className="p-0 text-gray-600 cursor-pointer"
                 variant="ghost"
                 onClick={() => navigate({ to: `/projects/${p.id}` })}
               >
@@ -270,7 +272,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 <>
                   <Button
                     title="Edit"
-                    className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                    className="p-0 text-gray-600 cursor-pointer"
                     variant="ghost"
                     onClick={() => navigate({ to: `/projects/edit/${p.id}` })}
                   >
@@ -279,7 +281,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
                   <Button
                     title="Delete"
-                    className="border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+                    className="p-0 text-gray-600 cursor-pointer"
                     variant="ghost"
                     onClick={() => onDelete(p)}
                   >
@@ -307,14 +309,14 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   }
 
   return (
-    <div className="border rounded-xl overflow-hidden h-[calc(100vh-220px)] flex flex-col">
+    <div className="border-none rounded-xl overflow-hidden h-[calc(100vh-120px)] flex flex-col bg-white">
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm border-collapse">
-          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-gray-600 text-xs font-semibold">
+          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-neutral-400 text-sm">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
-                  <th key={header.id} className="px-4 py-3">
+                  <th key={header.id} className="px-4 py-3 font-medium">
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -348,9 +350,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50">
+                <tr key={row.id} 
+                className={`${
+                  row.index % 2 === 0 ? "bg-slate-100" : "bg-white"
+                } hover:bg-gray-50 border-none`}>
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3">
+                    <td key={cell.id} className="!h-10 px-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -366,7 +371,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
       {/* Pagination */}
       {pagination && (
-        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t ">
+        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t">
           <span>
             Page {pagination.current_page} of {pagination.total_pages}
           </span>

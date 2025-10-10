@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreVertical, Filter, LayoutGrid, List, X } from "lucide-react";
+import { MoreVertical, Filter, LayoutGrid, List, X, Plus } from "lucide-react";
 import { ProjectData } from "@/interfaces/project";
 import { getAllPaginatedProjects } from "@/https/services/project";
 import DeleteProject from "./DeleteProject";
@@ -84,6 +84,8 @@ const Projects = () => {
       });
       return response;
     },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const projectsData =
@@ -134,20 +136,20 @@ const Projects = () => {
   }, [pagination, viewMode, selectedSort, selectedStatus, debouncedSearch]);
 
   return (
-    <div className="relative overflow-x-auto border rounded-xl p-4 h-[calc(100vh-110px)] flex flex-col">
+    <div className="relative overflow-x-auto rounded-xl p-2 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-        <h2 className="font-bold text-2xl">Projects</h2>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 className="font-medium text-xl 3xl:!text-2xl">Projects</h2>
 
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Search */}
-          <div className="relative w-64 h-10 border border-[#D1D1D1] bg-[#F6F6F6] rounded-sm shadow-none flex items-center px-2">
+          <div className="relative w-80 h-7 border border-neutral-300 bg-white rounded-sm shadow-none flex items-center px-2">
             <Input
               type="search"
               value={search_string}
               onChange={(e) => setSearchString(e.target.value)}
               placeholder="Search by Title"
-              className="pl-3 pr-8 h-full w-full border-none rounded text-black font-normal text-sm 3xl:!text-base shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-sm"
+              className="pl-2 pr-4 h-full w-full border-none rounded-sm text-black font-normal text-sm 3xl:!text-base shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-sm"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2">
               <SearchIcon className="w-5 h-5 text-gray-500" />
@@ -157,7 +159,7 @@ const Projects = () => {
           {/* Status Filter */}
           <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
+              <button className="flex items-center gap-2 border border-neutral-300 bg-white px-2 py-1 rounded-sm cursor-pointer text-sm h-7">
                 <div className="flex items-center gap-2">
                   <Filter className="text-purple-500" size={16} />
                   <span>{selectedStatus || "Sort by"}</span>
@@ -197,16 +199,16 @@ const Projects = () => {
           </Popover>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center bg-white p-0.5">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg cursor-pointer ${viewMode === "grid" ? "bg-purple-100 text-purple-600" : ""}`}
+              className={`p-1 cursor-pointer ${viewMode === "grid" ? "text-white bg-violet-600" : ""}`}
             >
               <LayoutGrid size={18} />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-2 rounded-lg cursor-pointer ${viewMode === "table" ? "bg-purple-100 text-purple-600" : ""}`}
+              className={`p-1 cursor-pointer ${viewMode === "table" ? "text-white bg-violet-600" : ""}`}
             >
               <List size={18} />
             </button>
@@ -216,15 +218,13 @@ const Projects = () => {
           {user?.user_type !== "EMPLOYEE" && (
             <Button
               onClick={handleNavigation}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg cursor-pointer"
+              className="px-2 py-0 h-7 bg-violet-600 hover:bg-violet-700 text-white rounded-sm cursor-pointer font-light"
             >
-              + New Project
+              <Plus /> New Project
             </Button>
           )}
         </div>
       </div>
-
-      <hr className="mb-4" />
 
       {/* Projects Section */}
       {viewMode === "grid" ? (
@@ -232,9 +232,9 @@ const Projects = () => {
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-purple-600 rounded-full animate-spin"></div>
             </div>
-          )}
+          )} 
 
           {/* Grid Cards */}
           {projectsData.length === 0 && !isLoading ? (
@@ -242,16 +242,27 @@ const Projects = () => {
               No projects available.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-290px)] overflow-y-auto lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-165px)] overflow-y-auto lg:grid-cols-4 gap-4">
               {projectsData.map((project: ProjectData) => (
                 <Card
                   key={project.id}
-                  className="w-full h-52 shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col justify-center items-center cursor-pointer"
+                  className="w-full shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col cursor-pointer pb-5 pt-3"
                   onClick={() => navigate({ to: `/projects/${project.id}` })}
                 >
-                  {/* Menu */}
-                  {user?.user_type !== "EMPLOYEE" && (
-                    <div className="absolute top-3 right-3">
+            
+                  {/* Card Content */}
+                  <CardContent className="flex flex-col px-4 gap-3">
+                    <div className="flex gap-1 items-center justify-between">
+                      <div className="flex items-center">
+                    <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
+                      {project.title?.charAt(0).toUpperCase() || "?"}
+                    </div>
+                    <h2 className="text-base 3xl:!text-lg font-medium break-words text-center px-2 capitalize">
+                      {project.title || "Untitled"}
+                    </h2>
+                    </div>
+                    {user?.user_type !== "EMPLOYEE" && (
+                    <div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
@@ -282,23 +293,15 @@ const Projects = () => {
                       </DropdownMenu>
                     </div>
                   )}
-
-                  {/* Card Content */}
-                  <CardContent className="flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white font-bold text-xl mb-4">
-                      {project.title?.charAt(0).toUpperCase() || "?"}
                     </div>
-                    <h2 className="text-lg font-semibold break-words text-center px-2">
-                      {project.title || "Untitled"}
-                    </h2>
                     <span
-                      className={`mt-2 text-xs px-3 py-1 rounded-full font-medium ${
+                      className={`mt-2 text-xs px-3 py-1 rounded-md font-medium w-fit ${
                         statusColors[
                           project.project_status?.toUpperCase() || ""
                         ] || "bg-gray-100 text-gray-700"
                       }`}
                     >
-                      {project.project_status || "Unknown"}
+                      {project.project_status || ""}
                     </span>
                   </CardContent>
                 </Card>
@@ -307,7 +310,7 @@ const Projects = () => {
           )}
 
           {/* Pagination */}
-          <div className="w-full flex justify-center mt-4">
+          <div className="w-full flex justify-center bg-white mt-2">
             <TasksPagination
               paginationDetails={
                 data?.data?.data?.pagination_info || {

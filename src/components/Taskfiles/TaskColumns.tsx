@@ -49,7 +49,7 @@ export const taskColumns = [
             <Tooltip>
               <TooltipTrigger asChild>
                 <span
-                  className="capitalize font-normal truncate max-w-[150px] cursor-default"
+                  className="capitalize font-medium truncate max-w-[150px] cursor-default"
                   title={title} // fallback for browsers without tooltip lib
                 >
                   {title}
@@ -100,9 +100,9 @@ export const taskColumns = [
       return (
         <div className="flex justify-start">
           <span
-            className={`px-2 py-0.5 rounded-full !text-xs font-normal capitalize ${colorClass}`}
+            className={`px-2 py-0.5 rounded-md !text-xs font-medium capitalize ${colorClass}`}
           >
-            {status.charAt(0).toUpperCase()+status.slice(1).toLowerCase()}
+            {status || "-"}
           </span>
         </div>
       );
