@@ -7,6 +7,7 @@ import {
   X,
   Check,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -244,16 +245,21 @@ const AddTaskForm = ({
     }
   };
 
+  const Form_STYLES = {
+    label: "text-sm font-normal text-neutral-500",
+    input: "w-full border text-sm border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+  }
+
   return (
-    <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
+    <div className="mt-6 mx-auto p-4 bg-white shadow rounded-xl border-none max-w-lg">
       {/* Header */}
-      <div className="flex items-center justify-start gap-3 mb-4">
+      <div className="flex items-center justify-start mb-4">
         <button
           type="button"
           onClick={() => window.history.back()}
           className="px-2 py-2 text-gray-600 rounded cursor-pointer"
         >
-          <MoveLeft size={20} />
+          <ArrowLeft size={20} />
         </button>
         <h2 className="text-lg font-semibold">
           {mode === "edit" ? "Edit Task" : "Add Task"}
@@ -269,7 +275,7 @@ const AddTaskForm = ({
 
       {/* Task Title */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className={Form_STYLES.label}>
           Task Title <span className="text-red-500">*</span>
         </label>
         <Input
@@ -280,7 +286,7 @@ const AddTaskForm = ({
             setTitle(e.target.value);
             clearFieldError("task_title"); // <-- remove error as user types
           }}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+          className={Form_STYLES.input}
         />
         {errors.task_title && (
           <p className="text-red-500 text-xs mt-1">
@@ -291,7 +297,7 @@ const AddTaskForm = ({
 
       {/* Description */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className={Form_STYLES.label}>
           Task Description <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -302,7 +308,7 @@ const AddTaskForm = ({
             setDescription(e.target.value);
             clearFieldError("description"); // <-- remove error as user types
           }}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+          className={`${Form_STYLES.input} resize-none h-20`}
         />
         {errors.description && (
           <p className="text-red-500 text-xs mt-1">
@@ -315,19 +321,19 @@ const AddTaskForm = ({
       <div className="flex gap-4 mb-4">
         {/* Start Date */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">
+          <label className={Form_STYLES.label}>
             Start Date <span className="text-red-500">*</span>
           </label>
           <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
+                  `${Form_STYLES.input} flex gap-2 items-center`,
                   !startDate && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="h-4 w-4 text-gray-500" />
-                {startDate ? formatDate(startDate) : "Pick a date"}
+                {startDate ? formatDate(startDate) : <span className="text-purple-300">Pick a date</span>}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -363,20 +369,20 @@ const AddTaskForm = ({
 
         {/* Due Date */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">
+          <label className={Form_STYLES.label}>
             Due Date <span className="text-red-500">*</span>
           </label>
           <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
+                  `${Form_STYLES.input} flex gap-2 items-center`,
                   !dueDate && "text-muted-foreground",
                   !startDate && "opacity-50 cursor-not-allowed"
                 )}
               >
                 <CalendarIcon className="h-4 w-4 text-gray-500" />
-                {dueDate ? formatDate(dueDate) : "Pick a due date"}
+                {dueDate ? formatDate(dueDate) : <span className="text-purple-300">Pick a due date</span>}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -410,7 +416,7 @@ const AddTaskForm = ({
       {/* Select Project */}
       {mode === "create" && (
         <div className="flex flex-col gap-2 mb-4">
-          <label className="text-sm font-medium">
+          <label className={Form_STYLES.label}>
             Select Project <span className="text-red-500">*</span>
           </label>
           <Popover
@@ -420,7 +426,7 @@ const AddTaskForm = ({
             <PopoverTrigger asChild>
               <div
                 ref={triggerRef}
-                className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+                className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer"
               >
                 {selectedProject ? (
                   (() => {
@@ -442,9 +448,9 @@ const AddTaskForm = ({
                     );
                   })()
                 ) : (
-                  <span className="text-gray-400">Select project...</span>
+                  <span className="text-purple-300">Select project...</span>
                 )}
-                <ChevronDown />
+                <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
               </div>
             </PopoverTrigger>
             <PopoverContent
@@ -500,13 +506,13 @@ const AddTaskForm = ({
       {/* Assign Users (Create mode only) */}
       {mode === "create" && (
         <div className="flex flex-col gap-2 mb-4">
-          <label className="text-sm font-medium">Assign Users</label>
+          <label className={Form_STYLES.label}>Assign Users</label>
           <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
             <PopoverTrigger asChild>
-              <div className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer">
+              <div className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer">
                 <div className="flex flex-wrap gap-1">
                   {assignedUsers.length === 0 ? (
-                    <span className="text-gray-400">Select users...</span>
+                    <span className="text-purple-300">Select users...</span>
                   ) : (
                     assignedUsers.map((id) => {
                       const user = usersResp.find((u: any) => u.id === id);
@@ -536,7 +542,7 @@ const AddTaskForm = ({
                       <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
                     </button>
                   )}
-                  <ChevronDown />
+                  <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
                 </div>
               </div>
             </PopoverTrigger>
@@ -594,7 +600,7 @@ const AddTaskForm = ({
           type="button"
           variant="outline"
           onClick={handleNavigation}
-          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 border rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer font-normal shadow-none"
         >
           Cancel
         </Button>
@@ -607,8 +613,8 @@ const AddTaskForm = ({
               ? updateMutation.isPending
               : createMutation.isPending
           }
-          className={`px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2 
-    hover:bg-purple-700 
+          className={`px-6 py-2 bg-purple-600 text-white rounded-sm flex items-center gap-2 
+    hover:bg-purple-700 font-normal
     ${
       mode === "edit"
         ? updateMutation.isPending

@@ -18,7 +18,7 @@ export const usersColumns = [
     maxWidth: "50px",
     minWidth: "50px",
     cell: (props: any) => (
-      <div style={{ textAlign: "center" }}>{props.getValue()}</div>
+      <div className="pl-2">{props.getValue()}</div>
     ),
   },
   {
@@ -33,7 +33,7 @@ export const usersColumns = [
       const title = info.getValue() || "-";
       return (
         <div className="flex items-center gap-2" style={{ textAlign: "left" }}>
-          <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold">
+          <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
           <span className="capitalize font-medium">{title}</span>
@@ -73,7 +73,7 @@ export const usersColumns = [
     cell: (info: any) => {
       const title = info.getValue();
       return (
-        <div style={{ textAlign: "left" }}>
+        <div>
           <span className="capitalize">{title || "-"}</span>
         </div>
       );

@@ -105,13 +105,13 @@ const TanStackTable: FC<pageProps> = ({
         {/* Scroll container */}
         <div
           className={`w-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 relative bg-white 
-      ${location.pathname.includes("tasks") ? "h-[calc(100vh-380px)]" : "h-[calc(100vh-240px)]"}`}
+      ${location.pathname.includes("tasks") ? "h-[calc(100vh-293px)]" : "h-[calc(100vh-185px)]"}`}
         >
-          <Table className="w-full text-sm border-collapse table-fixed">
+          <Table className="w-full text-sm table-fixed">
             {/* Sticky Header */}
             <TableHeader className="sticky top-0 z-20 bg-white text-neutral-400 text-xs font-normal">
               {table?.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="border-none">
                   {headerGroup.headers.map((header: any, index: number) => (
                     <TableHead
                       key={index}
@@ -120,7 +120,7 @@ const TanStackTable: FC<pageProps> = ({
                         minWidth: getWidth(header.id),
                         width: getWidth(header.id),
                       }}
-                      className="px-4 py-2 cursor-pointer text-sm 3xl:!text-base"
+                      className="cursor-pointer text-sm 3xl:!text-base text-neutral-500"
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -150,24 +150,24 @@ const TanStackTable: FC<pageProps> = ({
           <div
             className={`${
               location.pathname.includes("tasks")
-                ? "h-[calc(100vh-420px)] overflow-y-auto"
-                : "h-[calc(100vh-290px)] overflow-y-auto"
+                ? "h-[calc(100vh-340px)] overflow-y-auto"
+                : "h-[calc(100vh-230px)] overflow-y-auto"
             }`}
           >
-            <Table className="w-full text-sm border-collapse table-fixed">
+            <Table className="w-full text-sm  table-fixed">
               <TableBody>
                 {data?.length ? (
                   table?.getRowModel().rows.map((row, rowIndex) => (
                     <TableRow
                       key={row.id}
                       className={`${
-                        rowIndex % 2 === 0 ? "bg-slate-50" : "bg-white"
-                      } hover:bg-gray-50`}
+                        rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
+                      } hover:bg-gray-50 border-none`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className="px-4 py-2 text-sm 3xl:!text-base"
+                          className="text-sm 3xl:!text-base p-0.5 px-2 !h-9"
                           style={{
                             minWidth: getWidth(cell.column.columnDef.id),
                             width: getWidth(cell.column.columnDef.id),
@@ -194,7 +194,7 @@ const TanStackTable: FC<pageProps> = ({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="p-5 text-center"
+                      className="text-center"
                     >
                       {/* Loading... */}
                     </TableCell>

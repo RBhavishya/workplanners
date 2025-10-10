@@ -18,6 +18,9 @@ const ResetPasswordDialog = ({
   onOKClick,
   resetLoading,
   error,
+  dialogTitle,
+  label_1,
+  label_2
 }: {
   open: boolean;
   label: string;
@@ -25,12 +28,15 @@ const ResetPasswordDialog = ({
   onOKClick: (newPassword: string) => void;
   resetLoading: boolean;
   error?: string;
+  dialogTitle: string;
+  label_1?: string;
+  label_2?: string;
 }) => {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const handleConfirm = () => {
-    onOKClick(password); // always pass current password (even empty if needed)
+  const handleConfirm = async () => {
+    onOKClick(password);
   };
 
   const togglePasswordVisibility = () => {
@@ -46,11 +52,12 @@ const ResetPasswordDialog = ({
 
   if (!open) return null;
 
+
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onCancelClick()}>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
             {label || "Enter a new password for this user."}
           </DialogDescription>
@@ -82,7 +89,7 @@ const ResetPasswordDialog = ({
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-800"
             >
-              {passwordVisible ? <Eye /> : <EyeOff />}
+              {passwordVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
             </button>
           </div>
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -90,23 +97,23 @@ const ResetPasswordDialog = ({
 
         <DialogFooter>
           {/* Reset Button */}
-          <Button
+            <Button
             type="button"
             variant="default"
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-sm flex items-center gap-2 cursor-pointer font-normal"
             onClick={handleConfirm}
             disabled={resetLoading}
           >
             {resetLoading && (
               <Loader2 className="animate-spin h-4 w-4 text-white" />
             )}
-            {resetLoading ? "Resetting..." : "Reset Password"}
+            {resetLoading ? `${label_1}` : `${label_2}`}
           </Button>
 
           {/* Cancel Button */}
           <Button
             type="button"
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2 border rounded-sm hover:bg-gray-100 disabled:opacity-50 cursor-pointer shadow-none font-normal"
             variant="outline"
             onClick={onCancelClick}
             disabled={resetLoading}

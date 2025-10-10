@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Search, Bell } from "lucide-react";
 import UserDetails from "../login/UserDetails";
 import { useLocation } from "@tanstack/react-router";
 
@@ -51,22 +50,12 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     <header
       className="
         flex items-center justify-between
-        px-4 bg-white border-b
-        h-18                    
+        p-2 bg-white border-b                     
       "
     >
       {centerContent}
-      <div className="flex items-center justify-end w-full pr-6">
+      <div className="flex items-center justify-end w-full">
         <div className="flex items-center space-x-6">
-          {/* Optional: Notification / Date / Time sections */}
-          {/* <div className="relative">
-      <Bell className="w-6 h-6 text-purple-500 cursor-pointer" />
-      <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] flex items-center justify-center">
-        33
-      </span>
-    </div> */}
-
-          {/* User Profile Dropdown */}
           <UserDetails />
         </div>
       </div>

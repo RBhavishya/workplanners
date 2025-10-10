@@ -43,6 +43,8 @@ const Statisticstable = () => {
         pageSize: pagination.pageSize,
         search_string: debouncedSearch,
       }),
+      refetchOnWindowFocus: false,
+      retry: false,
   });
 
   const statsData: TaskStats[] =
@@ -55,7 +57,7 @@ const Statisticstable = () => {
   const columns: ColumnDef<TaskStats>[] = [
     {
       id: "sno",
-      header: () => <span className="font-medium text-black">S.No</span>,
+      header: () => <span>S.No</span>,
       cell: ({ row }) => <span>{row.original.serial}</span>,
       size: 80,
     },
@@ -65,31 +67,31 @@ const Statisticstable = () => {
       cell: (info: any) => (
         <span className="capitalize">{info.getValue() || "-"}</span>
       ),
-      header: () => <span className="font-medium text-black">Name</span>,
+      header: () => <span>Name</span>,
     },
     {
       accessorFn: (row: any) => row.total_tasks,
       id: "total",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span className="font-medium text-black">Total Tasks</span>,
+      header: () => <span>Total Tasks</span>,
     },
     {
       accessorFn: (row: any) => row.completed_tasks,
       id: "completed",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span className="font-medium text-black">Completed</span>,
+      header: () => <span>Completed</span>,
     },
     {
       accessorFn: (row: any) => row.in_progress_tasks,
       id: "inProgress",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span className="font-medium text-black">In Progress</span>,
+      header: () => <span>In Progress</span>,
     },
     {
       accessorFn: (row: any) => row.pending_tasks,
       id: "pending",
       cell: (info: any) => <span>{info.getValue() || "-"}</span>,
-      header: () => <span className="font-medium text-black">Overdue</span>,
+      header: () => <span>Overdue</span>,
     },
   ];
   const table = useReactTable({
@@ -118,8 +120,8 @@ const Statisticstable = () => {
   }, [searchString]);
 
   return (
-    <div className="bg-white p-3 mt-2 rounded-sm shadow-none flex flex-col h-[calc(100vh-183px)]">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white p-3 mt-1 rounded-sm shadow-none flex flex-col h-[calc(100vh-170px)]">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-normal">Statistics</h2>
 
         {/* Search Filter aligned to the right */}
@@ -146,12 +148,12 @@ const Statisticstable = () => {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr
                     key={headerGroup.id}
-                    className="text-neutral-400 sticky top-0 bg-white"
+                    className="text-neutral-500 sticky top-0 bg-white"
                   >
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className="px-4 py-2 cursor-pointer font-normal text-sm 3xl:!text-base"
+                        className="px-4 py-2 cursor-pointer font-medium text-sm 3xl:!text-base"
                       >
                         {flexRender(
                           header.column.columnDef.header,
@@ -177,7 +179,7 @@ const Statisticstable = () => {
                     <tr
                       key={row.id}
                       className={`rounded-md shadow-none ${
-                        row.index % 2 === 0 ? "bg-slate-50" : "bg-white"
+                        row.index % 2 === 0 ? "bg-slate-100" : "bg-white"
                       }`}
                     >
                       {row.getVisibleCells().map((cell) => (
