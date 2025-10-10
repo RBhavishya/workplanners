@@ -18,6 +18,9 @@ const ResetPasswordDialog = ({
   onOKClick,
   resetLoading,
   error,
+  dialogTitle,
+  label_1,
+  label_2
 }: {
   open: boolean;
   label: string;
@@ -25,12 +28,15 @@ const ResetPasswordDialog = ({
   onOKClick: (newPassword: string) => void;
   resetLoading: boolean;
   error?: string;
+  dialogTitle: string;
+  label_1?: string;
+  label_2?: string;
 }) => {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const handleConfirm = () => {
-    onOKClick(password); // always pass current password (even empty if needed)
+  const handleConfirm = async () => {
+    onOKClick(password);
   };
 
   const togglePasswordVisibility = () => {
@@ -46,11 +52,12 @@ const ResetPasswordDialog = ({
 
   if (!open) return null;
 
+
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onCancelClick()}>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
             {label || "Enter a new password for this user."}
           </DialogDescription>
@@ -90,7 +97,7 @@ const ResetPasswordDialog = ({
 
         <DialogFooter>
           {/* Reset Button */}
-          <Button
+            <Button
             type="button"
             variant="default"
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 cursor-pointer"
@@ -100,7 +107,7 @@ const ResetPasswordDialog = ({
             {resetLoading && (
               <Loader2 className="animate-spin h-4 w-4 text-white" />
             )}
-            {resetLoading ? "Resetting..." : "Reset Password"}
+            {resetLoading ? `${label_1}` : `${label_2}`}
           </Button>
 
           {/* Cancel Button */}

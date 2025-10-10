@@ -51,6 +51,8 @@ const Dashboard = () => {
       const response = await getetDashboardStatsAPI();
       return response.data;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   // Today Stats
@@ -60,6 +62,8 @@ const Dashboard = () => {
       const response = await getTodayStatsAPI();
       return response.data;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   // Today Tasks with Infinite Scroll
@@ -100,6 +104,8 @@ const Dashboard = () => {
       }
       return undefined;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
@@ -158,7 +164,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="p-0 flex gap-2">
+    <div className="p-0 flex">
       {/* Left Side - Cards & Table */}
       <div className="w-3/4 m-2">
         <div className="bg-white p-2 rounded-sm shadow-none mb-2">
@@ -208,12 +214,12 @@ const Dashboard = () => {
       </div>
 
       {/* Right Side - Today’s Task */}
-      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-80px)] overflow-auto">
-        <h2 className="text-lg font-semibold mb-1">Today’s Task</h2>
+      <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
+        <h2 className="text-lg font-semibold">All Task's</h2>
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-4 text-sm font-medium">
+        <div className="flex items-center gap-2 mb-4 text-sm font-medium">
           {[
             {
               label: "All",
@@ -238,17 +244,17 @@ const Dashboard = () => {
           ].map((item) => (
             <div
               key={item.label}
-              className={`cursor-pointer px-3 py-1 rounded-md ${
+              className={`cursor-pointer p-1 rounded-md flex gap-1 ${
                 todayFilter === item.status
-                  ? "bg-purple-100 text-purple-600 font-semibold"
-                  : "bg-gray-100 text-gray-600 font-normal"
+                  ? "text-purple-600 font-semibold"
+                  : "text-gray-600 font-normal"
               }`}
               onClick={() => {
                 setTodayFilter(item.status);
               }}
             >
               {item.label}{" "}
-              <span className="text-[11px] text-white rounded-full px-2.5 py-0.5 bg-neutral-400 font-normal">
+              <span className="text-[11px] text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
                 <CountUp end={item.count} duration={1} />
               </span>
             </div>
@@ -258,9 +264,9 @@ const Dashboard = () => {
         {/* Tasks List */}
         <div
           ref={containerRef}
-          className="space-y-4 h-[calc(100vh-250px)] overflow-y-auto pr-2"
+          className="space-y-2 h-[calc(100vh-250px)] overflow-y-auto pr-2"
         >
-          {isFetching && !isFetchingNextPage ? (
+          {isFetching ? (
             <div className="flex items-center justify-center py-6">
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
               <p className="ml-2 text-sm text-gray-500">Loading tasks...</p>
@@ -279,12 +285,12 @@ const Dashboard = () => {
                 todayFilter ? task.task_status === todayFilter : true
               )
               .map((task, index) => (
-                <div key={index} className="flex items-start gap-3">
+                <div key={index} className="flex items-start gap-2">
                   <div className="flex-1">
-                    <p className="font-medium text-gray-800">
+                    <p className="font-medium text-gray-600 capitalize text-sm 3xl:text-base">
                       {task.task_title}
                     </p>
-                    <p className="text-xs font-medium text-gray-700">
+                    <p className="text-[11px] font-normal text-gray-700">
                       Due Date:{" "}
                       <span className="text-gray-500 font-normal">
                         {task.end_date

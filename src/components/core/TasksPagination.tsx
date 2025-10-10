@@ -115,14 +115,14 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
 };
 
   return (
-    <ShadCNPagination className="flex justify-between px-2 py-0">
+    <ShadCNPagination className="flex justify-between px-2 py-0 m-0">
       <PaginationContent className="px-1 py-0 flex gap-2">
         <p className="text-sm 3xl:!text-base">Total {paginationDetails?.total_records || "0"}</p>
         <Select
           value={selectedValue?.toString()}
           onValueChange={handleRowChange}
         >
-          <SelectTrigger className="w-[120px] rounded-sm !h-8">
+          <SelectTrigger className="w-[120px] rounded-sm !h-7">
             <SelectValue placeholder="Items per page" />
           </SelectTrigger>
           <SelectContent className="max-w-[100px] bg-white cursor-pointer border-none shadow-[0px_0px_0px_1px_rgba(0,0,0,0.1)]">

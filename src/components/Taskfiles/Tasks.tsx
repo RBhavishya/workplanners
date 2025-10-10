@@ -32,6 +32,9 @@ import "rsuite/dist/rsuite-no-reset.min.css";
 import CountUp from "react-countup";
 import WeeklySummary from "../core/WeakelySummary";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
+import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
+import { PendingIcon } from "../icons/Dashboard/PendingIcon";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -120,6 +123,8 @@ const Tasks = () => {
 
       return response;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const { data: stats } = useQuery({
@@ -128,6 +133,8 @@ const Tasks = () => {
       const response = await getTasksStatsAPI();
       return response.data;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const { data: summary } = useQuery({
@@ -136,6 +143,8 @@ const Tasks = () => {
       const response = await getWeaklySummaryAPI();
       return response.data;
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
@@ -185,10 +194,10 @@ const Tasks = () => {
         const rowData = info.row.original;
 
         return (
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button
               title="View"
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
               variant={"ghost"}
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
@@ -197,7 +206,7 @@ const Tasks = () => {
 
             <Button
               title="Edit"
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
               variant={"ghost"}
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
@@ -206,7 +215,7 @@ const Tasks = () => {
 
             <Button
               title="Delete"
-              className="border border-gray-400 rounded px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
               variant={"ghost"}
               onClick={() => {
                 setTaskToDelete(rowData.id);
@@ -256,11 +265,9 @@ const Tasks = () => {
   });
 
   return (
-    <div className="flex flex-col bg-gray-100 h-full overflow-hidden gap-3">
-      <div className="w-full p-2 bg-white rounded-md">
-        <h1 className="flex text-bold text-2xl">Tasks</h1>
-        <div className="flex gap-6 ">
-          <div className="flex justify-around rounded gap-1 ml-10 mt-5">
+    <div className="flex flex-col overflow-hidden gap-2 m-2 rounded-md">
+        <div className="flex gap-6 bg-white p-2 rounded-md">
+          <div className="flex justify-around rounded gap-1">
             <div className="flex flex-wrap gap-3">
               <BigCard
                 title="Total Tasks"
@@ -271,7 +278,7 @@ const Tasks = () => {
                     duration={1.5}
                   />
                 }
-                icon={<ClipboardList />}
+                icon={<TotalTaskIcon />}
               />
 
               <BigCard
@@ -283,7 +290,7 @@ const Tasks = () => {
                     duration={1.5}
                   />
                 }
-                icon={<ClipboardPenLine />}
+                icon={<ProgressIcon />}
               />
               <BigCard
                 title="Overdue Tasks"
@@ -294,15 +301,14 @@ const Tasks = () => {
                     duration={1.5}
                   />
                 }
-                icon={<FileClock />}
+                icon={<PendingIcon />}
               />
             </div>
           </div>
           <WeeklySummary data={summary} />
         </div>
-      </div>
       <div className="bg-white rounded-md ">
-        <div className="flex justify-end items-center my-2 gap-3">
+        <div className="flex justify-end items-center m-1 gap-3">
           <TaskSearchFilter
             searchString={searchString}
             setSearchString={setSearchString}

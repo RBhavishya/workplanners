@@ -40,7 +40,7 @@ export const taskColumns = [
       const title = info.getValue() || "-";
       return (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-purple-500 flex items-center justify-center text-white font-bold shrink-0">
+          <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
 
@@ -49,7 +49,7 @@ export const taskColumns = [
             <Tooltip>
               <TooltipTrigger asChild>
                 <span
-                  className="capitalize font-medium truncate max-w-[150px] cursor-default"
+                  className="capitalize font-normal truncate max-w-[150px] cursor-default"
                   title={title} // fallback for browsers without tooltip lib
                 >
                   {title}
@@ -74,7 +74,7 @@ export const taskColumns = [
     cell: (info: any) => {
       const title = info.getValue();
       return (
-        <div style={{ textAlign: "left" }}>
+        <div>
           <span className="capitalize">{title || "-"}</span>
         </div>
       );
@@ -100,9 +100,9 @@ export const taskColumns = [
       return (
         <div className="flex justify-start">
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${colorClass}`}
+            className={`px-2 py-0.5 rounded-full !text-xs font-normal capitalize ${colorClass}`}
           >
-            {status ? status.replace("_", " ") : "-"}
+            {status.charAt(0).toUpperCase()+status.slice(1).toLowerCase()}
           </span>
         </div>
       );

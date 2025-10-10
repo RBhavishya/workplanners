@@ -286,6 +286,9 @@ const UsersDetais = () => {
           onOKClick={handlePasswordUpdate}
           error={resetError}
           resetLoading={resetLoading}
+          dialogTitle="Reset Password"
+          label_1="Reseting..."
+          label_2="Reset Password"
           label="Enter a new password for this user."
         />
       </div>
