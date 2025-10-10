@@ -165,6 +165,11 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
     navigate({ to: "/users" });
   };
 
+  const Form_STYLES = {
+    label: "text-sm font-normal text-neutral-500",
+    input: "w-full text-sm border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+  }
+
   return (
     <div className="mt-6 p-4 bg-white shadow rounded-xl border-none max-w-120 mx-auto">
       <div className="flex items-center justify-start mb-4">
@@ -195,7 +200,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
 
       {/* Name */}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-normal text-neutral-500">
+        <label className={Form_STYLES.label}>
           Name <span className="text-red-500">*</span>
         </label>
         <Input
@@ -206,7 +211,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             setName(e.target.value);
             clearFieldError("display_name");
           }}
-          className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
+          className={Form_STYLES.input}
         />
         {errors.display_name && (
           <p className="text-red-500 text-xs mt-1">
@@ -218,7 +223,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       {/* Email + Phone */}
       <div className="flex gap-4 mb-4">
         <div className="flex flex-col gap-2 w-1/2">
-          <label className="text-sm font-normal text-neutral-500">
+          <label className={Form_STYLES.label}>
             Email <span className="text-red-500">*</span>
           </label>
           <Input
@@ -229,7 +234,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               setEmail(e.target.value);
               clearFieldError("email");
             }}
-            className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
+            className={Form_STYLES.input}
           />
           {errors.email && (
             <p className="text-red-500 text-xs mt-1">
@@ -239,7 +244,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </div>
 
         <div className="flex flex-col gap-2 w-1/2">
-          <label className="text-sm font-normal text-neutral-500">
+          <label className={Form_STYLES.label}>
             Phone <span className="text-red-500">*</span>
           </label>
           <Input
@@ -251,7 +256,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               setPhone(value);
               clearFieldError("phone");
             }}
-            className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
+            className={Form_STYLES.input}
           />
           {errors.phone && (
             <p className="text-red-500 text-xs mt-1">
@@ -267,7 +272,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </label>
           <div className="relative w-full">
             <Input
-              className="w-full border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-purple-300"
+              className={Form_STYLES.input}
               id="password"
               placeholder="Enter Password"
               value={password}
@@ -298,7 +303,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </div>
       )}
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-normal text-neutral-500">
+        <label className={Form_STYLES.label}>
           Designation <span className="text-red-500">*</span>
         </label>
 
@@ -322,7 +327,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               ) : (
                 <span className="text-purple-300 !font-normal">Select designation...</span>
               )}
-              <ChevronDown className="text-purple-300"/>
+              <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
             </div>
           </PopoverTrigger>
 

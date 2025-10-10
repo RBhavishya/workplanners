@@ -11,10 +11,9 @@ import {
   CalendarIcon,
   ChevronDown,
   X,
-  CheckCircle,
   MoveLeft,
   Check,
-  Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -27,7 +26,6 @@ import {
 } from "../ui/command";
 import { useNavigate } from "@tanstack/react-router";
 import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
-
 import {
   createProjectAPI,
   getAllUsersAPI,
@@ -226,19 +224,24 @@ const AddProjectForm = ({
     navigate({ to: "/projects" });
   };
 
+  const Form_STYLES = {
+    label: "text-sm font-normal text-neutral-500",
+    input: "w-full border text-sm border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+  }
+
   return (
-    <div className="mt-6 ml-62 p-6 bg-white shadow rounded-xl border max-w-lg">
-      <div className="flex items-center justify-start gap-3 mb-4">
+    <div className="mt-6 mx-auto p-4 bg-white shadow rounded-xl border-none max-w-lg">
+      <div className="flex items-center justify-start mb-4">
         <span>
           <button
             onClick={() => window.history.back()}
             className="px-2 py-2 text-gray rounded cursor-pointer"
           >
-            <MoveLeft className="mr-2" size={20} />
+            <ArrowLeft className="mr-2" size={20} />
           </button>
         </span>
         <span>
-          <h2 className="text-lg font-semibold ml-30">
+          <h2 className="text-lg font-semibold">
             {mode === "edit" ? "Edit Project" : "Add Project"}
           </h2>
         </span>
@@ -250,36 +253,36 @@ const AddProjectForm = ({
       )}
 
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className={Form_STYLES.label}>
           Project Title <span className="text-red-500">*</span>
         </label>
         <Input
           type="text"
-          placeholder="Enter Project Title"
+          placeholder="Enter project title"
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
             clearFieldError("title");
           }}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+          className={Form_STYLES.input}
         />
         {errors.title && (
           <p className="text-red-500 text-xs mt-1">{errors.title.join(", ")}</p>
         )}
       </div>
       <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">
+        <label className={Form_STYLES.label}>
           Project Description <span className="text-red-500">*</span>
         </label>
         <textarea
-          placeholder="Enter Project Description"
+          placeholder="Enter project description"
           value={description}
           // onChange={(e) => setDescription(e.target.value)}
           onChange={(e) => {
             setDescription(e.target.value);
             clearFieldError("description"); // <-- remove error as user types
           }}
-          className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+          className={`${Form_STYLES.input} resize-none placeholder:font-normal`}
         />
         {errors.description && (
           <p className="text-red-500 text-xs mt-1">
@@ -290,20 +293,20 @@ const AddProjectForm = ({
       <div className="flex gap-4 mb-4">
         {/* Start Date Picker */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">
+          <label className={Form_STYLES.label}>
             Start Date <span className="text-red-500">*</span>
           </label>
           <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
+                  `${Form_STYLES.input} flex gap-2 items-center`,
                   !startDate && "text-muted-foreground"
                 )}
                 onClick={() => setStartDateOpen(true)}
               >
                 <CalendarIcon className="h-4 w-4 text-gray-500" />
-                {startDate ? formatDate(startDate) : "Pick a date"}
+                {startDate ? formatDate(startDate) : <span className="text-purple-300">Pick a date</span>}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -339,21 +342,21 @@ const AddProjectForm = ({
 
         {/* Due Date Picker */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="text-sm font-medium">
+          <label className={Form_STYLES.label}>
             Due Date <span className="text-red-500">*</span>
           </label>
           <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
             <PopoverTrigger asChild>
               <div
                 className={cn(
-                  "w-full flex items-center gap-2 border rounded-lg p-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors",
+                  `${Form_STYLES.input} flex gap-2 items-center`,
                   !dueDate && "text-muted-foreground",
                   !startDate && "opacity-50 cursor-not-allowed"
                 )}
                 onClick={() => startDate && setDueDateOpen(true)}
               >
                 <CalendarIcon className="h-4 w-4 text-gray-500" />
-                {dueDate ? formatDate(dueDate) : "Pick a due date"}
+                {dueDate ? formatDate(dueDate) : <span className="text-purple-300">Pick a due date</span>}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -385,16 +388,16 @@ const AddProjectForm = ({
       </div>
       {mode === "create" && (
         <div className="flex flex-col gap-2 mb-4">
-          <label className="text-sm font-medium">Assign Users</label>
+          <label className={Form_STYLES.label}>Assign Users</label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <div
                 ref={triggerRef}
-                className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer"
+                className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer"
               >
                 <div className="flex flex-wrap gap-1">
                   {assignedUsers.length === 0 ? (
-                    <span className="text-gray-400">Select users...</span>
+                    <span className="text-purple-300">Select users...</span>
                   ) : (
                     assignedUsers.map((id) => {
                       const user = Array.isArray(usersResp?.data?.data)
@@ -431,7 +434,7 @@ const AddProjectForm = ({
                       <X className="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-pointer" />
                     </button>
                   )}
-                  <ChevronDown />
+                  <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
                 </div>
               </div>
             </PopoverTrigger>
@@ -444,6 +447,7 @@ const AddProjectForm = ({
                   placeholder="Search users..."
                   value={search}
                   onValueChange={setSearch}
+                  className="placeholder:text-purple-300"
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {isLoading ? (
@@ -482,9 +486,9 @@ const AddProjectForm = ({
           )}
         </div>
       )}
-      <div className="flex flex-col gap-2 mb-4">
-        <label className="text-sm font-medium">Project Reference Links</label>
-        <div className="border rounded-lg p-2 flex flex-wrap gap-2 min-h-[48px]">
+      <div className="flex flex-col mb-4 gap-2">
+        <label className={Form_STYLES.label}>Project Reference Links</label>
+        <div className="border-none rounded-sm flex flex-wrap gap-2 min-h-[50px]">
           {links.map((link, index) => (
             <span
               key={index}
@@ -506,7 +510,7 @@ const AddProjectForm = ({
             value={linkInput}
             onChange={(e) => setLinkInput(e.target.value)}
             onKeyDown={handleAddLink}
-            className="flex-1 outline-none bg-transparent text-sm"
+            className={`${Form_STYLES.input}`}
           />
         </div>
         {errors.links && (
@@ -517,7 +521,7 @@ const AddProjectForm = ({
         <Button
           onClick={handleNavigation}
           variant="outline"
-          className="px-4 py-2 border rounded-lg text-purple-500 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 border shadow-none rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer font-normal"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           Cancel
@@ -526,7 +530,7 @@ const AddProjectForm = ({
         <Button
           onClick={handleSave}
           variant={mode === "edit" ? "outline" : "default"}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer flex items-center gap-2"
+          className="px-6 py-2 bg-purple-600 text-white rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 font-normal"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           {(mutation.isPending || updateMutation.isPending) && (
