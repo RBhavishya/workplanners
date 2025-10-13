@@ -291,7 +291,7 @@ const Projects = () => {
                         )}
                       </div>
                       <span
-                        className={`mt-2 text-xs px-3 py-1 rounded-md font-medium w-fit ${
+                        className={`mt-2 text-xs 3xl:!text-sm px-3 py-1 rounded-md font-medium w-fit ${
                           statusColors[
                             project.project_status?.toUpperCase() || ""
                           ] || "bg-gray-100 text-gray-700"

@@ -109,7 +109,7 @@ const TanStackTable: FC<pageProps> = ({
         >
           <Table className="w-full text-sm table-fixed">
             {/* Sticky Header */}
-            <TableHeader className="sticky top-0 z-20 bg-white text-neutral-400 text-xs font-normal">
+            <TableHeader className="sticky top-0 bg-white text-neutral-400 text-xs font-normal">
               {table?.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-none">
                   {headerGroup.headers.map((header: any, index: number) => (

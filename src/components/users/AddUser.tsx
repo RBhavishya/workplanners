@@ -166,8 +166,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   };
 
   const Form_STYLES = {
-    label: "text-sm font-normal text-neutral-500",
-    input: "w-full text-sm border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+    label: "text-sm 3xl:!text-base font-normal text-neutral-500",
+    input: "w-full text-sm 3xl:!text-base border border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
   }
 
   return (
@@ -183,7 +183,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </span>
         <span>
           <h2
-            className={`text-lg font-medium ${
+            className={`text-lg 3xl:!text-xl font-medium ${
               mode === "edit" ? "text-gray-800" : "text-purple-500"
             }`}
           >
@@ -193,7 +193,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       </div>
 
       {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm 3xl:!text-base">
           {formError}
         </div>
       )}
@@ -214,7 +214,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           className={Form_STYLES.input}
         />
         {errors.display_name && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.display_name.join(", ")}
           </p>
         )}
@@ -237,7 +237,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             className={Form_STYLES.input}
           />
           {errors.email && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.email.join(", ")}
             </p>
           )}
@@ -259,7 +259,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             className={Form_STYLES.input}
           />
           {errors.phone && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.phone.join(", ")}
             </p>
           )}
@@ -267,7 +267,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       </div>
       {mode === "create" && (
         <div className="mb-4">
-          <label className="block text-sm mb-1 font-normal text-neutral-500">
+          <label className="block text-sm 3xl:!text-base mb-1 font-normal text-neutral-500">
             Password <span className="text-red-500">*</span>
           </label>
           <div className="relative w-full">
@@ -298,7 +298,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             </button>
           </div>
           {errors?.password && (
-            <p className="text-xs pt-1 text-red-600">{errors.password[0]}</p>
+            <p className="text-xs 3xl:!text-sm pt-1 text-red-600">{errors.password[0]}</p>
           )}
         </div>
       )}
@@ -306,7 +306,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         <label className={Form_STYLES.label}>
           Designation <span className="text-red-500">*</span>
         </label>
-
+ 
         <Popover
           open={designationPopoverOpen}
           onOpenChange={setDesignationPopoverOpen}
@@ -317,7 +317,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
               className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer"
             >
               {designation ? (
-                <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
+                <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm 3xl:!text-base gap-1">
                   <span>{designation}</span>
                   {/* Optional clear button */}
                   <button type="button" onClick={() => setDesignation("")}>
@@ -358,7 +358,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         </Popover>
 
         {errors.designation && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.designation.join(", ")}
           </p>
         )}
@@ -368,7 +368,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         <Button
           onClick={handleNavigation}
           variant="outline"
-          className="px-4 py-2 border border-purple-300 rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer shadow-none font-normal"
+          className="px-4 py-2 text-sm 3xl:!text-base border border-purple-300 rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer shadow-none font-normal"
           disabled={createMutation.isPending || updateMutation.isPending}
         >
           Cancel
@@ -377,7 +377,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         <Button
           onClick={handleSave}
           variant="default"
-          className="px-6 py-2 bg-purple-600 text-white rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 shadow-none font-normal"
+          className="px-6 py-2 text-sm 3xl:!text-base bg-purple-600 text-white rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 shadow-none font-normal"
           disabled={createMutation.isPending || updateMutation.isPending}
         >
           {(createMutation.isPending || updateMutation.isPending) && (

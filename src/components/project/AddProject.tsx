@@ -225,8 +225,8 @@ const AddProjectForm = ({
   };
 
   const Form_STYLES = {
-    label: "text-sm font-normal text-neutral-500",
-    input: "w-full border text-sm border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+    label: "text-sm 3xl:!text-base font-normal text-neutral-500",
+    input: "w-full border text-sm 3xl:!text-base border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
   }
 
   return (
@@ -241,13 +241,13 @@ const AddProjectForm = ({
           </button>
         </span>
         <span>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg 3xl:!text-xl font-semibold">
             {mode === "edit" ? "Edit Project" : "Add Project"}
           </h2>
         </span>
       </div>
       {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm 3xl:!text-base">
           {formError}
         </div>
       )}
@@ -267,7 +267,7 @@ const AddProjectForm = ({
           className={Form_STYLES.input}
         />
         {errors.title && (
-          <p className="text-red-500 text-xs mt-1">{errors.title.join(", ")}</p>
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">{errors.title.join(", ")}</p>
         )}
       </div>
       <div className="flex flex-col gap-2 mb-4">
@@ -285,7 +285,7 @@ const AddProjectForm = ({
           className={`${Form_STYLES.input} resize-none placeholder:font-normal`}
         />
         {errors.description && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.description.join(", ")}
           </p>
         )}
@@ -334,7 +334,7 @@ const AddProjectForm = ({
             </PopoverContent>
           </Popover>
           {errors?.start_date && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.start_date.join(", ")}
             </p>
           )}
@@ -380,7 +380,7 @@ const AddProjectForm = ({
             </PopoverContent>
           </Popover>
           {errors?.due_date && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.due_date.join(", ")}
             </p>
           )}
@@ -521,7 +521,7 @@ const AddProjectForm = ({
         <Button
           onClick={handleNavigation}
           variant="outline"
-          className="px-4 py-2 border shadow-none rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer font-normal"
+          className="px-4 py-2 border shadow-none rounded-sm text-sm 3xl:!text-base text-purple-500 hover:bg-gray-100 cursor-pointer font-normal"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           Cancel
@@ -530,7 +530,7 @@ const AddProjectForm = ({
         <Button
           onClick={handleSave}
           variant={mode === "edit" ? "outline" : "default"}
-          className="px-6 py-2 bg-purple-600 text-white rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 font-normal"
+          className="px-6 py-2 bg-purple-600 text-white text-sm 3xl:!text-base rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 font-normal"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           {(mutation.isPending || updateMutation.isPending) && (

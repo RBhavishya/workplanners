@@ -65,12 +65,12 @@ const ResetPasswordDialog = ({
 
         {/* Password Input */}
         <div className="mb-4">
-          <label className="block text-sm mb-1">
+          <label className="block text-sm 3xl:!text-base mb-1">
             New Password <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <Input
-              className="bg-[#F5F6FA] appearance-none block py-1 h-10 text-lg focus:outline-none focus:border-gray-500 focus-visible:ring-0 focus-visible:shadow-none placeholder:text-sm placeholder:text-slate-600 border rounded-md text-md w-full pr-10"
+              className="bg-[#F5F6FA] appearance-none block py-1 h-10 text-lg 3xl:text-xl focus:outline-none focus:border-gray-500 focus-visible:ring-0 focus-visible:shadow-none placeholder:text-sm placeholder:text-slate-600 border rounded-md text-md w-full pr-10"
               id="password"
               placeholder="Enter Password"
               value={password}
@@ -92,7 +92,7 @@ const ResetPasswordDialog = ({
               {passwordVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
             </button>
           </div>
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          {error && <p className="text-red-500 text-sm 3xl:!text-base mt-1">{error}</p>}
         </div>
 
         <DialogFooter>

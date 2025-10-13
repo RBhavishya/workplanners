@@ -254,7 +254,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           if (!user) return null;
 
           return (
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 title="View"
                 className="p-0 text-gray-600 cursor-pointer"
@@ -306,11 +306,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     <div className="border-none rounded-xl overflow-hidden h-[calc(100vh-120px)] flex flex-col bg-white">
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm border-collapse">
-          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-neutral-400 text-sm">
+          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-neutral-400">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
-                  <th key={header.id} className="px-4 py-3 font-medium">
+                  <th key={header.id} className="px-4 py-3 font-medium text-sm 3xl:!text-base">
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -349,7 +349,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   className={`${row.index % 2 === 0 ? "bg-slate-100" : "bg-white"} hover:bg-gray-50 border-none`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="!h-10 px-3">
+                    <td key={cell.id} className="!h-10 px-3 text-sm 3xl:!text-base">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

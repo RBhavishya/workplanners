@@ -92,7 +92,7 @@ const UserDetails: React.FC = () => {
   return (
     <div className="flex justify-end w-full pr-6">
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex gap-2 items-center hover:cursor-pointer focus-visible:ring-0 focus:outline-0">
+        <DropdownMenuTrigger className="flex gap-3 items-center hover:cursor-pointer focus-visible:ring-0 focus:outline-0">
           <Avatar>
             <img
               src={user.profile_pic ? user.profile_pic : "/table/profile.webp"}
@@ -103,9 +103,16 @@ const UserDetails: React.FC = () => {
               {user.display_name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
-          <span className="font-semibold text-gray-800">
-            {user.display_name || "User"}
-          </span>
+          <div className="flex flex-col items-start">
+            <span className="font-semibold text-gray-800 ">
+              {user.display_name || "User"}
+            </span>
+            <span className="text-xs 3xl:!text-sm text-neutral-500">
+              {user.user_type === 'EMPLOYEE' ? user.designation : 
+              user.user_type.charAt(0).toUpperCase() +
+                user.user_type.slice(1).toLowerCase()} 
+            </span>
+          </div>
           <ChevronDown size={18} className="text-gray-600" />
         </DropdownMenuTrigger>
 
@@ -118,7 +125,7 @@ const UserDetails: React.FC = () => {
             className="cursor-pointer flex items-center gap-2 text-gray-700 focus:bg-violet-100 focus:text-violet-600 transition-colors"
             onClick={() => navigate({ to: "/view-profile" })}
           >
-            <User size={16} className="hover:text-violet-600"/>
+            <User size={16} className="hover:text-violet-600" />
             <span>View Profile</span>
           </DropdownMenuItem>
 
@@ -129,7 +136,7 @@ const UserDetails: React.FC = () => {
               setResetPasswordDialogOpen(true);
             }}
           >
-            <Key size={16} className="hover:text-violet-600"/>
+            <Key size={16} className="hover:text-violet-600" />
 
             <span>Update Password</span>
           </DropdownMenuItem>
@@ -138,7 +145,7 @@ const UserDetails: React.FC = () => {
             className="cursor-pointer flex items-center gap-2 text-gray-600 hover:text-white focus:bg-red-100 focus:text-red-600 transition-colors"
             onClick={handleLogout}
           >
-            <LogOutIcon size={16} className="hover:text-red-600"/>
+            <LogOutIcon size={16} className="hover:text-red-600" />
             <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
