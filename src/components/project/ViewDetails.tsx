@@ -14,7 +14,7 @@ import {
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Check, ChevronDown, Move, MoveLeft } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Move, MoveLeft, X } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -23,6 +23,21 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+
+const statuses = [
+  { value: "NEW", label: "New" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "OVERDUE", label: "Overdue" },
+  { value: "REVIEW", label: "Review" },
+];
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
@@ -164,229 +179,244 @@ const Viewdetails = () => {
 
   // --- JSX ---
   return (
-    <div className="p-4 ">
-      {/* Status Cards */}
-      <div className="flex items-center mb-2 w-full">
-        <SmallCard
-          cards={[
-            { title: "Total Tasks", value: status?.data?.total_count },
-            { title: "Completed Tasks", value: status?.data?.completed_count },
-            {
-              title: "In Progress Task",
-              value: status?.data?.inProgress_count,
-            },
-            { title: "New Tasks", value: status?.data?.new_count },
-            { title: "Review Tasks", value: status?.data?.review_count },
-            { title: "Pending Tasks", value: status?.data?.pending_count },
-          ]}
-        />
-      </div>
-
-      {/* Project Info */}
-      <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
-        <button
-          onClick={() => window.history.back()}
-          className="text-gray-600 hover:text-blue-600 cursor-pointer"
-        >
-          <MoveLeft className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold">
-            {projectdata.title?.charAt(0) || "P"}
+    <div className="flex">
+      <div className="flex flex-col m-2 gap-3">
+        {/* Project Info */}
+        <div className="rounded-md p-4 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)] flex justify-between items-center">
+          <div className="flex flex-col">
+          <div className="flex items-center gap-3 mb-2">
+          <button
+            onClick={() => window.history.back()}
+            className="text-gray-600 hover:text-blue-600 cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+            <div className="w-7 h-7 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
+              {projectdata.title?.charAt(0) || "P"}
+            </div>
+            <div className="flex items-center gap-2 text-lg font-medium">
+              <span className="capitalize">{projectdata.title}</span>
+              <span
+                className={`ml-2 text-sm px-2 py-1 rounded ${
+                  statusColors[projectdata.project_status] ||
+                  "bg-gray-200 text-gray-800"
+                }`}
+              >
+                {projectdata.project_status}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-[3px] text-xl font-semibold">
-            <span>{projectdata.title}</span>
-            <span
-              className={`ml-2 text-sm px-2 py-1 rounded ${
-                statusColors[projectdata.project_status] ||
-                "bg-gray-200 text-gray-800"
-              }`}
-            >
-              {projectdata.project_status}
-            </span>
+          <p className="text-gray-700 mt-2">
+            {projectdata.description || "No description available"}
+          </p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mt-2">
+              <img src={projectdata.createdByUser?.profile_pic} alt="avatar" className="w-8 h-8 rounded-full" />
+              <p>{projectdata.createdByUser?.display_name}</p>
+            </div>
           </div>
         </div>
-        <p className="text-gray-700 mt-2">
-          {projectdata.description || "No description available"}
-        </p>
-      </div>
+        {/* Status Cards */}
+        <div className="flex items-center w-full bg-white p-2 rounded-sm">
+          <SmallCard
+            cards={[
+              { title: "Total Tasks", value: status?.data?.total_count },
+              {
+                title: "Completed Tasks",
+                value: status?.data?.completed_count,
+              },
+              {
+                title: "In Progress Task",
+                value: status?.data?.inProgress_count,
+              },
+              { title: "New Tasks", value: status?.data?.new_count },
+              { title: "Review Tasks", value: status?.data?.review_count },
+              { title: "Pending Tasks", value: status?.data?.pending_count },
+            ]}
+          />
+        </div>
 
-      {/* Main Layout */}
-      <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-3 flex gap-6">
         {/* Tasks Table */}
-        <div className="w-2/3">
+        <div className="w-full">
           <TasksInProjectTable projectId={Number(id)} />
         </div>
+      </div>
 
-        {/* Project Details */}
-        <div className="w-1/3 border border-gray-200 rounded-3xl p-11">
-          <div className="text-2xl font-bold mb-4">Details</div>
-          <div className="h-[calc(100vh-500px)] overflow-y-auto">
-            {/* Created By */}
-            <div className="flex items-center gap-3 mb-4">
-              {projectdata.createdByUser?.profile_pic ? (
-                <img
-                  src={projectdata.createdByUser.profile_pic}
-                  alt={projectdata.createdByUser.display_name || "User"}
-                  className="w-10 h-10 rounded-full object-cover border"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
-                  {projectdata.createdByUser?.display_name?.charAt(0) || "U"}
-                </div>
-              )}
-              <div>
-                <p className="font-medium">
-                  {projectdata.createdByUser?.display_name || "Unknown"}
-                </p>
-                <p className="text-xs text-gray-500">Created By</p>
+      {/* Project Details */}
+      <div className="w-1/4 border-l border-gray-200 p-3 bg-white">
+        <div className="text-xl font-medium mb-4">Project Details</div>
+        <div className="flex flex-col gap-3">
+          {/* Created By */}
+          <div className="flex items-center gap-3 mb-4">
+            {projectdata.createdByUser?.profile_pic ? (
+              <img
+                src={projectdata.createdByUser.profile_pic}
+                alt={projectdata.createdByUser.display_name || "User"}
+                className="w-10 h-10 rounded-full object-cover border"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                {projectdata.createdByUser?.display_name?.charAt(0) || "U"}
               </div>
+            )}
+            <div>
+              <p className="font-medium">
+                {projectdata.createdByUser?.display_name || "Unknown"}
+              </p>
+              <p className="text-xs text-gray-500">Created By</p>
             </div>
+          </div>
 
-            {/* Status Selector */}
-            <div className="mb-4">
-              <strong>Status:</strong>{" "}
-              <select
-                value={projectdata.project_status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                disabled={loggedInUser.user_type === "EMPLOYEE"}
-                className={cn(
-                  "ml-2 border rounded p-1 cursor-pointer",
-                  loggedInUser.user_type === "EMPLOYEE" &&
-                    "bg-gray-100 text-gray-500 cursor-not-allowed"
-                )}
-              >
-                <option value="NEW">NEW</option>
-                <option value="IN_PROGRESS">IN_PROGRESS</option>
-                <option value="OVERDUE">OVERDUE</option>
-                <option value="REVIEW">REVIEW</option>
-                <option value="COMPLETED">COMPLETED</option>
-              </select>
-            </div>
-            {/* Dates */}
-            <p className="mb-2">
-              <strong>Start Date:</strong> {formatDate(projectdata.start_date)}
-            </p>
-            <p className="mb-2">
-              <strong>Due Date:</strong> {formatDate(projectdata.due_date)}
-            </p>
+          {/* Status Selector */}
+          <div className="flex items-center">
+            <p className="text-base 3xl:!text-lg">Status:</p>{" "}
+            <Select
+              value={projectdata.project_status}
+              onValueChange={(value) => handleStatusChange(value)}
+              disabled={loggedInUser.user_type === "EMPLOYEE"}
+            >
+              <SelectTrigger className={cn(
+                "ml-2 border rounded w-30 !h-7 cursor-pointer focus:ring-0 focus-visible:ring-0 shadow-none",
+                loggedInUser.user_type === "EMPLOYEE" &&
+                  "bg-gray-100 text-gray-500 cursor-not-allowed"
+              )}>
+                <SelectValue placeholder="Select a status"/>
+              </SelectTrigger>
+              <SelectContent>
+              {statuses.map((status) => (
+                <SelectItem value={status.value} key={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Dates */}
+          <div className="flex items-center justify-between">
+          <p className="flex flex-col">
+            <span className="text-neutral-400 text-sm 3xl:!text-base">Start Date:</span>
+            <span className="text-sm">{formatDate(projectdata.start_date)}</span>
+          </p>
+          <p className="flex flex-col">
+            <span className="text-neutral-400 text-sm 3xl:!text-base">Due Date:</span> 
+            <span className="text-sm">{formatDate(projectdata.due_date)}</span>
+          </p>
+          </div>
 
-            {/* Assigned Users */}
-            <div className="mt-6">
-              <strong>Assigned Users:</strong>
-              <ul className="mt-2">
-                {assignedUsers.length === 0 && (
-                  <li className="text-gray-500">No users assigned.</li>
-                )}
-                {assignedUsers.map((user) => (
-                  <li
-                    key={user.id}
-                    className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border"
+          {/* Assigned Users */}
+          <div>
+            <p className="text-lg 3xl:!text-xl">Members</p>
+            {/* Only MANAGERs can assign users */}
+            {loggedInUser.user_type === "MANAGER" && (
+              <div className="flex items-center gap-2">
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <div
+                      ref={triggerRef}
+                      className="rounded border flex items-center justify-between px-2 py-1 cursor-pointer flex-1"
+                    >
+                      <span className="text-gray-500">
+                        {selectedUsers.length > 0
+                          ? selectedUsers
+                              .map((u) => u.display_name || "Unnamed")
+                              .join(", ")
+                          : "Select users..."}
+                      </span>
+                      <ChevronDown className="w-5 h-5"/>
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    style={{
+                      width: triggerWidth ? `${triggerWidth}px` : "auto",
+                    }}
+                    className="p-0"
                   >
-                    <span>{user.display_name || "Unnamed"}</span>
-                    <button
-                      disabled={loggedInUser.user_type === "EMPLOYEE"} // disable for EMPLOYEE
-                      onClick={() => handleRemoveUser(user.id)}
-                      className={cn(
-                        "cursor-pointer",
-                        loggedInUser.user_type === "EMPLOYEE"
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-red-500 hover:text-red-700"
-                      )}
-                      title={
-                        loggedInUser.user_type === "EMPLOYEE"
-                          ? "Employees cannot remove users"
-                          : "Remove user"
-                      }
-                    >
-                      ✕
-                    </button>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Only MANAGERs can assign users */}
-              {loggedInUser.user_type === "MANAGER" && (
-                <div className="flex items-center gap-2 mt-3">
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <div
-                        ref={triggerRef}
-                        className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1"
-                      >
-                        <span className="text-gray-500">
-                          {selectedUsers.length > 0
-                            ? selectedUsers
-                                .map((u) => u.display_name || "Unnamed")
-                                .join(", ")
-                            : "Select users..."}
-                        </span>
-                        <ChevronDown />
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      style={{
-                        width: triggerWidth ? `${triggerWidth}px` : "auto",
-                      }}
-                      className="p-0"
-                    >
-                      <Command>
-                        <CommandInput
-                          placeholder="Search users..."
-                          value={search}
-                          onValueChange={setSearch}
-                        />
-                        <CommandList className="max-h-60 overflow-y-auto">
-                          {availableUsers
-                            .filter(
-                              (u) => !assignedUsers.find((au) => au.id === u.id)
-                            )
-                            .filter((u) =>
-                              (u.display_name || "")
-                                .toLowerCase()
-                                .includes(search.toLowerCase())
-                            )
-                            .map((user) => (
-                              <CommandItem
-                                key={user.id}
-                                onSelect={() => toggleUserSelect(user)}
-                              >
-                                <span>{user.display_name || "Unnamed"}</span>
-                                <Check
-                                  className={cn(
-                                    "h-4 w-4 ml-auto",
-                                    selectedUsers.find((u) => u.id === user.id)
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          {availableUsers.filter(
+                    <Command>
+                      <CommandInput
+                        placeholder="Search users..."
+                        value={search}
+                        onValueChange={setSearch}
+                      />
+                      <CommandList className="max-h-60 overflow-y-auto">
+                        {availableUsers
+                          .filter(
                             (u) => !assignedUsers.find((au) => au.id === u.id)
-                          ).length === 0 && (
-                            <CommandEmpty>No users found</CommandEmpty>
-                          )}
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <button
-                    onClick={handleAssignUsers}
-                    disabled={
-                      selectedUsers.length === 0 || assignUserMutation.isPending
-                    }
-                    className="px-3 py-1 bg-purple-600 text-white rounded disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
-                  >
-                    {assignUserMutation.isPending ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      "Add"
-                    )}
-                  </button>
-                </div>
+                          )
+                          .filter((u) =>
+                            (u.display_name || "")
+                              .toLowerCase()
+                              .includes(search.toLowerCase())
+                          )
+                          .map((user) => (
+                            <CommandItem
+                              key={user.id}
+                              onSelect={() => toggleUserSelect(user)}
+                            >
+                              <span className="capitalize">{user.display_name || "Unnamed"}</span>
+                              <Check
+                                className={cn(
+                                  "h-4 w-4 ml-auto",
+                                  selectedUsers.find((u) => u.id === user.id)
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        {availableUsers.filter(
+                          (u) => !assignedUsers.find((au) => au.id === u.id)
+                        ).length === 0 && (
+                          <CommandEmpty>No users found</CommandEmpty>
+                        )}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <button
+                  onClick={handleAssignUsers}
+                  disabled={
+                    selectedUsers.length === 0 || assignUserMutation.isPending
+                  }
+                  className="w-13 h-8 bg-purple-600 text-white rounded disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  {assignUserMutation.isPending ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    "Add"
+                  )}
+                </button>
+              </div>
+            )}
+            <div className="mt-2 h-[calc(100vh-355px)] overflow-y-auto">
+              {assignedUsers.length === 0 && (
+                <p className="text-gray-500">No users assigned.</p>
               )}
+              {assignedUsers.map((user) => (
+                <p
+                  key={user.id}
+                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
+                >
+                  <span className="capitalize">{user.display_name || "Unnamed"}</span>
+                  <button
+                    disabled={loggedInUser.user_type === "EMPLOYEE"}
+                    onClick={() => handleRemoveUser(user.id)}
+                    className={cn(
+                      "cursor-pointer",
+                      loggedInUser.user_type === "EMPLOYEE"
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-violet-700"
+                    )}
+                    title={ 
+                      loggedInUser.user_type === "EMPLOYEE"
+                        ? "Employees cannot remove users"
+                        : "Remove user"
+                    }
+                  >
+                    <X className="w-4 h-4"/>
+                  </button>
+                </p>
+              ))}
             </div>
           </div>
         </div>

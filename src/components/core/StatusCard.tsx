@@ -1,6 +1,3 @@
-import * as React from "react";
-import CountUp from "react-countup";
-
 interface StatusCardProps {
   title: string;
   value?: number; // optional → defaults to 0
@@ -18,11 +15,11 @@ const StatusCard = ({
 }: StatusCardProps) => {
   return (
     <div
-      className={`flex items-center justify-between w-[150px] h-[60px] rounded-xl px-4 ${bg}`}
+      className={`flex items-center justify-between w-[150px] h-[60px] rounded-md px-4 ${bg}`}
     >
       <span className="text-sm font-semibold text-gray-700">{title}</span>
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${circleBg} ${circleText}`}
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-normal ${circleBg} ${circleText}`}
       >
         {value.toString().padStart(2, "0")}
       </div>
@@ -36,43 +33,43 @@ const statusConfig: Record<
   { bg: string; circleBg: string; circleText: string }
 > = {
   "Total Tasks": {
-    bg: "bg-purple-200",
+    bg: "bg-purple-100",
     circleBg: "bg-purple-600",
     circleText: "text-white",
   },
   "Completed Tasks": {
-    bg: "bg-green-200",
+    bg: "bg-green-100",
     circleBg: "bg-green-600",
     circleText: "text-white",
   },
   "In Progress Task": {
-    bg: "bg-blue-200",
+    bg: "bg-blue-100",
     circleBg: "bg-blue-600",
     circleText: "text-white",
   },
   "Pending Tasks": {
-    bg: "bg-yellow-200",
+    bg: "bg-yellow-100",
     circleBg: "bg-yellow-600",
     circleText: "text-white",
   },
   "Review Tasks": {
-    bg: "bg-orange-200",
+    bg: "bg-orange-100",
     circleBg: "bg-orange-600",
     circleText: "text-white",
   },
 
   TODAY: {
-    bg: "bg-pink-200",
+    bg: "bg-pink-100",
     circleBg: "bg-pink-600",
     circleText: "text-white",
   },
   OVERDUE: {
-    bg: "bg-red-200",
+    bg: "bg-red-100",
     circleBg: "bg-red-600",
     circleText: "text-white",
   },
   CLOSED: {
-    bg: "bg-gray-300",
+    bg: "bg-gray-100",
     circleBg: "bg-gray-700",
     circleText: "text-white",
   },
@@ -84,7 +81,7 @@ interface SmallCardProps {
 
 const SmallCard = ({ cards }: SmallCardProps) => {
   return (
-    <div className="flex gap-4 flex-wrap">
+    <div className="flex gap-2 flex-wrap">
       {cards.map((card, index) => {
         const config = statusConfig[card.title] || {
           bg: "bg-gray-200",
