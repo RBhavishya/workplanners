@@ -24,7 +24,7 @@ import {
 import { addSerial } from "@/lib/helpers/addSerial";
 import TanStackTable from "../core/TasksTanstacktable";
 import { taskColumns } from "./TaskColumns";
-import TaskSearchFilter from "../core/TasksSearchFilter";
+import TaskSearchFilter from "../core/SearchFilter";
 import { toast } from "sonner";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import { DateRangePicker } from "rsuite";
@@ -35,6 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
 import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
 import { PendingIcon } from "../icons/Dashboard/PendingIcon";
+import SearchFilter from "../core/SearchFilter";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -309,7 +310,7 @@ const Tasks = () => {
         </div>
       <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center m-1 gap-3">
-          <TaskSearchFilter
+          <SearchFilter
             searchString={searchString}
             setSearchString={setSearchString}
             title="Find your Task"
