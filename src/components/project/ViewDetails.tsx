@@ -236,7 +236,7 @@ const Viewdetails = () => {
       </div>
 
       {/* Project Details */}
-      <div className="w-1/4 border-l border-gray-200 p-3 bg-white">
+      <div className="w-90 border-l border-gray-200 p-3 bg-white">
         <div className="text-xl font-medium mb-4">Project Details</div>
         <div className="flex flex-col gap-3">
           {/* Created By */}
@@ -298,7 +298,7 @@ const Viewdetails = () => {
 
           {/* Assigned Users */}
           <div>
-            <p className="text-lg 3xl:!text-xl">Members</p>
+            <p className="text-base 3xl:!text-lg mb-2">Members</p>
             {/* Only MANAGERs can assign users */}
             {loggedInUser.user_type === "MANAGER" && (
               <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ const Viewdetails = () => {
                 </button>
               </div>
             )}
-            <div className="mt-2 h-[calc(100vh-355px)] overflow-y-auto">
+            <div className="mt-2 h-[calc(100vh-370px)] overflow-y-auto">
               {assignedUsers.length === 0 && (
                 <p className="text-gray-500">No users assigned.</p>
               )}
@@ -389,7 +389,7 @@ const Viewdetails = () => {
                   key={user.id}
                   className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
                 >
-                  <span className="capitalize">{user.display_name || "Unnamed"}</span>
+                  <span className="capitalize text-sm 3xl:!text-base">{user.display_name || "Unnamed"}</span>
                   <button
                     disabled={loggedInUser.user_type === "EMPLOYEE"}
                     onClick={() => handleRemoveUser(user.id)}

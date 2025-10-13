@@ -134,9 +134,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
                 {name !== "-" ? name.charAt(0).toUpperCase() : "-"}
               </div>
-
-              {/* Tooltip for long project names */}
-              <TooltipProvider>
+              <p className="capitalize">{name}</p>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span
@@ -150,7 +149,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     <p>{name}</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
             </div>
           );
         },
