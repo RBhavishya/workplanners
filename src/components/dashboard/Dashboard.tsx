@@ -132,6 +132,8 @@ const Dashboard = () => {
     return cleanup;
   }, [setupObserver]);
 
+  const handleNavigation = () => navigate({ to: `/tasks/add` });
+
   const dashboardCards = [
     {
       title: "Total Tasks",
@@ -210,8 +212,20 @@ const Dashboard = () => {
 
       {/* Right Side - Today’s Task */}
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
-        <h2 className="text-lg font-semibold">Task Tracker</h2>
-        <p className="text-sm text-gray-500 mb-4">{formattedDate}</p>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h2 className="text-lg font-semibold">Task Tracker</h2>
+            <p className="text-sm text-gray-500">{formattedDate}</p>
+          </div>
+          <Button
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
+            onClick={handleNavigation}
+          >
+            + New Task
+          </Button>
+        </div>
+        {/* <h2 className="text-lg font-semibold">Task Tracker</h2>
+        <p className="text-sm text-gray-500 mb-4">{formattedDate}</p> */}
 
         {/* Filters */}
         <div className="flex items-center gap-2 mb-4 text-sm font-medium">
