@@ -337,7 +337,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
             className="p-2 max-w-150"
           >
             <div className="max-h-40 overflow-y-auto">
-              {["FrontendDeveloper", "BackendDeveloper", "QA"].map((option) => (
+              {["Frontend Developer", "Backend Developer", "QA", "Mobile Developer", "Designer", "UI Developer"].map((option) => (
                 <div
                   key={option}
                   className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
