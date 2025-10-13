@@ -298,7 +298,8 @@ const Dashboard = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-start gap-2 py-2 border-b border-gray-100"
+                    className="flex items-start gap-2 py-2 border-b border-gray-100 cursor-pointer"
+                      onClick={() => navigate({ to: `/tasks/view/${task.id}` })}
                   >
                     <div className="flex-1">
                       <p className="font-medium text-gray-600 capitalize text-sm 3xl:text-base">
