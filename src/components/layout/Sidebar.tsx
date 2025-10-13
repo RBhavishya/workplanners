@@ -5,6 +5,7 @@ import { ProjectsIcon } from "../icons/ProjectsIcon";
 import { TasksIcon } from "../icons/TasksIcon";
 import { UsersIcon } from "../icons/UsersIcon";
 import { Button } from "../ui/button";
+import { DashboardIcon } from "../icons/Dashboard/DashboardIcon";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -27,27 +28,24 @@ const Sidebar = () => {
             className="flex items-center px-3 py-1 group text-gray-700 group hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none"
             activeProps={{ className: activeProps.className }}
           >
-            <LayoutGrid
-              className="mr-3 w-5 h-5 text-neutral-500 group-hover:text-violet-600"
-              strokeWidth={1}
-            />
+            <DashboardIcon className="mr-3 w-4 h-4 group:text-violet-600"/>
             Dashboard
           </Link>
         )}
         <Link
           to="/tasks"
-          className="flex items-center px-3 py-1 text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none"
+          className="flex items-center px-3 py-1 text-gray-700 group hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none"
           activeProps={{ className: activeProps.className }}
         >
-          <TasksIcon className="mr-3 w-4 h-4" />
+          <TasksIcon className="mr-3 w-4 h-4 group:text-violet-600" />
           Tasks
         </Link>
         <Link
           to="/projects"
-          className="flex items-center px-3 py-1 rounded-none text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors"
+          className="flex items-center px-3 py-1 rounded-none group text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors"
           activeProps={{ className: activeProps.className }}
         >
-          <ProjectsIcon className="mr-3 w-4 h-4" />
+          <ProjectsIcon className="mr-3 w-4 h-4 group:text-violet-600" />
           Projects
         </Link>
         {user_type !== "EMPLOYEE" && (
@@ -56,7 +54,7 @@ const Sidebar = () => {
             className="flex items-center px-3 py-1 group rounded-none text-gray-700 hover:bg-violet-100 hover:text-violet-600 transition-colors"
             activeProps={{ className: activeProps.className }}
           >
-            <UsersIcon className="mr-3 w-4 h-4" />
+            <UsersIcon className="mr-3 w-4 h-4 group:text-violet-600" />
             Users
           </Link>
         )}
