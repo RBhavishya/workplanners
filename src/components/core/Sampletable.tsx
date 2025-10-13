@@ -103,7 +103,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       accessorFn: (_row, index) =>
         (pagination.pageIndex - 1) * pagination.pageSize + index + 1,
       cell: ({ getValue }) => (
-        <span className="text-gray-600 text-sm flex justify-center">
+        <span className="text-gray-600 text-sm">
           {getValue() as number}
         </span>
       ),
@@ -152,7 +152,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
             <Button
               title="View"
                variant="ghost"
-              className=" hover:text-indigo-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+              className=" hover:text-indigo-600 text-gray-600 cursor-pointer p-0"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
               <Eye size={16} />
@@ -160,7 +160,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
             <Button
               title="Edit"
                variant="ghost"
-              className=" hover:text-green-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+              className=" hover:text-green-600 text-gray-600 cursor-pointer p-0"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
               <Edit size={16} />
@@ -168,7 +168,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
             <Button
               title="Delete"
                variant="ghost"
-              className=" hover:text-red-600 border border-gray-400 rounded px-2 py-1 text-gray-600 cursor-pointer"
+              className=" hover:text-red-600 text-gray-600 cursor-pointer p-0"
               onClick={() => {
                 setTaskToDelete(rowData.id);
                 setDeleteDialogOpen(true);
@@ -192,16 +192,16 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   if (error) return <p>Error: {error.message}</p>;
   if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
 
-  return (
-    <div className="flex flex-col h-[calc(100vh-400px)] p-4">
+  return ( 
+    <div className="flex flex-col bg-white h-[calc(100vh-272px)] rounded-lg">
       {/* Scrollable table container */}
-      <div className="overflow-auto flex-1 border border-gray-200 rounded-lg">
-        <table className="w-full border-separate border-spacing-y-3 text-sm">
-          <thead className="bg-gray-50 sticky top-0 z-10">
+      <div className="overflow-auto flex-1 rounded-lg">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-white">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="text-left text-gray-500 text-xs">
+              <tr key={headerGroup.id} className="text-left text-gray-500 text-xs !h-10">
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="pb-2 px-4">
+                  <th key={header.id} className="px-4 ">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -212,9 +212,9 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="bg-white border-b border-gray-200">
+              <tr key={row.id} className="bg-white">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3">
+                  <td key={cell.id} className="py-1 px-4">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -225,7 +225,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       </div>
 
       {/* Pagination */}
-      <div className="mt-4">
+      <div className="mt-2">
         <TasksPagination
           paginationDetails={
             data?.data?.data?.pagination_info || {
