@@ -232,7 +232,7 @@ const Projects = () => {
 
           {/* Grid Cards */}
           {projectsData.length === 0 && !isLoading ? (
-            <p className="text-gray-500 text-center py-6">
+            <p className="text-gray-500 flex items-center justify-center py-6 h-[calc(100vh-165px)]">
               No projects available.
             </p>
           ) : (
