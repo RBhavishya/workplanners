@@ -37,13 +37,13 @@ const BigCard = ({ title, value = 0, icon }: BigCardProps) => {
 
   return (
     <div
-      className={`w-50 rounded-lg shadow-sm flex flex-col justify-between p-2 ${bg}`}
+      className={`w-50 3xl:!w-65 rounded-lg shadow-sm flex flex-col justify-between p-2 ${bg}`}
     >
       <div className="flex items-start justify-between">
-        <span className="text-sm text-neutral-400">{title}</span>
+        <span className="text-sm 3xl:!text-base text-neutral-400">{title}</span>
         <div>{icon || defaultIcon}</div>
       </div>
-      <span className="text-2xl font-medium">{value}</span>
+      <span className="text-2xl 3xl:!text-3xl font-medium">{value}</span>
     </div>
   );
 };

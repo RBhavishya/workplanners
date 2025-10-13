@@ -214,11 +214,11 @@ const Dashboard = () => {
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-lg font-semibold">Task Tracker</h2>
-            <p className="text-sm text-gray-500">{formattedDate}</p>
+            <h2 className="text-lg 3xl:!text-xl font-medium">Task Tracker</h2>
+            <p className="text-sm 3xl:!text-base text-gray-500">{formattedDate}</p>
           </div>
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer text-xs 3xl:!text-sm"
             onClick={handleNavigation}
           >
             + New Task
@@ -228,7 +228,7 @@ const Dashboard = () => {
         <p className="text-sm text-gray-500 mb-4">{formattedDate}</p> */}
 
         {/* Filters */}
-        <div className="flex items-center gap-2 mb-4 text-sm font-medium">
+        <div className="flex items-center gap-2 mb-4 text-sm 3xl:!text-base font-medium">
           {[
             {
               label: "All",
@@ -261,7 +261,7 @@ const Dashboard = () => {
               onClick={() => setTodayFilter(item.status)}
             >
               {item.label}
-              <span className="text-[11px] text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
+              <span className="text-[11px] 3xl:!text-xs text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
                 <CountUp end={item.count} duration={1} />
               </span>
             </div>
@@ -276,12 +276,12 @@ const Dashboard = () => {
           {isFetching ? (
             <div className="flex items-center justify-center py-6">
               <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="ml-2 text-sm text-gray-500">Loading tasks...</p>
+              <p className="ml-2 text-sm 3xl:!text-base text-gray-500">Loading tasks...</p>
             </div>
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true
             ).length === 0 ? (
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm 3xl:!text-base text-gray-500 text-center">
               {todayFilter
                 ? `No ${todayFilter.toLowerCase()} tasks today`
                 : "No tasks for today"}
@@ -302,12 +302,12 @@ const Dashboard = () => {
                       onClick={() => navigate({ to: `/tasks/view/${task.id}` })}
                   >
                     <div className="flex-1">
-                      <p className="font-medium text-gray-600 capitalize text-sm 3xl:text-base">
+                      <p className="font-medium text-gray-600 capitalize text-sm 3xl:!text-base">
                         {task.task_title}
                       </p>
 
                       {/* Due Date */}
-                      <p className="text-[11px] font-normal text-gray-700">
+                      <p className="text-[11px] 3xl:!text-xs font-normal text-gray-700">
                         Due Date:{" "}
                         <span className="text-gray-500 font-normal">
                           {task.end_date
@@ -326,7 +326,7 @@ const Dashboard = () => {
                           {visibleUsers.map((u: any) => (
                             <div
                               key={u.user_id}
-                              className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-[11px] font-medium text-white border-2 border-white"
+                              className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-[11px] 3xl:!text-xs font-medium text-white border-2 border-white"
                               title={u.display_name}
                             >
                               {u.display_name.charAt(0).toUpperCase()}
@@ -337,7 +337,7 @@ const Dashboard = () => {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-medium text-white border-2 border-white cursor-pointer">
+                                  <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs 3xl:!text-sm font-medium text-white border-2 border-white cursor-pointer">
                                     +{remainingUsers.length}
                                   </div>
                                 </TooltipTrigger>
@@ -376,9 +376,9 @@ const Dashboard = () => {
                       }
                     >
                       {task.task_status === "COMPLETED" ? (
-                        <GreenThickIcon className="w-4 h-4" />
+                        <GreenThickIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
                       ) : (
-                        <ClockIcon className="w-4 h-4" />
+                        <ClockIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
                       )}
                     </div>
                   </div>

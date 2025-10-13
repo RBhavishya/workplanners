@@ -122,7 +122,7 @@ const Statisticstable = () => {
   return (
     <div className="bg-white p-3 mt-1 rounded-sm shadow-none flex flex-col h-[calc(100vh-170px)]">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-normal">Statistics</h2>
+        <h2 className="text-lg 3xl:!text-xl font-normal">Statistics</h2>
 
         {/* Search Filter aligned to the right */}
         <SearchFilter
