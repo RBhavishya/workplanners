@@ -24,6 +24,8 @@ import { addSerial } from "@/lib/helpers/addSerial";
 import TasksPagination from "../core/TasksPagination";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
+import TaskSearchFilter from "../core/SearchFilter";
+import SearchFilter from "../core/SearchFilter";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -52,8 +54,8 @@ const Projects = () => {
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const [search_string, setSearchString] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(search_string);
+  const [searchString, setSearchString] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
 
   const statusColors: Record<string, string> = {
     NEW: "bg-purple-100 text-purple-600",
@@ -113,13 +115,13 @@ const Projects = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearch(search_string);
-      if (search_string) {
+      setDebouncedSearch(searchString);
+      if (searchString === "") {
         setPagination((prev) => ({ ...prev, pageIndex: 1 }));
       }
     }, 500);
     return () => clearTimeout(handler);
-  }, [search_string, selectedStatus]);
+  }, [searchString, selectedStatus]);
 
   useEffect(() => {
     router.navigate({
@@ -142,19 +144,11 @@ const Projects = () => {
         <h2 className="font-medium text-xl 3xl:!text-2xl">Projects</h2>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Search */}
-          <div className="relative w-80 h-7 border border-neutral-300 bg-white rounded-sm shadow-none flex items-center px-2">
-            <Input
-              type="search"
-              value={search_string}
-              onChange={(e) => setSearchString(e.target.value)}
-              placeholder="Search by Title"
-              className="pl-2 pr-4 h-full w-full border-none rounded-sm text-black font-normal text-sm 3xl:!text-base shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-sm"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2">
-              <SearchIcon className="w-5 h-5 text-gray-500" />
-            </span>
-          </div>
+          <SearchFilter
+            searchString={searchString}
+            setSearchString={setSearchString}
+            title="Search by Title"
+          />
 
           {/* Status Filter */}
           <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
@@ -232,9 +226,9 @@ const Projects = () => {
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
-          )} 
+          )}
 
           {/* Grid Cards */}
           {projectsData.length === 0 && !isLoading ? (
@@ -244,70 +238,71 @@ const Projects = () => {
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {projectsData.map((project: ProjectData) => (
-                <Card
-                  key={project.id}
-                  className="w-full shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col cursor-pointer pb-5 pt-3"
-                  onClick={() => navigate({ to: `/projects/${project.id}` })}
-                >
-            
-                  {/* Card Content */}
-                  <CardContent className="flex flex-col px-4 gap-3">
-                    <div className="flex gap-1 items-center justify-between">
-                      <div className="flex items-center">
-                    <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
-                      {project.title?.charAt(0).toUpperCase() || "?"}
-                    </div>
-                    <h2 className="text-base 3xl:!text-lg font-medium break-words text-center px-2 capitalize">
-                      {project.title || "Untitled"}
-                    </h2>
-                    </div>
-                    {user?.user_type !== "EMPLOYEE" && (
-                    <div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
-                            <MoreVertical size={18} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate({ to: `/projects/edit/${project.id}` });
-                            }}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteTarget(project);
-                              setShowDeleteDialog(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
-                    </div>
-                    <span
-                      className={`mt-2 text-xs px-3 py-1 rounded-md font-medium w-fit ${
-                        statusColors[
-                          project.project_status?.toUpperCase() || ""
-                        ] || "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {project.project_status || ""}
-                    </span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                {projectsData.map((project: ProjectData) => (
+                  <Card
+                    key={project.id}
+                    className="w-full shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col cursor-pointer pb-5 pt-3"
+                    onClick={() => navigate({ to: `/projects/${project.id}` })}
+                  >
+                    {/* Card Content */}
+                    <CardContent className="flex flex-col px-4 gap-3">
+                      <div className="flex gap-1 items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
+                            {project.title?.charAt(0).toUpperCase() || "?"}
+                          </div>
+                          <h2 className="text-base 3xl:!text-lg font-medium break-words text-center px-2 capitalize">
+                            {project.title || "Untitled"}
+                          </h2>
+                        </div>
+                        {user?.user_type !== "EMPLOYEE" && (
+                          <div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-1 rounded-full hover:bg-gray-100 cursor-pointer">
+                                  <MoreVertical size={18} />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate({
+                                      to: `/projects/edit/${project.id}`,
+                                    });
+                                  }}
+                                >
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteTarget(project);
+                                    setShowDeleteDialog(true);
+                                  }}
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        className={`mt-2 text-xs px-3 py-1 rounded-md font-medium w-fit ${
+                          statusColors[
+                            project.project_status?.toUpperCase() || ""
+                          ] || "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {project.project_status || ""}
+                      </span>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
 

@@ -9,8 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
 import TasksPagination from "../core/TasksPagination";
 import { addSerial } from "@/lib/helpers/addSerial";
-import TaskSearchFilter from "../core/TasksSearchFilter";
-
+import TaskSearchFilter from "../core/SearchFilter";
+import SearchFilter from "../core/SearchFilter";
 
 type TaskStats = {
   id: number;
@@ -43,8 +43,8 @@ const Statisticstable = () => {
         pageSize: pagination.pageSize,
         search_string: debouncedSearch,
       }),
-      refetchOnWindowFocus: false,
-      retry: false,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const statsData: TaskStats[] =
@@ -125,7 +125,7 @@ const Statisticstable = () => {
         <h2 className="text-lg font-normal">Statistics</h2>
 
         {/* Search Filter aligned to the right */}
-        <TaskSearchFilter
+        <SearchFilter
           searchString={searchString}
           setSearchString={setSearchString}
           title="Find your Users"

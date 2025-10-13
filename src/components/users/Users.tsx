@@ -8,12 +8,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import TaskSearchFilter from "../core/TasksSearchFilter";
+import TaskSearchFilter from "../core/SearchFilter";
 import TanStackTable from "../core/TasksTanstacktable";
 import { usersColumns } from "./UsersColumns";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import { toast } from "sonner";
 import ResetPasswordDialog from "../core/ResetPasswordDialoge";
+import SearchFilter from "../core/SearchFilter";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
@@ -236,7 +237,7 @@ const UsersDetais = () => {
     <div className="card-container shadow-all border-none p-2 rounded-xl bg-white m-2">
       <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center my-2 gap-3">
-          <TaskSearchFilter
+          <SearchFilter
             searchString={searchString}
             setSearchString={setSearchString}
             title="Find your Users"
