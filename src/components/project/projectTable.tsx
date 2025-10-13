@@ -17,6 +17,7 @@ import {
 } from "@radix-ui/react-tooltip";
 import dayjs from "dayjs";
 import { Button } from "../ui/button";
+import TasksPagination from "../core/TasksPagination";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -32,10 +33,10 @@ interface ProjectsTableProps {
   selectedStatus: string;
   setSelectedSort: (val: string) => void;
   setSelectedStatus: (val: string) => void;
-  setPageSize: (val: number) => void;
   page: number;
   pageSize: number;
   setPage: (page: number) => void;
+  setPageSize: (val: number) => void;
   onDelete: (project: any) => void;
 }
 
@@ -77,8 +78,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         project_status: selectedStatus,
         search_string: debouncedSearch,
       }),
-      retry: false,
-      refetchOnWindowFocus: false,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const projects = data?.data?.data?.records || [];
@@ -140,7 +141,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   <TooltipTrigger asChild>
                     <span
                       className="font-medium truncate max-w-[160px] cursor-default"
-                      title={name} // fallback native tooltip
+                      title={name}
                     >
                       {name}
                     </span>
@@ -251,13 +252,10 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         header: "Actions",
         cell: ({ row }) => {
           const p = row.original;
-
-          // Wait until user is loaded
           if (!user) return null;
 
           return (
             <div className="flex gap-2">
-              {/* Always show View */}
               <Button
                 title="View"
                 className="p-0 text-gray-600 cursor-pointer"
@@ -266,8 +264,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               >
                 <Eye size={16} />
               </Button>
-
-              {/* ✅ Only show Edit/Delete if MANAGER */}
               {user?.user_type === "MANAGER" && (
                 <>
                   <Button
@@ -278,7 +274,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   >
                     <Edit size={16} />
                   </Button>
-
                   <Button
                     title="Delete"
                     className="p-0 text-gray-600 cursor-pointer"
@@ -350,10 +345,10 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} 
-                className={`${
-                  row.index % 2 === 0 ? "bg-slate-100" : "bg-white"
-                } hover:bg-gray-50 border-none`}>
+                <tr
+                  key={row.id}
+                  className={`${row.index % 2 === 0 ? "bg-slate-100" : "bg-white"} hover:bg-gray-50 border-none`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="!h-10 px-3">
                       {flexRender(
@@ -370,85 +365,22 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       </div>
 
       {/* Pagination */}
-      {pagination && (
-        <div className="flex justify-between items-center p-3 text-sm text-gray-600 border-t">
-          <span>
-            Page {pagination.current_page} of {pagination.total_pages}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <label htmlFor="pageSize" className="text-gray-600">
-              Show:
-            </label>
-            <select
-              id="pageSize"
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              className="border rounded px-2 py-1 text-sm cursor-pointer"
-            >
-              {[10, 25, 50, 100].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              disabled={!pagination.prev_page}
-              onClick={() => setPage(pagination.prev_page)}
-              className={`px-3 py-1 rounded border ${
-                pagination.prev_page
-                  ? "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
-                  : "text-gray-400 bg-gray-100 cursor-not-allowed"
-              }`}
-            >
-              Prev
-            </button>
-
-            {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
-              .filter((p) => {
-                const current = pagination.current_page;
-                const total = pagination.total_pages;
-                if (p === 1 || p === total) return true;
-                if (p >= current - 1 && p <= current + 1) return true;
-                return false;
-              })
-              .map((p, i, arr) => {
-                const prev = arr[i - 1];
-                return (
-                  <React.Fragment key={p}>
-                    {prev && p - prev > 1 && <span className="px-2">...</span>}
-                    <button
-                      onClick={() => setPage(p)}
-                      className={`px-3 py-1 rounded border ${
-                        p === pagination.current_page
-                          ? "bg-indigo-500 text-white border-indigo-500 cursor-default"
-                          : "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  </React.Fragment>
-                );
-              })}
-            <button
-              disabled={!pagination.next_page}
-              onClick={() => setPage(pagination.next_page)}
-              className={`px-3 py-1 rounded border ${
-                pagination.next_page
-                  ? "text-gray-700 bg-white hover:bg-gray-100 cursor-pointer"
-                  : "text-gray-400 bg-gray-100 cursor-not-allowed"
-              }`}
-            >
-              Next
-            </button>
-          </div>
-
-          <span>Total Records: {pagination.total_records}</span>
-        </div>
-      )}
+      <div className="w-full flex justify-center bg-white mt-2">
+        <TasksPagination
+          paginationDetails={
+            pagination || {
+              total_records: 0,
+              total_pages: 1,
+              current_page: page,
+              page_size: pageSize,
+              next_page: null,
+              prev_page: null,
+            }
+          }
+          capturePageNum={setPage}
+          captureRowPerItems={setPageSize}
+        />
+      </div>
     </div>
   );
 };
