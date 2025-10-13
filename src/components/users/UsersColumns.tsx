@@ -74,7 +74,7 @@ export const usersColumns = [
       const title = info.getValue();
       return (
         <div>
-          <span className="capitalize">{title || "-"}</span>
+          <span>{title.charAt(0).toUpperCase() + title.slice(1).toLowerCase() || "-"}</span>
         </div>
       );
     },
@@ -96,7 +96,7 @@ export const usersColumns = [
       const title = info.getValue();
       return (
         <div style={{ textAlign: "left" }}>
-          <span className="capitalize">{title || "-"}</span>
+          <span>{title || "-"}</span>
         </div>
       );
     },

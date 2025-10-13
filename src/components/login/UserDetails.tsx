@@ -115,30 +115,30 @@ const UserDetails: React.FC = () => {
           side="bottom"
         >
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 text-gray-700 hover:bg-violet-100 transition-colors"
+            className="cursor-pointer flex items-center gap-2 text-gray-700 focus:bg-violet-100 focus:text-violet-600 transition-colors"
             onClick={() => navigate({ to: "/view-profile" })}
           >
-            <User size={16} />
+            <User size={16} className="hover:text-violet-600"/>
             <span>View Profile</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 text-gray-700 group hover:bg-violet-100 transition-colors"
+            className="cursor-pointer flex items-center gap-2 text-gray-700 group focus:bg-violet-100 focus:text-violet-600 transition-colors"
             onClick={() => {
               setUserToResetPassword(user.id);
               setResetPasswordDialogOpen(true);
             }}
           >
-            <Key size={16} />
+            <Key size={16} className="hover:text-violet-600"/>
 
             <span>Update Password</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 text-gray-600 hover:text-white hover:bg-red-600 transition-colors"
+            className="cursor-pointer flex items-center gap-2 text-gray-600 hover:text-white focus:bg-red-100 focus:text-red-600 transition-colors"
             onClick={handleLogout}
           >
-            <LogOutIcon size={16} />
+            <LogOutIcon size={16} className="hover:text-red-600"/>
             <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

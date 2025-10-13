@@ -64,7 +64,7 @@ function ViewProfile() {
   });
 
   // Update user
-  const { mutate: updateUser } = useMutation({
+  const updateUser = useMutation({
     mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
     onSuccess: (res: any) => {
       if (res?.success) {
@@ -115,7 +115,7 @@ function ViewProfile() {
       phone: userData.phone_number,
       designation: userData.disignation,
     };
-    updateUser(payload);
+    updateUser.mutate(payload);
   };
 
   const handleCancel = () => setIsEditing(false);
@@ -200,8 +200,16 @@ function ViewProfile() {
               <Button
                 className="bg-green-600 text-white px-6 py-0 h-7 rounded-sm text-sm hover:bg-green-700 cursor-pointer font-light"
                 onClick={handleSave}
+                disabled={updateUser.isPending}
               >
-                Save
+                {updateUser.isPending? (
+                  <>
+                    <Loader className="animate-spin w-4 h-4" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </div>
           )}
@@ -244,7 +252,13 @@ function ViewProfile() {
                 type="text"
                 name="phone_number"
                 value={userData.phone_number}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d{0,10}$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                maxLength={10}
                 className="border p-1 rounded w-full mt-1"
               />
             ) : (
