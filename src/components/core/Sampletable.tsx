@@ -116,7 +116,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
           <div className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-100 text-indigo-600">
             📌
           </div>
-          <span>{row.original.task_title}</span>
+          <span className="capitalize">{row.original.task_title}</span>
         </div>
       ),
     },
@@ -193,7 +193,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
 
   return ( 
-    <div className="flex flex-col bg-white h-[calc(100vh-272px)] rounded-lg">
+    <div className="flex flex-col bg-white h-[calc(100vh-265px)] rounded-lg">
       {/* Scrollable table container */}
       <div className="overflow-auto flex-1 rounded-lg">
         <table className="w-full text-sm">

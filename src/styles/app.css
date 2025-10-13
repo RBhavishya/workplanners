@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@config "../../tailwind.config.js";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -112,10 +116,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 font-manrope;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-manrope;
   }
 }
 
