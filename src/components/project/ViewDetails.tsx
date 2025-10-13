@@ -182,8 +182,7 @@ const Viewdetails = () => {
     <div className="flex">
       <div className="flex flex-col m-2 gap-3">
         {/* Project Info */}
-        <div className="rounded-md p-4 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)] flex justify-between items-center">
-          <div className="flex flex-col">
+        <div className="rounded-md p-4 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
           <div className="flex items-center gap-3 mb-2">
           <button
             onClick={() => window.history.back()}
@@ -209,13 +208,6 @@ const Viewdetails = () => {
           <p className="text-gray-700 mt-2">
             {projectdata.description || "No description available"}
           </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mt-2">
-              <img src={projectdata.createdByUser?.profile_pic} alt="avatar" className="w-8 h-8 rounded-full" />
-              <p>{projectdata.createdByUser?.display_name}</p>
-            </div>
-          </div>
         </div>
         {/* Status Cards */}
         <div className="flex items-center w-full bg-white p-2 rounded-sm">
