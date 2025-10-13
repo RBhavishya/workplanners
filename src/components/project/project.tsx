@@ -228,7 +228,7 @@ const Projects = () => {
 
       {/* Projects Section */}
       {viewMode === "grid" ? (
-        <div className="relative flex-1 h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="relative flex-1 h-[calc(100vh-120px)] overflow-y-auto">
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
@@ -242,7 +242,8 @@ const Projects = () => {
               No projects available.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 h-[calc(100vh-165px)] overflow-y-auto lg:grid-cols-4 gap-4">
+            <div className="h-[calc(100vh-165px)] overflow-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {projectsData.map((project: ProjectData) => (
                 <Card
                   key={project.id}
@@ -306,6 +307,7 @@ const Projects = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
             </div>
           )}
 
