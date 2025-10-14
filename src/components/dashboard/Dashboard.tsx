@@ -23,15 +23,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
+import Loading from "../core/Loading";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search as string);
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
-
   const [time, setTime] = useState(new Date());
   const [todayFilter, setTodayFilter] = useState<string>("");
-
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +41,6 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const formattedTime = time.toLocaleTimeString("en-GB");
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
     day: "2-digit",
@@ -224,9 +222,6 @@ const Dashboard = () => {
             + New Task
           </Button>
         </div>
-        {/* <h2 className="text-lg font-semibold">Task Tracker</h2>
-        <p className="text-sm text-gray-500 mb-4">{formattedDate}</p> */}
-
         {/* Filters */}
         <div className="flex items-center gap-2 mb-4 text-sm 3xl:!text-base font-medium">
           {[
@@ -271,12 +266,11 @@ const Dashboard = () => {
         {/* Tasks List */}
         <div
           ref={containerRef}
-          className="space-y-2 h-[calc(100vh-250px)] overflow-y-auto pr-2"
+          className="space-y-2 h-[calc(100vh-190px)] overflow-y-auto pr-2"
         >
           {isFetching ? (
             <div className="flex items-center justify-center py-6">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="ml-2 text-sm 3xl:!text-base text-gray-500">Loading tasks...</p>
+              <Loading loading={isFetching} />
             </div>
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true
@@ -298,16 +292,39 @@ const Dashboard = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-start gap-2 py-2 border-b border-gray-100 cursor-pointer"
+                    className="flex flex-col items-start gap-1 p-1 border-b border-gray-200 cursor-pointer"
                       onClick={() => navigate({ to: `/tasks/view/${task.id}` })}
                   >
-                    <div className="flex-1">
+                    <div className="flex items-center justify-between w-full">
                       <p className="font-medium text-gray-600 capitalize text-sm 3xl:!text-base">
                         {task.task_title}
                       </p>
+                      {/* Task Status Icon */}
+                    <div
+                      className={
+                        task.task_status === "COMPLETED"
+                          ? "text-green-500"
+                          : [
+                                "IN_PROGRESS",
+                                "OVERDUE",
+                                "REVIEW",
+                                "NEW",
+                              ].includes(task.task_status)
+                            ? "text-yellow-500"
+                            : "text-gray-400"
+                      }
+                    >
+                      {task.task_status === "COMPLETED" ? (
+                        <GreenThickIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
+                      ) : (
+                        <ClockIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
+                      )}
+                    </div>
+                    </div>
 
-                      {/* Due Date */}
-                      <p className="text-[11px] 3xl:!text-xs font-normal text-gray-700">
+                  <div className="flex items-center justify-between w-full">
+                    {/* Due Date */}
+                    <p className="text-[11px] 3xl:!text-xs font-normal text-gray-700">
                         Due Date:{" "}
                         <span className="text-gray-500 font-normal">
                           {task.end_date
@@ -319,14 +336,13 @@ const Dashboard = () => {
                             : "No due date"}
                         </span>
                       </p>
-
-                      {/* Assigned Users */}
-                      {task.users && task.users.length > 0 && (
+                    {/* Assigned Users */}
+                    {task.users && task.users.length > 0 && (
                         <div className="flex -space-x-2 items-center mt-1">
                           {visibleUsers.map((u: any) => (
                             <div
                               key={u.user_id}
-                              className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-[11px] 3xl:!text-xs font-medium text-white border-2 border-white"
+                              className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] 3xl:!text-xs font-medium text-white border-2 border-white"
                               title={u.display_name}
                             >
                               {u.display_name.charAt(0).toUpperCase()}
@@ -347,7 +363,7 @@ const Dashboard = () => {
                                 >
                                   <div className="flex flex-col gap-1">
                                     {remainingUsers.map((u: any) => (
-                                      <span key={u.user_id}>
+                                      <span key={u.user_id} className="capitalize">
                                         {u.display_name}
                                       </span>
                                     ))}
@@ -357,28 +373,6 @@ const Dashboard = () => {
                             </TooltipProvider>
                           )}
                         </div>
-                      )}
-                    </div>
-
-                    {/* Task Status Icon */}
-                    <div
-                      className={
-                        task.task_status === "COMPLETED"
-                          ? "text-green-500"
-                          : [
-                                "IN_PROGRESS",
-                                "OVERDUE",
-                                "REVIEW",
-                                "NEW",
-                              ].includes(task.task_status)
-                            ? "text-yellow-500"
-                            : "text-gray-400"
-                      }
-                    >
-                      {task.task_status === "COMPLETED" ? (
-                        <GreenThickIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
-                      ) : (
-                        <ClockIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
                       )}
                     </div>
                   </div>

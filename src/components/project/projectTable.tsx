@@ -18,6 +18,8 @@ import {
 import dayjs from "dayjs";
 import { Button } from "../ui/button";
 import TasksPagination from "../core/TasksPagination";
+import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import Loading from "../core/Loading";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -191,7 +193,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     >
                       <div className="flex flex-col gap-1">
                         {remainingUsers.map((u: any) => (
-                          <span key={u.user_id}>{u.display_name}</span>
+                          <span key={u.user_id} className="capitalize">{u.display_name}</span>
                         ))}
                       </div>
                     </TooltipContent>
@@ -306,7 +308,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     <div className="border-none rounded-xl overflow-hidden h-[calc(100vh-120px)] flex flex-col bg-white">
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm border-collapse">
-          <thead className="bg-gray-50 sticky top-0 z-10 text-left text-neutral-400">
+          <thead className="bg-gray-50 sticky top-0 text-left text-neutral-400">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
@@ -328,8 +330,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   className="text-center py-6 text-gray-500"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span>Loading projects...</span>
+                    <Loading loading={isLoading || isFetching} />
                   </div>
                 </td>
               </tr>
@@ -339,7 +340,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   colSpan={columns.length}
                   className="text-gray-500 text-center py-6"
                 >
-                  No projects found
+                  <div className="flex flex-col items-center justify-center gap-3">
+                      <NoProjectIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Project found
+                      </p>
+                    </div>
                 </td>
               </tr>
             ) : (
