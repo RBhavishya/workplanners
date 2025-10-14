@@ -73,12 +73,10 @@ export const usersColumns = [
       // Convert "team_lead" -> "Teamlead"
       const formattedTitle = title
         .split("_")
-        .map((word, index) =>
-          index === 0
-            ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            : word.toLowerCase()
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
-        .join(""); // join without space
+        .join(" "); // join without space
       return (
         <div>
           <span>{formattedTitle || "-"}</span>
