@@ -3,6 +3,7 @@ import UserDetails from "../login/UserDetails";
 import { useLocation } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { Button } from "../ui/button";
+import { NotificationIcon } from "../icons/NotificationIcon";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
@@ -58,8 +59,8 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
             variant="ghost"
             title="Notifications"
           >
-            <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute top-1.5 right-1.5 block w-2 h-2 bg-red-500 rounded-full"></span>
+            <NotificationIcon className="!w-10 !h-10 text-gray-600" />
+            <span className="absolute top-0 right-0 block w-4 h-4 bg-red-500 rounded-full text-xs text-white font-light">0</span>
           </Button>
 
           {/* User details */}

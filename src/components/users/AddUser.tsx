@@ -397,12 +397,12 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </PopoverTrigger>
 
           <PopoverContent
-            align="start" // align left to the trigger
-            sideOffset={4} // optional spacing from trigger
+            align="start"
+            sideOffset={4}
             className="p-2 max-w-150"
           >
             <div className="max-h-40 overflow-y-auto">
-              {["Employee", "Team Lead"].map((option) => (
+              {["EMPLOYEE", "TEAM_LEAD"].map((option) => (
                 <div
                   key={option}
                   className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
