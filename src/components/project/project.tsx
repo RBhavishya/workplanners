@@ -105,14 +105,6 @@ const Projects = () => {
   const handleNavigation = () => navigate({ to: `/projects/add` });
   const handleView = (id: number) => navigate({ to: `/projects/${id}` });
 
-  if (isError) {
-    return (
-      <p className="text-red-500 p-4">
-        Error fetching projects: {error?.message || "Unknown error"}
-      </p>
-    );
-  }
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
@@ -231,14 +223,14 @@ const Projects = () => {
           )}
 
           {/* Grid Cards */}
-          {projectsData.length === 0 && !isLoading ? (
+          {projectsData?.length === 0 && !isLoading ? (
             <p className="text-gray-500 flex items-center justify-center py-6 h-[calc(100vh-165px)]">
               No projects available.
             </p>
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {projectsData.map((project: ProjectData) => (
+                {projectsData?.map((project: ProjectData) => (
                   <Card
                     key={project.id}
                     className="w-full shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col cursor-pointer pb-5 pt-3"
