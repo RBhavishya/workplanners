@@ -8,7 +8,6 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import {
   deleteTasksAPI,
   getAllPaginatedTasks,
@@ -80,22 +79,6 @@ const Tasks = () => {
       selectedStatus,
     ],
     queryFn: async () => {
-      const response = await getAllPaginatedTasks({
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-        order_by: pagination.order_by,
-        search_string: debouncedSearch,
-        task_status: selectedStatus,
-        from_date:
-          dateValue?.length && dateValue[0]
-            ? formatDate(dateValue[0])
-            : undefined,
-        to_date:
-          dateValue?.length && dateValue[1]
-            ? formatDate(dateValue[1])
-            : undefined,
-      });
-
       if (location.pathname !== "/dashboard") {
         router.navigate({
           to: "/tasks",
@@ -116,6 +99,21 @@ const Tasks = () => {
           },
         });
       }
+      const response = await getAllPaginatedTasks({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        order_by: pagination.order_by,
+        search_string: debouncedSearch,
+        task_status: selectedStatus,
+        from_date:
+          dateValue?.length && dateValue[0]
+            ? formatDate(dateValue[0])
+            : undefined,
+        to_date:
+          dateValue?.length && dateValue[1]
+            ? formatDate(dateValue[1])
+            : undefined,
+      });
 
       return response;
     },

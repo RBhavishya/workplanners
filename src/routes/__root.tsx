@@ -1,5 +1,5 @@
-/// <reference types="vite/client" />;
-import appCss from '@/styles/app.css?url'
+// import appCss from '@/styles/app.css?url'
+import '../styles/app.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   createRootRoute,
@@ -19,7 +19,7 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'Work Planners' },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    // links: [{ rel: 'stylesheet', href: appCss }],
   }),
   component: RootComponent,
 })

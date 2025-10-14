@@ -462,7 +462,7 @@ const AddProjectForm = ({
                           key={u.id}
                           onSelect={() => toggleUser(u.id)}
                         >
-                          <span>{u.display_name}</span>
+                          <span className="capitalize">{u.display_name}</span>
                           <Check
                             className={cn(
                               "h-4 w-4 ml-auto",

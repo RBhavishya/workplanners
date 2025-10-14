@@ -52,13 +52,6 @@ const UsersDetais = () => {
   const { isLoading, data, isFetching } = useQuery({
     queryKey: ["users", pagination, debouncedSearch, del, selectedUserType],
     queryFn: async () => {
-      const response = await getAllPaginatedUsers({
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-        order_by: pagination.order_by,
-        search_string: debouncedSearch,
-        user_type: selectedUserType,
-      });
       if (location.pathname !== "/dashboard") {
         router.navigate({
           to: "/users",
@@ -71,6 +64,14 @@ const UsersDetais = () => {
           },
         });
       }
+      const response = await getAllPaginatedUsers({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        order_by: pagination.order_by,
+        search_string: debouncedSearch,
+        user_type: selectedUserType,
+      });
+      
       return response;
     },
     retry: false,

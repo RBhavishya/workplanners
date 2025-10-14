@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  ColumnDef,
-} from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
 import { getDashboardStatistics } from "@/https/services/dashboard";
-import TasksPagination from "../core/TasksPagination";
 import { addSerial } from "@/lib/helpers/addSerial";
-import TaskSearchFilter from "../core/SearchFilter";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import SearchFilter from "../core/SearchFilter";
+import TasksPagination from "../core/TasksPagination";
+import { NoDataIcon } from "../icons/NoIcons/NoDataIcon";
 
 type TaskStats = {
   id: number;
@@ -165,15 +165,17 @@ const Statisticstable = () => {
                 ))}
               </thead>
               <tbody>
-                {table.getRowModel().rows.length === 0 && !isLoading ? (
+                {table.getRowModel().rows.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="text-center py-4 text-gray-500"
-                    >
-                      No data found.
-                    </td>
-                  </tr>
+                  <td colSpan={columns.length} className="text-center py-15">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <NoDataIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Data found
+                      </p>
+                    </div>
+                  </td>
+                </tr>
                 ) : (
                   table.getRowModel().rows.map((row) => (
                     <tr
