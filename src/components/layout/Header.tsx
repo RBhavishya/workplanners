@@ -37,20 +37,6 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     current_page: pageIndexParam,
   });
 
-  const formattedTime = time.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Kolkata",
-  });
-  const formattedDate = time.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "short",
-    timeZone: "Asia/Kolkata",
-  });
-
   const defaultCenter =
     location.pathname === "/dashboard" ? (
       <div className="flex-1 max-w-md mx-2">

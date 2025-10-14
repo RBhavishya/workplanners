@@ -8,7 +8,6 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import {
   deleteTasksAPI,
   getAllPaginatedTasks,
@@ -31,6 +30,7 @@ import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
 import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { taskColumns } from "./TaskColumns";
+import Loading from "../core/Loading";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -80,22 +80,6 @@ const Tasks = () => {
       selectedStatus,
     ],
     queryFn: async () => {
-      const response = await getAllPaginatedTasks({
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-        order_by: pagination.order_by,
-        search_string: debouncedSearch,
-        task_status: selectedStatus,
-        from_date:
-          dateValue?.length && dateValue[0]
-            ? formatDate(dateValue[0])
-            : undefined,
-        to_date:
-          dateValue?.length && dateValue[1]
-            ? formatDate(dateValue[1])
-            : undefined,
-      });
-
       if (location.pathname !== "/dashboard") {
         router.navigate({
           to: "/tasks",
@@ -116,6 +100,21 @@ const Tasks = () => {
           },
         });
       }
+      const response = await getAllPaginatedTasks({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        order_by: pagination.order_by,
+        search_string: debouncedSearch,
+        task_status: selectedStatus,
+        from_date:
+          dateValue?.length && dateValue[0]
+            ? formatDate(dateValue[0])
+            : undefined,
+        to_date:
+          dateValue?.length && dateValue[1]
+            ? formatDate(dateValue[1])
+            : undefined,
+      });
 
       return response;
     },
@@ -367,7 +366,7 @@ const Tasks = () => {
         <div className="bg-white relative">
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loading loading={isLoading || isFetching} /> 
             </div>
           )}
 

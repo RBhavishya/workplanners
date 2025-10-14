@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
+import { getAllPaginatedProjects } from "@/https/services/project";
+import { ProjectData } from "@/interfaces/project";
+import { addSerial } from "@/lib/helpers/addSerial";
+import { useQuery } from "@tanstack/react-query";
 import {
+  useLocation,
   useNavigate,
   useRouter,
-  useLocation,
   useSearch,
 } from "@tanstack/react-router";
+import { Filter, LayoutGrid, List, MoreVertical, Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import SearchFilter from "../core/SearchFilter";
+import TasksPagination from "../core/TasksPagination";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreVertical, Filter, LayoutGrid, List, X, Plus } from "lucide-react";
-import { ProjectData } from "@/interfaces/project";
-import { getAllPaginatedProjects } from "@/https/services/project";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
 import ProjectsTable from "./projectTable";
-import { Input } from "../ui/input";
-import { SearchIcon } from "../icons/SearchIcon";
-import { addSerial } from "@/lib/helpers/addSerial";
-import TasksPagination from "../core/TasksPagination";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
-import TaskSearchFilter from "../core/SearchFilter";
-import SearchFilter from "../core/SearchFilter";
+import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import Loading from "../core/Loading";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -135,7 +134,7 @@ const Projects = () => {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-medium text-xl 3xl:!text-2xl">Projects</h2>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <SearchFilter
             searchString={searchString}
             setSearchString={setSearchString}
@@ -185,16 +184,16 @@ const Projects = () => {
           </Popover>
 
           {/* View Toggle */}
-          <div className="flex items-center bg-white p-0.5">
+          <div className="flex items-center bg-white p-0 border border-neutral-300 rounded-sm">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-1 cursor-pointer ${viewMode === "grid" ? "text-white bg-violet-600" : ""}`}
+              className={`cursor-pointer rounded-l p-1 ${viewMode === "grid" ? "text-white bg-violet-600" : ""}`}
             >
               <LayoutGrid size={18} />
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`p-1 cursor-pointer ${viewMode === "table" ? "text-white bg-violet-600" : ""}`}
+              className={`cursor-pointer rounded-r p-1 ${viewMode === "table" ? "text-white bg-violet-600" : ""}`}
             >
               <List size={18} />
             </button>
@@ -218,15 +217,18 @@ const Projects = () => {
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loading loading={isLoading || isFetching} />
             </div>
           )}
 
           {/* Grid Cards */}
-          {projectsData?.length === 0 && !isLoading ? (
-            <p className="text-gray-500 flex items-center justify-center py-6 h-[calc(100vh-165px)]">
-              No projects available.
-            </p>
+          {projectsData.length === 0 && !isLoading ? (
+             <div className="flex flex-col items-center justify-center gap-2 bg-white h-[calc(100vh-165px)]">
+             <NoProjectIcon />
+             <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+               No Project found
+             </p>
+           </div>
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
