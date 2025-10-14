@@ -9,6 +9,7 @@ import {
   getAllNotificationsAPI,
   markAsReadAPI,
 } from "@/https/services/notifications";
+import { tr } from "date-fns/locale";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
