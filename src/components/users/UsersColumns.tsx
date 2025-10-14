@@ -83,7 +83,7 @@ export const usersColumns = [
     minWidth: "80px",
     header: () => (
       <div className="flex justify-center">
-        <span>User Type</span>
+        <span>Role</span>
       </div>
     ),
     footer: (props: any) => props.column.id,

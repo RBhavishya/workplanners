@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import UserDetails from "../login/UserDetails";
 import { useLocation } from "@tanstack/react-router";
+import { Bell } from "lucide-react";
+import { Button } from "../ui/button";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
@@ -47,15 +49,20 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
   return (
-    <header
-      className="
-        flex items-center justify-between
-        p-2 bg-white border-b                     
-      "
-    >
+     <header className="flex items-center justify-between p-2 bg-white border-b">
       {centerContent}
       <div className="flex items-center justify-end w-full">
         <div className="flex items-center space-x-6">
+          <Button
+            className="relative p-2 rounded-full hover:bg-gray-100 transition cursor-pointer"
+            variant="ghost"
+            title="Notifications"
+          >
+            <Bell className="w-5 h-5 text-gray-600" />
+            <span className="absolute top-1.5 right-1.5 block w-2 h-2 bg-red-500 rounded-full"></span>
+          </Button>
+
+          {/* User details */}
           <UserDetails />
         </div>
       </div>
