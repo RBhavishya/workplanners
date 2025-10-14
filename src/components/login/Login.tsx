@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
         setErrors(error.data.errData);
       } else {
         toast.error(
-          error?.data?.message || "User not found or invalid credentials"
+          error?.message
         );
       }
     },

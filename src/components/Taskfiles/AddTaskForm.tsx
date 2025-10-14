@@ -33,6 +33,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import Loading from "../core/Loading";
 
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
@@ -466,7 +467,7 @@ const AddTaskForm = ({
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {loadingProjects ? (
-                    <div className="p-2 text-gray-500">Loading...</div>
+                    <Loading loading={loadingProjects} />
                   ) : projects.length === 0 ? (
                     <CommandEmpty>No projects found.</CommandEmpty>
                   ) : (
@@ -560,7 +561,7 @@ const AddTaskForm = ({
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {loadingUsers ? (
-                    <div className="p-2 text-gray-500">Loading...</div>
+                    <Loading loading={loadingUsers} />
                   ) : usersResp.length === 0 ? (
                     <CommandEmpty>No users found.</CommandEmpty>
                   ) : (

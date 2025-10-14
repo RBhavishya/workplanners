@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import { Button } from "../ui/button";
 import TasksPagination from "../core/TasksPagination";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import Loading from "../core/Loading";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -329,8 +330,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   className="text-center py-6 text-gray-500"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span>Loading projects...</span>
+                    <Loading loading={isLoading || isFetching} />
                   </div>
                 </td>
               </tr>

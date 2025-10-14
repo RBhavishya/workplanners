@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import Loading from "../core/Loading";
 
 const statuses = [
   { value: "NEW", label: "New" },
@@ -167,7 +168,7 @@ const Viewdetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        <Loading loading={isLoading} />
       </div>
     );
   }

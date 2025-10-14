@@ -23,15 +23,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
+import Loading from "../core/Loading";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search as string);
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
-
   const [time, setTime] = useState(new Date());
   const [todayFilter, setTodayFilter] = useState<string>("");
-
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +41,6 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const formattedTime = time.toLocaleTimeString("en-GB");
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
     day: "2-digit",
@@ -272,8 +270,7 @@ const Dashboard = () => {
         >
           {isFetching ? (
             <div className="flex items-center justify-center py-6">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="ml-2 text-sm 3xl:!text-base text-gray-500">Loading tasks...</p>
+              <Loading loading={isFetching} />
             </div>
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true

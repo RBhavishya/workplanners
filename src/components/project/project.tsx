@@ -24,6 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
 import ProjectsTable from "./projectTable";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import Loading from "../core/Loading";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -224,7 +225,7 @@ const Projects = () => {
           {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loading loading={isLoading || isFetching} />
             </div>
           )}
 

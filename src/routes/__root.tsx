@@ -1,4 +1,5 @@
 // import appCss from '@/styles/app.css?url'
+import { authMiddleware } from '@/lib/helpers/middleware'
 import '../styles/app.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
@@ -19,9 +20,12 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'Work Planners' },
     ],
-    // links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap'},
+    ],
   }),
   component: RootComponent,
+  beforeLoad: authMiddleware
 })
 
 function RootComponent() {

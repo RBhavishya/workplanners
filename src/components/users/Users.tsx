@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { usersColumns } from "./UsersColumns";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Filter, X } from "lucide-react";
+import Loading from "../core/Loading";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
@@ -297,7 +298,7 @@ const UsersDetais = () => {
         <div className="bg-white relative">
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loading loading={isLoading || isFetching} />
             </div>
           )}
           <div className="mt-5">

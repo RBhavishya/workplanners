@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import SearchFilter from "../core/SearchFilter";
 import TasksPagination from "../core/TasksPagination";
 import { NoDataIcon } from "../icons/NoIcons/NoDataIcon";
+import Loading from "../core/Loading";
 
 type TaskStats = {
   id: number;
@@ -140,7 +141,7 @@ const Statisticstable = () => {
           <div className="flex-1 overflow-y-auto relative">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
-                <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+               <Loading loading={isLoading} />
               </div>
             )}
             <table className="w-full text-left">
@@ -165,7 +166,7 @@ const Statisticstable = () => {
                 ))}
               </thead>
               <tbody>
-                {table.getRowModel().rows.length === 0 ? (
+                {table.getRowModel().rows.length === 0 && !isLoading ? (
                   <tr>
                   <td colSpan={columns.length} className="text-center py-15">
                     <div className="flex flex-col items-center justify-center gap-3">
