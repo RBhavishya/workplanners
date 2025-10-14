@@ -167,7 +167,7 @@ const Dashboard = () => {
       <div className="w-3/4 m-2">
         <div className="bg-white p-2 rounded-sm shadow-none mb-2">
           <div className="flex flex-wrap gap-3">
-            {isError ? (
+            {/* {isError ? (
               <p className="text-red-500">Error loading stats</p>
             ) : (
               dashboardCards.map((card) => {
@@ -203,7 +203,35 @@ const Dashboard = () => {
                   </div>
                 );
               })
-            )}
+            )} */}
+            {dashboardCards.map((card) => {
+  const isActive =
+    new URLSearchParams(location.search as string).get("task_status") ===
+    card.status;
+
+  return (
+    <div
+      key={card.title}
+      className={`cursor-pointer ${isActive ? "border border-purple-600 rounded-md" : ""}`}
+      onClick={() =>
+        navigate({
+          to: "/tasks",
+          search: {
+            page: 1,
+            page_size: pageSizeParam,
+            task_status: card.status || undefined,
+          },
+        })
+      }
+    >
+      <BigCard
+        title={card.title}
+        value={<CountUp start={0} end={card.value} duration={1.5} />}
+        icon={card.icon}
+      />
+    </div>
+  );
+})}
           </div>
         </div>
 
