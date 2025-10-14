@@ -104,14 +104,6 @@ const Projects = () => {
   const handleNavigation = () => navigate({ to: `/projects/add` });
   const handleView = (id: number) => navigate({ to: `/projects/${id}` });
 
-  if (isError) {
-    return (
-      <p className="text-red-500 p-4">
-        Error fetching projects: {error?.message || "Unknown error"}
-      </p>
-    );
-  }
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
@@ -240,7 +232,7 @@ const Projects = () => {
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {projectsData.map((project: ProjectData) => (
+                {projectsData?.map((project: ProjectData) => (
                   <Card
                     key={project.id}
                     className="w-full shadow-lg rounded-2xl hover:shadow-xl relative flex flex-col cursor-pointer pb-5 pt-3"

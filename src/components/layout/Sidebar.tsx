@@ -17,20 +17,20 @@ const Sidebar = () => {
   const activeProps = {
     className: "bg-violet-100 text-violet-600 font-normal",
     link: "flex items-center px-3 py-1 group text-base 3xl:!text-lg text-gray-700 group hover:bg-violet-100 hover:text-violet-600 transition-colors rounded-none",
-    icon: "mr-3 w-4 h-4 3xl:!w-5 3xl:!h-5 group:text-violet-600"
+    icon: "mr-3 w-4 h-4 3xl:!w-5 3xl:!h-5 group:text-violet-600",
   };
 
   return (
     <aside className="w-54 bg-white border-r fixed left-0 top-0 h-full p-0 flex flex-col shadow-none z-10">
       {/* <div className='border-b p-3'> <UserDetails/></div> */}
       <nav className="flex flex-col space-y-4 mt-15 p-3 flex-grow">
-        {user_type !== "EMPLOYEE" && (
+        {user_type !== "EMPLOYEE" && user_type !== "TEAM_LEAD" && (
           <Link
             to="/dashboard"
             className={activeProps.link}
             activeProps={{ className: activeProps.className }}
           >
-            <DashboardIcon className={activeProps.icon}/>
+            <DashboardIcon className={activeProps.icon} />
             Dashboard
           </Link>
         )}
@@ -50,7 +50,7 @@ const Sidebar = () => {
           <ProjectsIcon className={activeProps.icon} />
           Projects
         </Link>
-        {user_type !== "EMPLOYEE" && (
+        {user_type !== "EMPLOYEE" && user_type !== "TEAM_LEAD" && (
           <Link
             to="/users"
             className={activeProps.link}

@@ -298,12 +298,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isError) {
-    return (
-      <p className="text-red-500 text-center py-4">Failed to fetch projects</p>
-    );
-  }
-
   return (
     <div className="border-none rounded-xl overflow-hidden h-[calc(100vh-120px)] flex flex-col bg-white">
       <div className="overflow-auto flex-1">

@@ -133,9 +133,9 @@ const Statisticstable = () => {
         />
       </div>
 
-      {isError ? (
-        <p className="text-red-500">Error fetching statistics</p>
-      ) : (
+      {/* isError ? ( */}
+        {/* <p className="text-red-500">Error fetching statistics</p> */}
+      {/* ) : ( */}
         <>
           {/* Scrollable Table Section */}
           <div className="flex-1 overflow-y-auto relative">
@@ -223,7 +223,6 @@ const Statisticstable = () => {
             </div>
           )}
         </>
-      )}
     </div>
   );
 };

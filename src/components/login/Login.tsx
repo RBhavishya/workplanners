@@ -134,13 +134,18 @@ const LoginPage: React.FC = () => {
       Cookies.set("token", access_token, { priority: "High" });
       localStorage.setItem("user", JSON.stringify(user_details));
       setErrors({});
+
       let redirectPath = "/dashboard";
-      if (user_details?.user_type === "ADMIN") {
-        redirectPath = "/dashboard";
-      } else if (user_details?.user_type === "MANAGER") {
-        redirectPath = "/dashboard";
-      } else if (user_details?.user_type === "EMPLOYEE") {
+      if (
+        user_details?.user_type === "EMPLOYEE" ||
+        user_details?.user_type === "TEAM_LEAD"
+      ) {
         redirectPath = "/tasks";
+      } else if (
+        user_details?.user_type === "ADMIN" ||
+        user_details?.user_type === "MANAGER"
+      ) {
+        redirectPath = "/dashboard";
       }
 
       navigate({ to: redirectPath });

@@ -34,10 +34,12 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState("");
   const [designation, setDesignation] = useState("");
+  const [userType, setUserType] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+   const [rolePopoverOpen, setRolePopoverOpen] = useState(false);
   const [designationPopoverOpen, setDesignationPopoverOpen] = useState(false);
   const [designationTriggerWidth, setDesignationTriggerWidth] = useState<
     number | null
@@ -129,6 +131,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       email: email,
       phone: phone,
       designation: designation,
+      user_type: userType,
     };
     if (mode === "edit") {
       updateMutation.mutate(payload);
@@ -144,6 +147,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       setDesignation(userResp.data?.data.designation);
       setEmail(userResp.data?.data.email);
       setPhone(userResp.data?.data.phone);
+      setUserType(userResp.data?.data.user_type);
     }
   }, [userResp, mode]);
 
@@ -360,6 +364,67 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         {errors.designation && (
           <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.designation.join(", ")}
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col gap-2 mb-4">
+        <label className={Form_STYLES.label}>
+          Role <span className="text-red-500">*</span>
+        </label>
+ 
+        <Popover
+          open={rolePopoverOpen}
+          onOpenChange={setRolePopoverOpen}
+        >
+          <PopoverTrigger asChild>
+            <div
+              ref={triggerRef}
+              className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer"
+            >
+              {userType ? (
+                <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm 3xl:!text-base gap-1">
+                  <span>{userType}</span>
+                  {/* Optional clear button */}
+                  <button type="button" onClick={() => setUserType("")}>
+                    <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-purple-300 !font-normal">Select role...</span>
+              )}
+              <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
+            </div>
+          </PopoverTrigger>
+
+          <PopoverContent
+            align="start"
+            sideOffset={4}
+            className="p-2 max-w-150"
+          >
+            <div className="max-h-40 overflow-y-auto">
+              {["EMPLOYEE", "TEAM_LEAD"].map((option) => (
+                <div
+                  key={option}
+                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
+                  onClick={() => {
+                    setUserType(option);
+                    setRolePopoverOpen(false);
+                    clearFieldError("userType");
+                  }}
+                >
+                  <span>{option}</span>
+                  {userType === option && (
+                    <Check className="w-4 h-4 text-purple-500" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {errors.user_type && (
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            {errors.user_type.join(", ")}
           </p>
         )}
       </div>
