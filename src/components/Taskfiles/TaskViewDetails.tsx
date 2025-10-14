@@ -1,14 +1,3 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Check, ChevronDown, MoveLeft } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addAsignedUserAPI,
   deleteTaskAssignedUserAPI,
@@ -17,9 +6,36 @@ import {
   getTasksAvailableUsersAPI,
   TasksStatusAPI,
 } from "@/https/services/tasks";
-import { useParams } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
+import { ArrowLeft, Check, ChevronDown, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { TaskComments } from "./TaskComments";
+
+const statuses = [
+  { value: "NEW", label: "New" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "OVERDUE", label: "Overdue" },
+  { value: "REVIEW", label: "Review" },
+];
 
 const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
@@ -37,6 +53,7 @@ const TaskViewDetails = () => {
     REVIEW: "bg-yellow-100 text-yellow-700",
     COMPLETED: "bg-green-100 text-green-600",
   };
+  const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const {
     data: taskResponse,
@@ -129,12 +146,11 @@ const TaskViewDetails = () => {
     }
   }, [assignedUsersData]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (triggerRef.current) {
       setTriggerWidth(triggerRef.current.offsetWidth);
     }
   }, [open]);
-
 
   if (isLoading) {
     return (
@@ -149,45 +165,52 @@ const TaskViewDetails = () => {
   if (!taskdata) return <p className="text-center">No Tasks found</p>;
 
   return (
-    <div className="p-4">
-      <div className="border border-gray-300 rounded-xl p-4 mb-6 bg-gray-50">
-        <button
-          onClick={() => window.history.back()}
-          className="text-gray-600 hover:text-blue-600 cursor-pointer"
-        >
-          <MoveLeft className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold">
-            {taskdata.task_title?.charAt(0) || "P"}
-          </div>
-          <div className="flex items-center gap-[3px] text-xl font-semibold">
-            <span>{taskdata.task_title}</span>
-            <span
-              className={`ml-2 text-sm px-2 py-1 rounded ${
-                statusColors[taskdata.task_status] ||
-                "bg-gray-200 text-gray-800"
-              }`}
+    <div className="flex justify-between">
+      <div className="flex flex-col m-2 gap-3 w-full">
+        <div className="rounded-md p-3 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={() => window.history.back()}
+              className="text-gray-600 hover:text-blue-600 cursor-pointer"
             >
-              {taskdata.task_status}
-            </span>
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
+              {taskdata.task_title?.charAt(0) || "T"}
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <span className="capitalize">{taskdata.task_title}</span>
+                <span
+                  className={`ml-2 text-sm px-2 py-1 rounded ${
+                    statusColors[taskdata.task_status] ||
+                    "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {taskdata.task_status.charAt(0).toUpperCase() + taskdata.task_status.slice(1).toLowerCase()}
+                </span>
+              </div>
+              <p className="text-gray-700 text-sm 3xl:!text-base">
+                {taskdata.description || "No description available"}
+              </p>
+            </div>
           </div>
         </div>
-        <p className="text-gray-700 mt-2">
-          {taskdata.description || "No description available"}
-        </p>
+        <div className="bg-white h-[calc(100vh-165px)] rounded-md shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
+          <TaskComments />
+        </div>
       </div>
 
-      <div className="border border-gray-200 bg-white rounded-3xl shadow-lg p-3 flex gap-6">
-        <div className="w-1/3 border border-gray-200 rounded-3xl p-4 ml-auto">
-          <div className="text-2xl font-bold mb-4">Details</div>
-          <div className="h-[calc(100vh-410px)] overflow-y-auto">
+      {/* Task Details */}
+      <div className="w-2/5 border-l border-gray-200 p-3 bg-white">
+        <div className="text-xl font-medium mb-4">Task Details</div>
+        <div className="flex flex-col gap-3">
+          {/* Created By */}
           <div className="flex items-center gap-3 mb-4">
             {taskdata.createdByUser?.profile_pic ? (
               <img
                 src={taskdata.createdByUser.profile_pic}
-                alt={taskdata.task_title || "User"}
+                alt={taskdata.createdByUser.display_name || "User"}
                 className="w-10 h-10 rounded-full object-cover border"
               />
             ) : (
@@ -196,78 +219,73 @@ const TaskViewDetails = () => {
               </div>
             )}
             <div>
-              <p className="font-medium">
+              <p className="font-medium capitalize">
                 {taskdata.task_title || "Untitled Task"}
               </p>
               <p className="text-xs text-gray-500">Task Title</p>
             </div>
           </div>
-          <div className="mb-4">
-            <strong>Status:</strong>{" "}
-            <select
+
+          {/* Status Selector */}
+          <div className="flex items-center gap-2">
+            <p className="text-base 3xl:!text-lg">Status:</p>{" "}
+            <Select
               value={taskdata.task_status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="ml-2 border rounded p-1 cursor-pointer"
+              onValueChange={(value) => handleStatusChange(value)}
             >
-              <option value="NEW">NEW</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="OVERDUE">OVERDUE</option>
-              <option value="REVIEW">REVIEW</option>
-              <option value="COMPLETED">COMPLETED</option>
-            </select>
+              <SelectTrigger className="ml-2 border rounded w-30 !h-7 focus:ring-0 focus-visible:ring-0 shadow-nonebg-gray-100 text-gray-500 cursor-pointer">
+                <SelectValue placeholder="Select a status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statuses.map((status) => (
+                  <SelectItem value={status.value} key={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Dates */}
+          <div className="flex items-center justify-between">
+            <p className="flex flex-col">
+              <span className="text-neutral-400 text-sm 3xl:!text-base">
+                Start Date
+              </span>
+              <span className="text-sm">{formatDate(taskdata.start_date)}</span>
+            </p>
+            <p className="flex flex-col">
+              <span className="text-neutral-400 text-sm 3xl:!text-base">
+                Due Date
+              </span>
+              <span className="text-sm">{formatDate(taskdata.end_date)}</span>
+            </p>
           </div>
 
-          {/* Dates */}
-          <p className="mb-2">
-            <strong>Start Date:</strong> {formatDate(taskdata.start_date)}
-          </p>
-          <p className="mb-2">
-            <strong>Due Date:</strong> {formatDate(taskdata.end_date)}
-          </p>
-
           {/* Assigned Users */}
-          <div className="mt-6">
-            <strong>Assigned Users:</strong>
-            <ul className="mt-2">
-              {assignedUsers.length === 0 && (
-                <li className="text-gray-500">No users assigned.</li>
-              )}
-              {assignedUsers.map((user) => (
-                <li
-                  key={user.id}
-                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1 rounded border"
-                >
-                  <span>{user.display_name || "Unnamed"}</span>
-                  <button
-                    className="text-red-500 hover:text-red-700 cursor-pointer"
-                    onClick={() => handleRemoveUser(user.id)}
-                  >
-                    ✕
-                  </button>
-                </li>
-              ))}
-            </ul>
-
-            {/* Assign Users Popover */}
-            <div className="flex items-center gap-2 mt-3">
+          <div>
+            <p className="text-base 3xl:!text-lg mb-2">Members</p>
+            {/* Only MANAGERs can assign users */}
+            <div className="flex items-center gap-2">
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <div
                     ref={triggerRef}
-                    className="rounded border flex items-center justify-between px-2 py-2 cursor-pointer flex-1"
+                    className="rounded border flex items-center justify-between px-2 py-1 cursor-pointer flex-1"
                   >
                     <span className="text-gray-500">
                       {selectedUsers.length > 0
                         ? selectedUsers
                             .map((u) => u.display_name || "Unnamed")
                             .join(", ")
-                        : "Select"}
+                        : "Select users..."}
                     </span>
-                    <ChevronDown />
+                    <ChevronDown className="w-5 h-5" />
                   </div>
                 </PopoverTrigger>
                 <PopoverContent
-                  style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
+                  style={{
+                    width: triggerWidth ? `${triggerWidth}px` : "auto",
+                  }}
                   className="p-0"
                 >
                   <Command>
@@ -291,7 +309,9 @@ const TaskViewDetails = () => {
                             key={user.id}
                             onSelect={() => toggleUserSelect(user)}
                           >
-                            <span>{user.display_name || "Unnamed"}</span>
+                            <span className="capitalize">
+                              {user.display_name || "Unnamed"}
+                            </span>
                             <Check
                               className={cn(
                                 "h-4 w-4 ml-auto",
@@ -316,7 +336,7 @@ const TaskViewDetails = () => {
                 disabled={
                   selectedUsers.length === 0 || assignUserMutation.isPending
                 }
-                className="px-3 py-1 bg-purple-600 text-white rounded disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                className="w-13 h-8 bg-purple-600 text-white rounded disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 {assignUserMutation.isPending ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -325,7 +345,39 @@ const TaskViewDetails = () => {
                 )}
               </button>
             </div>
-          </div>
+            <div className="mt-2 h-[calc(100vh-370px)] overflow-y-auto">
+              {assignedUsers.length === 0 && (
+                <p className="text-gray-500 text-sm 3xl:!text-base flex items-center justify-center h-full">
+                  No users assigned.
+                </p>
+              )}
+              {assignedUsers.map((user) => (
+                <p
+                  key={user.id}
+                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
+                >
+                  <span className="capitalize text-sm 3xl:!text-base">
+                    {user.display_name || "Unnamed"}
+                  </span>
+                  <button
+                    onClick={() => handleRemoveUser(user.id)}
+                    className={cn(
+                      "cursor-pointer",
+                      loggedInUser.user_type === "EMPLOYEE"
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-violet-700"
+                    )}
+                    title={
+                      loggedInUser.user_type === "EMPLOYEE"
+                        ? "Employees cannot remove users"
+                        : "Remove user"
+                    }
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </div>

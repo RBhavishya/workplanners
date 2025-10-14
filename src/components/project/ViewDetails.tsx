@@ -41,7 +41,6 @@ const statuses = [
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
