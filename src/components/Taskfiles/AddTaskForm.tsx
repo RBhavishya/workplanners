@@ -27,7 +27,7 @@ import {
   gettasksByIdAPI,
   updateTasksAPI,
 } from "@/https/services/tasks";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -39,15 +39,11 @@ const formatDate = (date?: Date) =>
 const AddTaskForm = ({
   taskId = null,
   taskData = null,
-  open,
-  onClose,
   onSave,
 }: {
   mode?: "create" | "edit";
   taskId?: any;
   taskData?: any;
-  open?: boolean;
-  onClose?: any;
   onSave?: (data: any) => void;
 }) => {
   const navigate = useNavigate();
@@ -55,7 +51,7 @@ const AddTaskForm = ({
   const id = params?.id ? Number(params.id) : null;
   const mode = id ? "edit" : "create";
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   // States
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -126,7 +122,7 @@ const AddTaskForm = ({
       toast.success(res?.data?.message || "Task created successfully");
       setSuccessMessage("Task created successfully!");
       onSave?.(res?.data?.data);
-      setTimeout(() => navigate({ to: "/tasks" }), 1000);
+      router.history.back();
       await queryClient.refetchQueries({ queryKey: ["tasks"] });
     },
     onError: (error: any) => {
@@ -154,7 +150,7 @@ const AddTaskForm = ({
     },
     onSuccess: async (res: any) => {
       toast.success(res?.message || "Task updated successfully!");
-      navigate({ to: "/tasks" });
+      router.history.back();
       await queryClient.refetchQueries({ queryKey: ["tasks"] });
     },
     onError: (error: any) => {
@@ -171,7 +167,7 @@ const AddTaskForm = ({
     },
   });
 
-  const handleNavigation = () => navigate({ to: "/tasks" });
+  const handleNavigation = () => router.history.back();
 
   const handleSave = () => {
     setFormError(null);
