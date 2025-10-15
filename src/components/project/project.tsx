@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllPaginatedProjects } from "@/https/services/project";
 import { ProjectData } from "@/interfaces/project";
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useQuery } from "@tanstack/react-query";
@@ -23,9 +22,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
-import Loading from "../core/Loading";
 import TanStackTable from "../core/Tanstacktable";
 import { getProjectColumns } from "./projectColumns";
+import { getAllUsersProjects } from "@/https/services/project";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -76,7 +75,7 @@ const Projects = () => {
       selectedSort,
     ],
     queryFn: async () => {
-      const response = await getAllPaginatedProjects({
+      const response = await getAllUsersProjects({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         viewMode,
@@ -255,10 +254,10 @@ const Projects = () => {
                       <div className="flex gap-1 items-center justify-between">
                         <div className="flex items-center">
                           <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
-                            {project.title?.charAt(0).toUpperCase() || "?"}
+                            {project.project_name?.charAt(0).toUpperCase() || "?"}
                           </div>
                           <h2 className="text-sm 3xl:!text-base font-medium break-words px-2 capitalize">
-                            {project.title || "Untitled"}
+                            {project.project_name || "Untitled"}
                           </h2>
                         </div>
                         {user?.user_type !== "EMPLOYEE" && (

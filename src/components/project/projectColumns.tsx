@@ -27,12 +27,12 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
       enableSorting: false,
     },
     {
-      id: "title",
+      id: "project_name",
       header: "Project Name",
-      accessorKey: "title",
+      accessorKey: "project_name",
       cell: ({ row }: any) => {
         const project = row.original;
-        const name = project.title || "-";
+        const name = project.project_name || "-";
 
         return (
           <div className="flex items-center gap-2">
