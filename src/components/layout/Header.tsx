@@ -88,7 +88,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
   try {
     const response = await getAllNotificationsCountsAPI();
     if (response?.status === 200 || response?.status === 201) {
-      setNotificationCounts(response?.data?.data?.count || 0);
+      setNotificationCounts(response?.data?.data ?? 0);
     }
   } catch (error) {
     console.error("Failed to fetch notifications:", error);
