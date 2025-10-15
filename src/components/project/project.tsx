@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllPaginatedProjects } from "@/https/services/project";
 import { ProjectData } from "@/interfaces/project";
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useQuery } from "@tanstack/react-query";
@@ -22,9 +21,10 @@ import {
 } from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
-import ProjectsTable from "./projectTable";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
-import Loading from "../core/Loading";
+import TanStackTable from "../core/Tanstacktable";
+import { getProjectColumns } from "./projectColumns";
+import { getAllUsersProjects } from "@/https/services/project";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -75,7 +75,7 @@ const Projects = () => {
       selectedSort,
     ],
     queryFn: async () => {
-      const response = await getAllPaginatedProjects({
+      const response = await getAllUsersProjects({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         viewMode,
@@ -102,7 +102,14 @@ const Projects = () => {
     setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
 
   const handleNavigation = () => navigate({ to: `/projects/add` });
-  const handleView = (id: number) => navigate({ to: `/projects/${id}` });
+
+  const getData = (params: any) => {
+    setPagination({
+      pageIndex: params.pageIndex || 1,
+      pageSize: params.pageSize || 25,
+      order_by: params.order_by || "",
+    });
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -214,10 +221,14 @@ const Projects = () => {
       {/* Projects Section */}
       {viewMode === "grid" ? (
         <div className="relative flex-1 h-[calc(100vh-120px)] overflow-y-auto">
-          {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <Loading loading={isLoading || isFetching} />
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
             </div>
           )}
 
@@ -243,10 +254,10 @@ const Projects = () => {
                       <div className="flex gap-1 items-center justify-between">
                         <div className="flex items-center">
                           <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
-                            {project.title?.charAt(0).toUpperCase() || "?"}
+                            {project.project_name?.charAt(0).toUpperCase() || "?"}
                           </div>
-                          <h2 className="text-base 3xl:!text-lg font-medium break-words text-center px-2 capitalize">
-                            {project.title || "Untitled"}
+                          <h2 className="text-sm 3xl:!text-base font-medium break-words px-2 capitalize">
+                            {project.project_name || "Untitled"}
                           </h2>
                         </div>
                         {user?.user_type !== "EMPLOYEE" && (
@@ -320,21 +331,30 @@ const Projects = () => {
         </div>
       ) : (
         <div className="w-full">
-          <ProjectsTable
-            debouncedSearch={debouncedSearch}
-            selectedSort={selectedSort}
-            selectedStatus={selectedStatus}
-            setSelectedStatus={setSelectedStatus}
-            setSelectedSort={setSelectedSort}
-            page={pagination.pageIndex}
-            pageSize={pagination.pageSize}
-            setPage={capturePageNum}
-            setPageSize={captureRowPerItems}
-            onDelete={(project) => {
-              setDeleteTarget(project);
-              setShowDeleteDialog(true);
-            }}
-          />
+          <TanStackTable
+              data={projectsData}
+              columns={getProjectColumns(navigate, user, (project: ProjectData) => {
+                setDeleteTarget(project);
+                setShowDeleteDialog(true);
+              })}
+              paginationDetails={
+                data?.data?.data?.pagination_info || {
+                  total_records: 0,
+                  total_pages: 1,
+                  current_page: pagination.pageIndex,
+                  page_size: pagination.pageSize,
+                  next_page: null,
+                  prev_page: null,
+                }
+              }
+              getData={getData}
+              loading={isLoading}
+              removeSortingForColumnIds={[
+                "serial",
+                "actions",
+              ]}
+              height='calc(100vh - 120px)'
+            />
         </div>
       )}
 

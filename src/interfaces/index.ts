@@ -29,7 +29,8 @@ export interface pageProps {
   columns: any[];
   data: any[];
   loading?: boolean;
-
+  height?: string;
+  height1?: string;
   getData?: any;
   paginationDetails: any;
   removeSortingForColumnIds?: string[];

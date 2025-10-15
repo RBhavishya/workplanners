@@ -28,7 +28,6 @@ function ViewProfile() {
     profile_pic: "",
     disignation: "",
   });
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   // Fetch user data
@@ -78,7 +77,6 @@ function ViewProfile() {
           email: userData.email,
           phone: userData.phone_number,
           designation: userData.disignation,
-          profile_pic: previewUrl || userData.profile_pic,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
@@ -90,19 +88,6 @@ function ViewProfile() {
     },
     onError: (err) => errPopper(err),
   });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-      setIsUploading(true);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setPreviewUrl(null);
-    setUserData((prev: any) => ({ ...prev, profile_pic: "" }));
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -142,41 +127,12 @@ function ViewProfile() {
           Profile
         </CardTitle>
 
-        <div className="p-2 w-fit">
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
+        <div className="relative">
+          <img
+            src="/table/profile.webp"
+            alt="User Profile"
+            className="w-32 h-32 rounded-full object-cover shadow"
           />
-
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer relative w-32 h-32"
-          >
-            {previewUrl ? (
-              <div className="relative">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-32 h-32 rounded-full object-cover shadow"
-                />
-              </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={
-                    userData.profile_pic?.trim()
-                      ? userData.profile_pic
-                      : "/table/profile.webp"
-                  }
-                  alt="User Profile"
-                  className="w-32 h-32 rounded-full object-cover shadow"
-                />
-              </div>
-            )}
-          </label>
         </div>
       </CardHeader>
 
@@ -285,16 +241,8 @@ function ViewProfile() {
           <div>
             <p className="text-base text-neutral-400">User Type</p>
             <p>
-              {userType?.user_type
-                ? userType.user_type
-                      .split("_")
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      ) 
-                      .join(" ") 
-                : "-"}
+              {userType.user_type.charAt(0).toUpperCase() +
+                userType.user_type.slice(1).toLowerCase()}
             </p>
           </div>
         </div>

@@ -8,13 +8,14 @@ import {
 } from "@tanstack/react-table";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { getTasksByProjectId } from "@/https/services/project";
-import { Task} from "@/interfaces/project";
+import { Task } from "@/interfaces/project";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { deleteTasksAPI } from "@/https/services/tasks";
 import { toast } from "sonner";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import TasksPagination from "./TasksPagination";
 import { Button } from "../ui/button";
+import { NoTasksIcon } from "../icons/NoIcons/NoTasksIcon";
 
 interface TasksTableProps {
   projectId: number;
@@ -103,9 +104,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       accessorFn: (_row, index) =>
         (pagination.pageIndex - 1) * pagination.pageSize + index + 1,
       cell: ({ getValue }) => (
-        <span className="text-gray-600 text-sm">
-          {getValue() as number}
-        </span>
+        <span className="text-gray-600 text-sm">{getValue() as number}</span>
       ),
     },
     {
@@ -151,7 +150,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
           <div className="flex gap-3 justify-center text-gray-500">
             <Button
               title="View"
-               variant="ghost"
+              variant="ghost"
               className=" hover:text-indigo-600 text-gray-600 cursor-pointer p-0"
               onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
             >
@@ -159,7 +158,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
             </Button>
             <Button
               title="Edit"
-               variant="ghost"
+              variant="ghost"
               className=" hover:text-green-600 text-gray-600 cursor-pointer p-0"
               onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
             >
@@ -167,7 +166,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
             </Button>
             <Button
               title="Delete"
-               variant="ghost"
+              variant="ghost"
               className=" hover:text-red-600 text-gray-600 cursor-pointer p-0"
               onClick={() => {
                 setTaskToDelete(rowData.id);
@@ -188,38 +187,77 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <p>Loading tasks...</p>;
   if (error) return <p>Error: {error.message}</p>;
-  if (!data?.data.data.records?.length) return <p>No tasks found.</p>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center">
+        <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+      </div>
+    );
+  }
 
-  return ( 
-    <div className="flex flex-col bg-white h-[calc(100vh-265px)] rounded-lg">
-      {/* Scrollable table container */}
+  return (
+    <div className="flex flex-col bg-white h-[calc(100vh-278px)] rounded-lg">
       <div className="overflow-auto flex-1 rounded-lg">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-white">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="text-left text-gray-500 text-xs !h-10">
+              <tr
+                key={headerGroup.id}
+                className="text-left text-gray-500 text-xs !h-10"
+              >
                 {headerGroup.headers.map((header) => (
                   <th key={header.id} className="px-4 ">
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="bg-white">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-1 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={taskColumns.length} className="text-center py-6">
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <NoTasksIcon className="w-50 h-50" />
+                    <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                      No Tasks Found
+                    </p>
+                  </div>
+                </td>
               </tr>
-            ))}
+            ) : isLoading ? (
+              <tr>
+                <td colSpan={taskColumns.length}>
+                <div className="flex items-center justify-center">
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
+            </div>
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="bg-white">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-1 px-4 ext-[13px] 3xl:!text-base">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

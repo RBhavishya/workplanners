@@ -26,7 +26,7 @@ export const getDashboardStatistics = async ({
   }
 };
 
-export const getetDashboardStatsAPI = async () => {
+export const getDashboardStatsAPI = async () => {
     try {
         const response = await $fetch.get("/dash-board/status");
         return response.data;

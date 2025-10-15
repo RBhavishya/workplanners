@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import {
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { ArrowLeft, Check, ChevronDown, Move, MoveLeft, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, X } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -168,7 +168,7 @@ const Viewdetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <Loading loading={isLoading} />
+        <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
       </div>
     );
   }
@@ -177,23 +177,22 @@ const Viewdetails = () => {
     return <p className="text-center text-red-500">Error loading project</p>;
   if (!projectdata) return <p className="text-center">No project found</p>;
 
-  // --- JSX ---
   return (
     <div className="flex">
       <div className="flex flex-col m-2 gap-3">
-        {/* Project Info */}
-        <div className="rounded-md p-4 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
-          <div className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => window.history.back()}
-            className="text-gray-600 hover:text-blue-600 cursor-pointer"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-            <div className="w-7 h-7 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
+        <div className="rounded-md p-3 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={() => window.history.back()}
+              className="text-gray-600 hover:text-blue-600 cursor-pointer"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
               {projectdata.title?.charAt(0) || "P"}
             </div>
-            <div className="flex items-center gap-2 text-lg font-medium">
+            <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
               <span className="capitalize">{projectdata.title}</span>
               <span
                 className={`ml-2 text-sm px-2 py-1 rounded ${
@@ -204,29 +203,33 @@ const Viewdetails = () => {
                 {projectdata.project_status}
               </span>
             </div>
-          </div>
-          <p className="text-gray-700 mt-2">
+          <p className="text-gray-700 text-sm 3xl:!text-base">
             {projectdata.description || "No description available"}
           </p>
+          </div>
         </div>
-        {/* Status Cards */}
-        <div className="flex items-center w-full bg-white p-2 rounded-sm">
-          <SmallCard
-            cards={[
-              { title: "Total Tasks", value: status?.data?.total_count },
-              {
-                title: "Completed Tasks",
-                value: status?.data?.completed_count,
-              },
-              {
-                title: "In Progress Task",
-                value: status?.data?.inProgress_count,
-              },
-              { title: "New Tasks", value: status?.data?.new_count },
-              { title: "Review Tasks", value: status?.data?.review_count },
-              { title: "Pending Tasks", value: status?.data?.pending_count },
-            ]}
-          />
+      </div>
+
+        <div className="flex flex-col bg-white">
+          <p className="text-base 3xl:!text-lg font-medium px-2 pt-1">Tasks</p>
+          <div className="flex items-center w-full p-2 rounded-sm">
+            <SmallCard
+              cards={[
+                { title: "Total", value: status?.data?.total_count },
+                { title: "New", value: status?.data?.new_count },
+                {
+                  title: "In Progress",
+                  value: status?.data?.inProgress_count,
+                },
+                {
+                  title: "Completed",
+                  value: status?.data?.completed_count,
+                },
+                { title: "Review", value: status?.data?.review_count },
+                { title: "Overdue", value: status?.data?.pending_count },
+              ]}
+            />
+          </div>
         </div>
 
         {/* Tasks Table */}
@@ -268,32 +271,42 @@ const Viewdetails = () => {
               onValueChange={(value) => handleStatusChange(value)}
               disabled={loggedInUser.user_type === "EMPLOYEE"}
             >
-              <SelectTrigger className={cn(
-                "ml-2 border rounded w-30 !h-7 cursor-pointer focus:ring-0 focus-visible:ring-0 shadow-none",
-                loggedInUser.user_type === "EMPLOYEE" &&
-                  "bg-gray-100 text-gray-500 cursor-not-allowed"
-              )}>
-                <SelectValue placeholder="Select a status"/>
+              <SelectTrigger
+                className={cn(
+                  "ml-2 border rounded w-30 !h-7 cursor-pointer focus:ring-0 focus-visible:ring-0 shadow-none",
+                  loggedInUser.user_type === "EMPLOYEE" &&
+                    "bg-gray-100 text-gray-500 cursor-not-allowed"
+                )}
+              >
+                <SelectValue placeholder="Select a status" />
               </SelectTrigger>
               <SelectContent>
-              {statuses.map((status) => (
-                <SelectItem value={status.value} key={status.value}>
-                  {status.label}
-                </SelectItem>
-              ))}
+                {statuses.map((status) => (
+                  <SelectItem value={status.value} key={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           {/* Dates */}
           <div className="flex items-center justify-between">
-          <p className="flex flex-col">
-            <span className="text-neutral-400 text-sm 3xl:!text-base">Start Date:</span>
-            <span className="text-sm">{formatDate(projectdata.start_date)}</span>
-          </p>
-          <p className="flex flex-col">
-            <span className="text-neutral-400 text-sm 3xl:!text-base">Due Date:</span> 
-            <span className="text-sm">{formatDate(projectdata.due_date)}</span>
-          </p>
+            <p className="flex flex-col">
+              <span className="text-neutral-400 text-sm 3xl:!text-base">
+                Start Date:
+              </span>
+              <span className="text-sm">
+                {formatDate(projectdata.start_date)}
+              </span>
+            </p>
+            <p className="flex flex-col">
+              <span className="text-neutral-400 text-sm 3xl:!text-base">
+                Due Date:
+              </span>
+              <span className="text-sm">
+                {formatDate(projectdata.due_date)}
+              </span>
+            </p>
           </div>
 
           {/* Assigned Users */}
@@ -315,7 +328,7 @@ const Viewdetails = () => {
                               .join(", ")
                           : "Select users..."}
                       </span>
-                      <ChevronDown className="w-5 h-5"/>
+                      <ChevronDown className="w-5 h-5" />
                     </div>
                   </PopoverTrigger>
                   <PopoverContent
@@ -345,7 +358,9 @@ const Viewdetails = () => {
                               key={user.id}
                               onSelect={() => toggleUserSelect(user)}
                             >
-                              <span className="capitalize">{user.display_name || "Unnamed"}</span>
+                              <span className="capitalize">
+                                {user.display_name || "Unnamed"}
+                              </span>
                               <Check
                                 className={cn(
                                   "h-4 w-4 ml-auto",
@@ -389,7 +404,9 @@ const Viewdetails = () => {
                   key={user.id}
                   className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
                 >
-                  <span className="capitalize text-sm 3xl:!text-base">{user.display_name || "Unnamed"}</span>
+                  <span className="capitalize text-sm 3xl:!text-base">
+                    {user.display_name || "Unnamed"}
+                  </span>
                   <button
                     disabled={loggedInUser.user_type === "EMPLOYEE"}
                     onClick={() => handleRemoveUser(user.id)}
@@ -399,13 +416,13 @@ const Viewdetails = () => {
                         ? "text-gray-400 cursor-not-allowed"
                         : "text-violet-700"
                     )}
-                    title={ 
+                    title={
                       loggedInUser.user_type === "EMPLOYEE"
                         ? "Employees cannot remove users"
                         : "Remove user"
                     }
                   >
-                    <X className="w-4 h-4"/>
+                    <X className="w-4 h-4" />
                   </button>
                 </p>
               ))}
