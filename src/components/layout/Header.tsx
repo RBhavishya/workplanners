@@ -81,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     } finally {
-      setIsNotificationLoading(false);
+      // setIsNotificationLoading(false);
     }
   };
 
@@ -107,11 +107,11 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
 
   const handlePopoverToggle = () => {
     setIsNotificationsOpen((prev) => !prev);
-    if (!isNotificationsOpen) {
-      setNotificationsData([]);
-      getAllNotifications(1);
-    }
   };
+
+  useEffect(() => {
+    getAllNotifications();
+  }, []);
 
   const handleNotificationsScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const bottom =
@@ -202,13 +202,15 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                     {notificationsData.map((notification: any) => (
                       <li
                         key={notification.id}
-                        className="py-2 border-b last:border-none cursor-pointer hover:bg-gray-100 rounded-none px-2"
+                        className={`py-2 border-b last:border-none cursor-pointer hover:bg-gray-100 rounded-none px-2 ${
+                          notification.is_marked === false ? "bg-gray-50" : ""
+                        }`}
                         onClick={() => {
                           if (notification.is_marked === false) {
                             markAsRead(notification.id);
                           }
 
-                          // Navigation logic based on notification category
+                          // Navigation logic based on category
                           if (
                             notification?.category === "task" ||
                             notification?.category === 1
@@ -230,18 +232,18 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                           setIsNotificationsOpen(false);
                         }}
                       >
+                        {/* Notification title/description */}
                         <p
-                          className={`${
+                          className={`text-sm ${
                             notification.is_marked === false
                               ? "font-semibold text-gray-900"
                               : "font-normal text-gray-700"
                           }`}
                         >
-                          {/* {notification.title || "-"} */}
-                        </p>
-                        <p className="text-sm text-gray-600">
                           {notification.description || "-"}
                         </p>
+
+                        {/* Timestamp */}
                         <p className="text-xs text-gray-400 mt-1">
                           {notification.created_at
                             ? new Date(notification.created_at).toLocaleString(
