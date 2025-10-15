@@ -115,7 +115,7 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
 };
 
   return (
-    <ShadCNPagination className="flex justify-between px-2 py-0 m-0 bg-white">
+    <ShadCNPagination className="flex justify-between px-2 py-0 m-0 bg-white rounded-b-md">
       <PaginationContent className="px-1 py-0 flex gap-2">
         <p className="text-sm 3xl:!text-base">Total {paginationDetails?.total_records || "0"}</p>
         <Select

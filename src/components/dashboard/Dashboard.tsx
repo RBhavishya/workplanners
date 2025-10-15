@@ -18,7 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
-import Loading from "../core/Loading";
 import { addSerial } from "@/lib/helpers/addSerial";
 import { getStatisticsColumns } from "./StatisticsColumns";
 import TanStackTable from "../core/Tanstacktable";
@@ -162,34 +161,41 @@ const Dashboard = () => {
       <div className="w-3/4 m-2">
         <DashboardCards stats={stats} isError={isError} error={error as any} />
 
-       <div className="flex flex-col bg-white rounded-md">
-        <div className="flex items-center justify-between m-2">
-          <h2 className="text-lg 3xl:!text-xl font-normal">Statistics</h2>
-          <SearchFilter
-            searchString={searchString}
-            setSearchString={setSearchString}
-            title="Find your Users"
+        <div className="flex flex-col bg-white rounded-md">
+          <div className="flex items-center justify-between m-2">
+            <h2 className="text-lg 3xl:!text-xl font-normal">Statistics</h2>
+            <SearchFilter
+              searchString={searchString}
+              setSearchString={setSearchString}
+              title="Find your Users"
+            />
+          </div>
+          <TanStackTable
+            columns={getStatisticsColumns()}
+            data={statsData}
+            loading={isLoading}
+            getData={getData}
+            paginationDetails={
+              data?.data?.data?.pagination_info || {
+                total_records: 0,
+                total_pages: 1,
+                current_page: pagination.pageIndex,
+                page_size: pagination.pageSize,
+                next_page: null,
+                prev_page: null,
+              }
+            }
+            height="calc(100vh - 215px)"
+            removeSortingForColumnIds={[
+              "sno",
+              "name",
+              "total",
+              "completed",
+              "inProgress",
+              "pending",
+            ]}
           />
         </div>
-        <TanStackTable
-          columns={getStatisticsColumns()}
-          data={statsData}
-          loading={isLoading}
-          getData={getData}
-          paginationDetails={
-            data?.data?.data?.pagination_info || {
-              total_records: 0,
-              total_pages: 1,
-              current_page: pagination.pageIndex,
-              page_size: pagination.pageSize,
-              next_page: null,
-              prev_page: null,
-            }
-          }
-          height='calc(100vh - 215px)'
-          removeSortingForColumnIds={["sno", "name", "total", "completed", "inProgress", "pending"]}
-        />
-      </div>
       </div>
 
       {/* Right Side - Today’s Task */}
@@ -256,7 +262,12 @@ const Dashboard = () => {
         >
           {isFetching ? (
             <div className="flex items-center justify-center py-6">
-              <Loading loading={isFetching} />
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
             </div>
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true

@@ -357,12 +357,6 @@ const Tasks = () => {
           </Button>
         </div>
         <div className="bg-white relative">
-          {(isLoading || isFetching) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <Loading loading={isLoading || isFetching} /> 
-            </div>
-          )}
-
           <TanStackTable
             data={taksDataAfterSerial}
             columns={[...taskColumns, ...taskActions]}

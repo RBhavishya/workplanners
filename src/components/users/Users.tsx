@@ -295,11 +295,6 @@ const UsersDetais = () => {
           </Button>
         </div>
         <div className="bg-white relative">
-          {(isLoading || isFetching) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <Loading loading={isLoading || isFetching} />
-            </div>
-          )}
           <div className="mt-5">
             <TanStackTable
               data={users}

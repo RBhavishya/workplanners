@@ -187,12 +187,17 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <p>Loading tasks...</p>;
   if (error) return <p>Error: {error.message}</p>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center">
+        <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col bg-white h-[calc(100vh-295px)] rounded-lg">
-      {/* Scrollable table container */}
+    <div className="flex flex-col bg-white h-[calc(100vh-278px)] rounded-lg">
       <div className="overflow-auto flex-1 rounded-lg">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-white">
@@ -219,18 +224,31 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
               <tr>
                 <td colSpan={taskColumns.length} className="text-center py-6">
                   <div className="flex flex-col items-center justify-center gap-3">
-                    <NoTasksIcon className="w-50 h-50"/>
+                    <NoTasksIcon className="w-50 h-50" />
                     <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
                       No Tasks Found
                     </p>
                   </div>
                 </td>
               </tr>
+            ) : isLoading ? (
+              <tr>
+                <td colSpan={taskColumns.length}>
+                <div className="flex items-center justify-center">
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
+            </div>
+                </td>
+              </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
                 <tr key={row.id} className="bg-white">
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="py-1 px-4">
+                    <td key={cell.id} className="py-1 px-4 ext-[13px] 3xl:!text-base">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

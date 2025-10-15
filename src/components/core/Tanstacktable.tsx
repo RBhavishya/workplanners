@@ -98,123 +98,128 @@ const TanStackTable: FC<pageProps> = ({
 
   return (
     <div className="overflow-x-auto w-full">
-        <div className="w-full relative bg-white" style={{ height: height }}>
-          <table className="w-full text-sm table-fixed h-full">
-            <thead className="!sticky top-0 bg-white text-neutral-400 text-xs font-normal">
-              {table?.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-none h-10">
-                  {headerGroup.headers.map((header: any, index: number) => (
-                    <th
-                      key={index}
-                      colSpan={header.colSpan}
+      <div className="w-full relative bg-white" style={{ height: height }}>
+        <table className="w-full text-sm table-fixed h-full">
+          <thead className="!sticky top-0 bg-white text-neutral-400 font-normal">
+            {table?.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="border-none h-10">
+                {headerGroup.headers.map((header: any, index: number) => (
+                  <th
+                    key={index}
+                    colSpan={header.colSpan}
+                    style={{
+                      minWidth: getWidth(header.id),
+                      width: getWidth(header.id),
+                    }}
+                    className="cursor-pointer text-sm 3xl:!text-base text-neutral-500 px-1"
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className="flex items-center gap-1 select-none"
+                        onClick={() => sortAndGetData(header)}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        <SortItems
+                          header={header}
+                          removeSortingForColumnIds={removeSortingForColumnIds}
+                        />
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {data?.length ? (
+              table?.getRowModel().rows.map((row, rowIndex) => (
+                <tr
+                  key={row.id}
+                  className={`${
+                    rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
+                  } hover:bg-gray-50 border-none`}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="text-[13px] 3xl:!text-base p-0.5 px-2 !h-9"
                       style={{
-                        minWidth: getWidth(header.id),
-                        width: getWidth(header.id),
+                        minWidth: getWidth(cell.column.columnDef.id),
+                        width: getWidth(cell.column.columnDef.id),
                       }}
-                      className="cursor-pointer text-sm 3xl:!text-base text-neutral-500 px-1"
                     >
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className="flex items-center gap-1 select-none"
-                          onClick={() => sortAndGetData(header)}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          <SortItems
-                            header={header}
-                            removeSortingForColumnIds={
-                              removeSortingForColumnIds
-                            }
-                          />
-                        </div>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
                       )}
-                    </th>
+                    </td>
                   ))}
                 </tr>
-              ))}
-            </thead>
-              <tbody>
-                {data?.length ? (
-                  table?.getRowModel().rows.map((row, rowIndex) => (
-                    <tr
-                      key={row.id}
-                      className={`${
-                        rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
-                      } hover:bg-gray-50 border-none`}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className="text-sm 3xl:!text-base p-0.5 px-2 !h-9"
-                          style={{
-                            minWidth: getWidth(cell.column.columnDef.id),
-                            width: getWidth(cell.column.columnDef.id),
-                          }}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : !loading ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="text-gray-500 text-center"
-                    >
-                      {location.pathname.includes("tasks") ? (
-                        <div className="flex flex-col items-center justify-center gap-3">
-                          <NoTasksIcon className="w-60 h-60"/>
-                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
-                            No Tasks Found
-                          </p>
-                        </div>
-                      ) : location.pathname.includes("projects") ? (
-                        <div className="flex flex-col items-center justify-center gap-3">
-                          <NoProjectIcon />
-                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
-                            No Projects Found
-                          </p>
-                        </div>
-                      ) : location.pathname.includes("dashboard") ? (
-                        <div className="flex flex-col items-center justify-center gap-3">
-                          <NoDataIcon />
-                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
-                            No Data Found
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center gap-3">
-                          <NoUsersIcon />
-                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
-                            No Users Found
-                          </p>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td colSpan={columns.length} className="text-center">
-                      {/* Loading... */}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-          </table>
+              ))
+            ) : !loading ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="text-gray-500 text-center"
+                >
+                  {location.pathname.includes("tasks") ? (
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <NoTasksIcon className="w-60 h-60" />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Tasks Found
+                      </p>
+                    </div>
+                  ) : location.pathname.includes("projects") ? (
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <NoProjectIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Projects Found
+                      </p>
+                    </div>
+                  ) : location.pathname.includes("dashboard") ? (
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <NoDataIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Data Found
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <NoUsersIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Users Found
+                      </p>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ) : (
+              <tr>
+                <td colSpan={columns.length}>
+                <div className="flex items-center justify-center">
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
+            </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
         <div className="sticky bottom-0">
-        <TasksPagination
-          paginationDetails={paginationDetails}
-          capturePageNum={capturePageNum}
-          captureRowPerItems={captureRowPerItems}
-        />
+          <TasksPagination
+            paginationDetails={paginationDetails}
+            capturePageNum={capturePageNum}
+            captureRowPerItems={captureRowPerItems}
+          />
         </div>
-    </div>
+      </div>
     </div>
   );
 };

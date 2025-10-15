@@ -230,10 +230,14 @@ const Projects = () => {
       {/* Projects Section */}
       {viewMode === "grid" ? (
         <div className="relative flex-1 h-[calc(100vh-120px)] overflow-y-auto">
-          {/* Loading Spinner */}
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <Loading loading={isLoading || isFetching} />
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
             </div>
           )}
 

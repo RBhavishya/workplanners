@@ -155,7 +155,12 @@ const TaskViewDetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <img
+                src="/6-dots-scale.svg"
+                alt="loader"
+                width={60}
+                height={60}
+              />
       </div>
     );
   }
@@ -179,7 +184,7 @@ const TaskViewDetails = () => {
               {taskdata.task_title?.charAt(0) || "T"}
             </div>
             <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-lg font-medium">
+              <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
                 <span className="capitalize">{taskdata.task_title}</span>
                 <span
                   className={`ml-2 text-sm px-2 py-1 rounded ${

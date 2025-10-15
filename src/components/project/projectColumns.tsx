@@ -23,7 +23,7 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
       header: "S. No",
       accessorKey: "serial",
       cell: ({ row }: any) => row.original.serial,
-      width: "80px",
+      width: "50px",
       enableSorting: false,
     },
     {
@@ -43,7 +43,7 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
           </div>
         );
       },
-      width: "200px",
+      width: "350px",
     },
     {
       id: "users",

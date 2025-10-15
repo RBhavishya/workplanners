@@ -27,7 +27,7 @@ export const usersColumns = [
     cell: (info: any) => {
       const title = info.getValue() || "-";
       return (
-        <div className="flex items-center gap-2" style={{ textAlign: "left" }}>
+        <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
@@ -36,9 +36,9 @@ export const usersColumns = [
       );
     },
     footer: (props: any) => props.column.id,
-    width: "150px",
-    maxWidth: "150px",
-    minWidth: "150px",
+    width: "200px",
+    maxWidth: "200px",
+    minWidth: "200px",
   },
   {
     accessorFn: (row: any) => row.designation,
@@ -46,7 +46,7 @@ export const usersColumns = [
     cell: (info: any) => {
       const title = info.getValue();
       return (
-        <div style={{ textAlign: "left" }}>
+        <div>
           <span className="capitalize">{title || "-"}</span>
         </div>
       );
@@ -95,9 +95,9 @@ export const usersColumns = [
         </div>
       );
     },
-    width: "200px",
-    maxWidth: "200px",
-    minWidth: "200px",
+    width: "150px",
+    maxWidth: "150px",
+    minWidth: "150px",
     header: () => (
       <div className="flex justify-center">
         <span>Email</span>
@@ -116,9 +116,9 @@ export const usersColumns = [
         </div>
       );
     },
-    width: "130px",
-    maxWidth: "130px",
-    minWidth: "130px",
+    width: "100px",
+    maxWidth: "100px",
+    minWidth: "100px",
     header: () => (
       <div className="flex justify-center">
         <span>Phone Number</span>
@@ -191,7 +191,7 @@ export const usersColumns = [
 
       return (
         <div className="flex items-center relative">
-          <div className={`${isActive ? "text-green-600" : "text-red-600"} rounded-full cursor-pointer flex items-center py-0 px-2 gap-2 w-fit`}
+          <div className={`${isActive ? "text-green-600" : "text-red-600"} rounded-full cursor-pointer flex items-center gap-2 w-fit`}
             onClick={togglePopover}
           >
             <span className={`h-1.5 w-1.5 rounded-lg  ${isActive ? "bg-green-600" : "bg-red-600"}`}></span>
@@ -216,9 +216,9 @@ export const usersColumns = [
         </div>
       );
     },
-    width: "100px",
-    maxWidth: "115px",
-    minWidth: "150px",
+    width: "80px",
+    maxWidth: "80px",
+    minWidth: "80px",
     header: () => <span>Status</span>,
     footer: (props: any) => props.column.id,
   },
