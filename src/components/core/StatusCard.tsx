@@ -32,27 +32,27 @@ const statusConfig: Record<
   string,
   { bg: string; circleBg: string; circleText: string }
 > = {
-  "Total Tasks": {
+  "Total": {
     bg: "bg-purple-100",
     circleBg: "bg-purple-600",
     circleText: "text-white",
   },
-  "Completed Tasks": {
+  "Completed": {
     bg: "bg-green-100",
     circleBg: "bg-green-600",
     circleText: "text-white",
   },
-  "In Progress Task": {
+  "In Progress": {
     bg: "bg-blue-100",
     circleBg: "bg-blue-600",
     circleText: "text-white",
   },
-  "Pending Tasks": {
+  "Overdue": {
     bg: "bg-yellow-100",
     circleBg: "bg-yellow-600",
     circleText: "text-white",
   },
-  "Review Tasks": {
+  "Review": {
     bg: "bg-orange-100",
     circleBg: "bg-orange-600",
     circleText: "text-white",

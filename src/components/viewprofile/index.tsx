@@ -12,7 +12,7 @@ import { Pencil, Loader, X, SquarePen, ArrowLeft } from "lucide-react";
 import { getusersByIdAPI, UserUpdateAPI } from "@/https/services/users";
 import { Button } from "../ui/button";
 import { errPopper } from "@/lib/helpers/errPoppers";
-import {  useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 
 function ViewProfile() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -28,7 +28,6 @@ function ViewProfile() {
     profile_pic: "",
     disignation: "",
   });
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   // Fetch user data
@@ -78,7 +77,6 @@ function ViewProfile() {
           email: userData.email,
           phone: userData.phone_number,
           designation: userData.disignation,
-          profile_pic: previewUrl || userData.profile_pic,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
@@ -90,19 +88,6 @@ function ViewProfile() {
     },
     onError: (err) => errPopper(err),
   });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-      setIsUploading(true);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setPreviewUrl(null);
-    setUserData((prev: any) => ({ ...prev, profile_pic: "" }));
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -133,56 +118,28 @@ function ViewProfile() {
     <Card className="flex flex-col p-4 shadow-none rounded-md bg-white m-4 border-0">
       <CardHeader className="flex-none md:mb-0 md:mr-4 relative bg-white border-none shadow-none p-0 rounded-md">
         <CardTitle className="text-xl font-medium p-0">
-          <Button onClick={() => router.history.back()} className="hover:bg-white p-0 px-2 cursor-pointer bg-white border-none shadow-none text-black">
-          <ArrowLeft />
+          <Button
+            onClick={() => router.history.back()}
+            className="hover:bg-white p-0 px-2 cursor-pointer bg-white border-none shadow-none text-black"
+          >
+            <ArrowLeft />
           </Button>
           Profile
         </CardTitle>
 
-        <div className="p-2 w-fit">
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
+        <div className="relative">
+          <img
+            src="/table/profile.webp"
+            alt="User Profile"
+            className="w-32 h-32 rounded-full object-cover shadow"
           />
-
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer relative w-32 h-32"
-          >
-            {previewUrl ? (
-              <div className="relative">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-32 h-32 rounded-full object-cover shadow"
-                /> 
-              </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={
-                    userData.profile_pic?.trim()
-                      ? userData.profile_pic
-                      : "/table/profile.webp"
-                  }
-                  alt="User Profile"
-                  className="w-32 h-32 rounded-full object-cover shadow"
-                />
-              </div>
-            )}
-          </label>
         </div>
       </CardHeader>
 
       <CardContent className="bg-white shadow-none rounded-md p-3 border">
         <div className="flex items-center justify-between relative mb-4">
-        <div className="text-lg font-medium mb-2">
-          Personal Information
-        </div>
-        {!isEditing ? (
+          <div className="text-lg font-medium mb-2">Personal Information</div>
+          {!isEditing ? (
             <Button
               className="bg-violet-600 font-light text-white px-4 py-0 h-7 rounded-sm text-sm absolute right-2 top-1 hover:bg-violet-700 cursor-pointer"
               onClick={() => setIsEditing(true)}
@@ -202,7 +159,7 @@ function ViewProfile() {
                 onClick={handleSave}
                 disabled={updateUser.isPending}
               >
-                {updateUser.isPending? (
+                {updateUser.isPending ? (
                   <>
                     <Loader className="animate-spin w-4 h-4" />
                     Saving...
@@ -231,7 +188,7 @@ function ViewProfile() {
           </div>
 
           <div>
-          <p className="text-base text-neutral-400">Email</p>
+            <p className="text-base text-neutral-400">Email</p>
             {isEditing ? (
               <input
                 type="email"
@@ -246,7 +203,7 @@ function ViewProfile() {
           </div>
 
           <div>
-          <p className="text-base text-neutral-400">Phone Number</p>
+            <p className="text-base text-neutral-400">Phone Number</p>
             {isEditing ? (
               <input
                 type="text"
@@ -267,7 +224,7 @@ function ViewProfile() {
           </div>
 
           <div>
-          <p className="text-base text-neutral-400">Designation</p>
+            <p className="text-base text-neutral-400">Designation</p>
             {isEditing ? (
               <input
                 type="text"
@@ -282,8 +239,11 @@ function ViewProfile() {
           </div>
 
           <div>
-          <p className="text-base text-neutral-400">User Type</p>
-            <p>{userType.user_type.charAt(0).toUpperCase() + userType.user_type.slice(1).toLowerCase()}</p>
+            <p className="text-base text-neutral-400">User Type</p>
+            <p>
+              {userType.user_type.charAt(0).toUpperCase() +
+                userType.user_type.slice(1).toLowerCase()}
+            </p>
           </div>
         </div>
       </CardContent>

@@ -1,9 +1,8 @@
-export function NoTasksIcon() {
+export function NoTasksIcon({className} : {className?: string}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="300"
-      height="300"
+      className={className}
       viewBox="0 0 705 635"
       fill="none"
     >

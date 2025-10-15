@@ -20,11 +20,11 @@ export const taskColumns = [
     id: "serial",
     header: () => <span>S.No</span>,
     footer: (props: any) => props.column.id,
-    width: "10px",
-    maxWidth: "10px",
-    minWidth: "10px",
+    width: "20px",
+    maxWidth: "20px",
+    minWidth: "20px",
     cell: (props: any) => (
-      <div style={{ textAlign: "center" }}>{props.getValue()}</div>
+      <div>{props.getValue()}</div>
     ),
   },
   {

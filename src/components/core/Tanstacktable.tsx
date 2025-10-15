@@ -1,356 +1,253 @@
-import React, { useEffect, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
-  ColumnDef,
 } from "@tanstack/react-table";
-import { $fetch } from "@/https/fetch";
+import { FC, useState } from "react";
+import { useLocation } from "@tanstack/react-router";
+import TasksPagination from "./TasksPagination";
+import { pageProps } from "@/interfaces";
+import { NoTasksIcon } from "../icons/NoIcons/NoTasksIcon";
+import { NoUsersIcon } from "../icons/NoIcons/NoUsersIcon";
+import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import { NoDataIcon } from "../icons/NoIcons/NoDataIcon";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  logo_url: string | null;
-  project_status: string;
-  start_date: string;
-  due_date: string | null;
-}
-const columns: ColumnDef<Project>[] = [
-  {
-    accessorKey: "id",
-    header: "S No",
-  },
-  {
-    accessorKey: "title",
-    header: "Task Name",
-  },
-  {
-    accessorKey: "description",
-    header: "Task Brief",
-  },
-  {
-    accessorKey: "project_status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("project_status");
-      let bgColor = "bg-purple-200";
-      let text = "New";
-      if (status === "In Progress") {
-        bgColor = "bg-blue-200";
-        text = "In Progress";
-      } else if (status === "Review") {
-        bgColor = "bg-yellow-200";
-        text = "Review";
-      } else if (status === "Done") {
-        bgColor = "bg-green-200";
-        text = "Done";
-      } else if (status === "Overdue") {
-        bgColor = "bg-red-200";
-        text = "Overdue";
-      } else if (status === "COMPLETED") {
-        bgColor = "bg-green-200";
-        text = "Completed";
-      }
-      return (
-        <span className={`px-2 py-1 rounded-full text-sm ${bgColor}`}>
-          {text}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "due_date",
-    header: "Due Date",
-    cell: ({ row }) => {
-      const dueDate = row.getValue("due_date");
-      return dueDate
-        ? new Date(dueDate?.toString()).toLocaleDateString()
-        : "N/A";
-    },
-  },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: () => (
-      <div className="flex space-x-2">
-        <Button variant="ghost" size="icon">
-          <span className="h-4 w-4">⋮</span>
-        </Button>
-        <Button variant="ghost" size="icon">
-          <span className="h-4 w-4">⋮</span>
-        </Button>
-      </div>
-    ),
-  },
-];
-const ProjectTable: React.FC = () => {
-  const [data, setData] = useState<Project[]>([]);
-  const [paginationDetails, setPaginationDetails] = useState({
-    total_records: 0,
-    total_pages: 1,
-    current_page: 1,
-    page_size: 6,
-    next_page: null,
-    prev_page: null,
-  });
-  const [sort, setSort] = useState<{
-    column: string;
-    direction: "asc" | "desc";
-  } | null>({ column: "id", direction: "asc" });
-  const [searchString, setSearchString] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  const getAllProjectsAPI = async (params: {
-    order_by?: string;
-    page?: number;
-    page_size?: number;
-    search_string?: string;
-  }) => {
-    try {
-      const queryParams = new URLSearchParams({
-        order_by: params.order_by || "id:asc",
-        page: params.page?.toString() || "1",
-        page_size: params.page_size?.toString() || "6",
-        search_string: params.search_string || "",
-      }).toString();
-      const response = await $fetch.get(`/projects?${queryParams}`);
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
-  const fetchProjects = async () => {
-    setIsFetching(true);
-    try {
-      const response = await getAllProjectsAPI({
-        order_by: sort ? `${sort.column}:${sort.direction}` : "id:asc",
-        page: paginationDetails.current_page,
-        page_size: paginationDetails.page_size,
-        search_string: searchString,
-      });
-      const paginationInfo = response.data.pagination_info ?? {
-        total_records: paginationDetails.total_records || 0,
-        total_pages: paginationDetails.total_pages || 1,
-        current_page: paginationDetails || 1,
-        page_size: paginationDetails.page_size,
-        next_page: paginationDetails.next_page || null,
-        prev_page: paginationDetails.prev_page || null,
-      };
-      setData(response.data?.data?.records || []);
-      setPaginationDetails(paginationInfo);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      setData([]);
-      setPaginationDetails({
-        total_records: 0,
-        total_pages: 1,
-        current_page: 1,
-        page_size: paginationDetails.page_size,
-        next_page: null,
-        prev_page: null,
-      });
-    } finally {
-      setIsFetching(false);
-    }
-  };
-  useEffect(() => {
-    fetchProjects();
-  }, [
-    paginationDetails.current_page,
-    paginationDetails.page_size,
-    sort,
-    searchString,
-  ]);
+const TanStackTable: FC<pageProps> = ({
+  columns,
+  data,
+  loading = false,
+  getData,
+  paginationDetails,
+  removeSortingForColumnIds,
+  height,
+  height1,
+}) => {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location?.search);
   const table = useReactTable({
-    data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    manualPagination: true,
-    pageCount: paginationDetails.total_pages,
+    data: data?.length ? data : [],
     state: {
-      pagination: {
-        pageIndex: paginationDetails.current_page - 1,
-        pageSize: paginationDetails.page_size,
-      },
+      sorting,
     },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
-  const handlePageChange = (page: number) => {
-    setPaginationDetails((prev) => ({
-      ...prev,
-      current_page: page,
-    }));
+
+  const capturePageNum = (value: number) => {
+    getData({
+      ...searchParams,
+      pageSize: searchParams.get("page_size")
+        ? searchParams.get("page_size")
+        : 25,
+      pageIndex: value,
+      order_by: searchParams.get("order_by"),
+    });
   };
-  const handlePageSizeChange = (size: number) => {
-    setPaginationDetails((prev) => ({
-      ...prev,
-      page_size: size,
-      current_page: 1,
-    }));
+  const captureRowPerItems = (value: number) => {
+    getData({
+      ...searchParams,
+      pageSize: value,
+      pageIndex: 1,
+      order_by: searchParams.get("order_by"),
+    });
   };
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchString(e.target.value);
-    setPaginationDetails((prev) => ({
-      ...prev,
-      current_page: 1,
-    }));
+
+  const getWidth = (id: string | undefined) => {
+    const widthObj = columns.find((col) => col.id === id);
+    return widthObj ? widthObj?.width || widthObj?.size || "100px" : "100px";
   };
+
+  const sortAndGetData = (header: any) => {
+    if (
+      removeSortingForColumnIds &&
+      removeSortingForColumnIds.length &&
+      removeSortingForColumnIds.includes(header.id)
+    ) {
+      return;
+    }
+
+    let sortBy = header.id;
+    let sortDirection = "asc";
+    let orderBy = `${sortBy}:asc`;
+
+    if (searchParams.get("order_by")?.startsWith(header.id)) {
+      if (searchParams.get("order_by") === `${header.id}:asc`) {
+        sortDirection = "desc";
+        orderBy = `${header.id}:desc`;
+      } else {
+        sortBy = "";
+        sortDirection = "";
+        orderBy = "";
+      }
+    }
+
+    getData({
+      ...searchParams,
+      pageIndex: searchParams.get("page"),
+      pageSize: searchParams.get("page_size"),
+      order_by: orderBy,
+    });
+  };
+
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Today’s Agenda</h2>
-        <div className="flex space-x-2">
-          <Input
-            type="text"
-            value={searchString}
-            onChange={handleSearch}
-            placeholder="Find your Task..."
-            className="w-64"
-          />
-          <Button variant="outline" size="sm">
-            Status
-          </Button>
-          <Button variant="outline" size="sm">
-            Due Date
-          </Button>
-          <Button className="bg-purple-600 text-white">New Task</Button>
-        </div>
-      </div>
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-left">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+    <div className="overflow-x-auto w-full">
+        <div className="w-full relative bg-white" style={{ height: height }}>
+          <table className="w-full text-sm table-fixed h-full">
+            <thead className="!sticky top-0 bg-white text-neutral-400 text-xs font-normal">
+              {table?.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="border-none h-10">
+                  {headerGroup.headers.map((header: any, index: number) => (
+                    <th
+                      key={index}
+                      colSpan={header.colSpan}
+                      style={{
+                        minWidth: getWidth(header.id),
+                        width: getWidth(header.id),
+                      }}
+                      className="cursor-pointer text-sm 3xl:!text-base text-neutral-500 px-1"
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className="flex items-center gap-1 select-none"
+                          onClick={() => sortAndGetData(header)}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          <SortItems
+                            header={header}
+                            removeSortingForColumnIds={
+                              removeSortingForColumnIds
+                            }
+                          />
+                        </div>
                       )}
-                    </TableCell>
+                    </th>
                   ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  No data found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex justify-between items-center mt-4">
-        <span>
-          Showing {data.length} of {paginationDetails.total_records} records |
-          Total Pages: {paginationDetails.total_pages}
-        </span>
-        <div className="flex space-x-2 items-center">
-          <Select
-            value={paginationDetails.page_size.toString()}
-            onValueChange={(value) => handlePageSizeChange(Number(value))}
-          >
-            <SelectTrigger className="w-[70px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[6, 12, 18, 24].map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
+                </tr>
               ))}
-            </SelectContent>
-          </Select>
-          <div className="flex space-x-1">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() =>
-                handlePageChange(paginationDetails.current_page - 1)
-              }
-              disabled={paginationDetails.current_page === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from(
-              { length: paginationDetails.total_pages },
-              (_, i) => i + 1
-            )
-              .slice(
-                Math.max(0, paginationDetails.current_page - 2),
-                Math.min(
-                  paginationDetails.total_pages,
-                  paginationDetails.current_page + 3
-                )
-              )
-              .map((page) => (
-                <Button
-                  key={page}
-                  variant={
-                    paginationDetails.current_page === page
-                      ? "default"
-                      : "outline"
-                  }
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </Button>
-              ))}
-            {paginationDetails.current_page + 3 <
-              paginationDetails.total_pages && <span>...</span>}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() =>
-                handlePageChange(paginationDetails.current_page + 1)
-              }
-              disabled={
-                paginationDetails.current_page === paginationDetails.total_pages
-              }
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+            </thead>
+              <tbody>
+                {data?.length ? (
+                  table?.getRowModel().rows.map((row, rowIndex) => (
+                    <tr
+                      key={row.id}
+                      className={`${
+                        rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
+                      } hover:bg-gray-50 border-none`}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className="text-sm 3xl:!text-base p-0.5 px-2 !h-9"
+                          style={{
+                            minWidth: getWidth(cell.column.columnDef.id),
+                            width: getWidth(cell.column.columnDef.id),
+                          }}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : !loading ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      className="text-gray-500 text-center"
+                    >
+                      {location.pathname.includes("tasks") ? (
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <NoTasksIcon className="w-60 h-60"/>
+                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                            No Tasks Found
+                          </p>
+                        </div>
+                      ) : location.pathname.includes("projects") ? (
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <NoProjectIcon />
+                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                            No Projects Found
+                          </p>
+                        </div>
+                      ) : location.pathname.includes("dashboard") ? (
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <NoDataIcon />
+                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                            No Data Found
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <NoUsersIcon />
+                          <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                            No Users Found
+                          </p>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan={columns.length} className="text-center">
+                      {/* Loading... */}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+          </table>
+        <div className="sticky bottom-0">
+        <TasksPagination
+          paginationDetails={paginationDetails}
+          capturePageNum={capturePageNum}
+          captureRowPerItems={captureRowPerItems}
+        />
         </div>
-      </div>
+    </div>
     </div>
   );
 };
-export default ProjectTable;
+
+export default TanStackTable;
+
+const SortItems = ({
+  header,
+  removeSortingForColumnIds,
+}: {
+  header: any;
+  removeSortingForColumnIds?: string[];
+}) => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location?.search);
+
+  const sortBy = searchParams.get("order_by")?.split(":")[0];
+  const sortDirection = searchParams.get("order_by")?.split(":")[1];
+  if (removeSortingForColumnIds?.includes(header.id)) {
+    return null;
+  }
+
+  return (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      {sortBy === header.id ? (
+        sortDirection === "asc" ? (
+          <img src="/table/sort-asc.svg" height={15} width={15} alt="Asc" />
+        ) : (
+          <img src="/table/sort-desc.svg" height={15} width={15} alt="Desc" />
+        )
+      ) : (
+        <img src="/table/sort-norm.svg" height={15} width={15} alt="No Sort" />
+      )}
+    </div>
+  );
+};

@@ -3,11 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-const statusColors: Record<string, string> = {
-  ACTIVE: "bg-green-100 text-green-600",
-  INACTIVE: "bg-red-100 text-red-600",
-};
-
 export const usersColumns = [
   {
     accessorFn: (row: any) => row.serial,
@@ -195,64 +190,23 @@ export const usersColumns = [
       }, [isOpen]);
 
       return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              color: isActive ? "#28A745" : "#A71D2A",
-              background: isActive ? "#28A74533" : "#A71D2A33",
-            }}
-            className="rounded-full cursor-pointer flex items-center py-0 px-3 min-w-[100px]"
+        <div className="flex items-center relative">
+          <div className={`${isActive ? "text-green-600" : "text-red-600"} rounded-full cursor-pointer flex items-center py-0 px-2 gap-2 w-fit`}
             onClick={togglePopover}
           >
-            <span
-              style={{
-                height: "8px",
-                width: "8px",
-                borderRadius: "50%",
-                backgroundColor: isActive ? "green" : "red",
-                marginRight: "8px",
-              }}
-            ></span>
+            <span className={`h-1.5 w-1.5 rounded-lg  ${isActive ? "bg-green-600" : "bg-red-600"}`}></span>
             {isActive ? "Active" : "Inactive"}
           </div>
           {isOpen && (
             <div
               ref={popoverRef}
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: "0",
-                marginTop: "5px",
-                padding: "5px",
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                zIndex: 100,
-              }}
-            >
-              <div
-                style={{
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  color: "green",
-                }}
+              className="absolute top-0 left-0 mt-2 p-2 bg-white border border-neutral-300 rounded shadow-[(0,2px,10px,rgba(0,0,0,0.1)] z-100">
+              <div className="p-2 cursor-pointer text-green-600"
                 onClick={() => updateUserStatus(true)}
               >
                 Active
               </div>
-              <div
-                style={{
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  color: "red",
-                }}
+              <div className="p-2 cursor-pointer text-red-600"
                 onClick={() => updateUserStatus(false)}
               >
                 Inactive

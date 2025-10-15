@@ -22,9 +22,10 @@ import {
 } from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
-import ProjectsTable from "./projectTable";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 import Loading from "../core/Loading";
+import TanStackTable from "../core/Tanstacktable";
+import { getProjectColumns } from "./projectColumns";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -102,7 +103,14 @@ const Projects = () => {
     setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
 
   const handleNavigation = () => navigate({ to: `/projects/add` });
-  const handleView = (id: number) => navigate({ to: `/projects/${id}` });
+
+  const getData = (params: any) => {
+    setPagination({
+      pageIndex: params.pageIndex || 1,
+      pageSize: params.pageSize || 25,
+      order_by: params.order_by || "",
+    });
+  };
 
   if (isError) {
     return (
@@ -253,7 +261,7 @@ const Projects = () => {
                           <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
                             {project.title?.charAt(0).toUpperCase() || "?"}
                           </div>
-                          <h2 className="text-base 3xl:!text-lg font-medium break-words text-center px-2 capitalize">
+                          <h2 className="text-sm 3xl:!text-base font-medium break-words px-2 capitalize">
                             {project.title || "Untitled"}
                           </h2>
                         </div>
@@ -328,21 +336,30 @@ const Projects = () => {
         </div>
       ) : (
         <div className="w-full">
-          <ProjectsTable
-            debouncedSearch={debouncedSearch}
-            selectedSort={selectedSort}
-            selectedStatus={selectedStatus}
-            setSelectedStatus={setSelectedStatus}
-            setSelectedSort={setSelectedSort}
-            page={pagination.pageIndex}
-            pageSize={pagination.pageSize}
-            setPage={capturePageNum}
-            setPageSize={captureRowPerItems}
-            onDelete={(project) => {
-              setDeleteTarget(project);
-              setShowDeleteDialog(true);
-            }}
-          />
+          <TanStackTable
+              data={projectsData}
+              columns={getProjectColumns(navigate, user, (project: ProjectData) => {
+                setDeleteTarget(project);
+                setShowDeleteDialog(true);
+              })}
+              paginationDetails={
+                data?.data?.data?.pagination_info || {
+                  total_records: 0,
+                  total_pages: 1,
+                  current_page: pagination.pageIndex,
+                  page_size: pagination.pageSize,
+                  next_page: null,
+                  prev_page: null,
+                }
+              }
+              getData={getData}
+              loading={isLoading}
+              removeSortingForColumnIds={[
+                "serial",
+                "actions",
+              ]}
+              height='calc(100vh - 120px)'
+            />
         </div>
       )}
 

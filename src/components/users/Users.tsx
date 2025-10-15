@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 import SearchFilter from "../core/SearchFilter";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
-import TanStackTable from "../core/TasksTanstacktable";
+import TanStackTable from "../core/Tanstacktable";
 import { Button } from "../ui/button";
 import { usersColumns } from "./UsersColumns";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -30,7 +30,6 @@ const UsersDetais = () => {
     ? searchParams.get("order_by")
     : "";
   const initialSearch = searchParams.get("search") || "";
-
   const [searchString, setSearchString] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -316,6 +315,7 @@ const UsersDetais = () => {
                 "task_status",
                 "actions",
               ]}
+              height='calc(100vh - 145px)'
             />
           </div>
         </div>

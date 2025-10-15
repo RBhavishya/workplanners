@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import BigCard from "../core/Cards";
 import SearchFilter from "../core/SearchFilter";
 import DeleteTaskDialog from "../core/TaskDeleteFilter";
-import TanStackTable from "../core/TasksTanstacktable";
+import TanStackTable from "../core/Tanstacktable";
 import WeeklySummary from "../core/WeakelySummary";
 import { PendingIcon } from "../icons/Dashboard/PendingIcon";
 import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
@@ -252,13 +252,6 @@ const Tasks = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const formattedTime = time.toLocaleTimeString("en-GB");
-  const formattedDate = time.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "2-digit",
-    month: "short",
-  });
-
   return (
     <div className="flex flex-col overflow-hidden gap-2 m-2 rounded-md">
         <div className="flex gap-6 bg-white p-2 rounded-md">
@@ -384,6 +377,7 @@ const Tasks = () => {
               "task_status",
               "actions",
             ]}
+            height='calc(100vh - 260px)'
           />
         </div>
         <DeleteTaskDialog

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import {
 } from "@/https/services/project";
 import SmallCard from "../core/StatusCard";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { ArrowLeft, Check, ChevronDown, Move, MoveLeft, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, X } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -210,23 +210,26 @@ const Viewdetails = () => {
           </p>
         </div>
         {/* Status Cards */}
-        <div className="flex items-center w-full bg-white p-2 rounded-sm">
+        <div className="flex flex-col bg-white">
+        <p className="text-base 3xl:!text-lg font-medium px-2 pt-1">Tasks</p>
+        <div className="flex items-center w-full p-2 rounded-sm">
           <SmallCard
             cards={[
-              { title: "Total Tasks", value: status?.data?.total_count },
+              { title: "Total", value: status?.data?.total_count },
+              { title: "New", value: status?.data?.new_count },
               {
-                title: "Completed Tasks",
-                value: status?.data?.completed_count,
-              },
-              {
-                title: "In Progress Task",
+                title: "In Progress",
                 value: status?.data?.inProgress_count,
               },
-              { title: "New Tasks", value: status?.data?.new_count },
-              { title: "Review Tasks", value: status?.data?.review_count },
-              { title: "Pending Tasks", value: status?.data?.pending_count },
+              {
+                title: "Completed",
+                value: status?.data?.completed_count,
+              },
+              { title: "Review", value: status?.data?.review_count },
+              { title: "Overdue", value: status?.data?.pending_count },
             ]}
           />
+        </div>
         </div>
 
         {/* Tasks Table */}
