@@ -88,7 +88,7 @@ export const Pagination = ({
               setPage?.(1); // reset to page 1
             }}
           >
-            <SelectTrigger className="w-40 h-8 text-sm border border-gray-300 rounded">
+            <SelectTrigger className="w-40 h-8 text-sm 3xl:!text-base border border-gray-300 rounded">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -96,7 +96,7 @@ export const Pagination = ({
                 <SelectItem
                   key={size}
                   value={size.toString()}
-                  className="text-sm"
+                  className="text-sm 3xl:!text-base"
                 >
                   {size}
                 </SelectItem>
@@ -104,7 +104,7 @@ export const Pagination = ({
             </SelectContent>
           </Select>
 
-          <span className="text-sm text-gray-600">
+          <span className="text-sm 3xl:!text-base text-gray-600">
             Showing {startRecord} to {endRecord} from {displayTotalRecords} data
           </span>
         </div>
@@ -115,7 +115,7 @@ export const Pagination = ({
         <div className="flex items-center gap-1">
           {/* Prev */}
           <button
-            className="flex items-center justify-center w-8 h-8 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center justify-center w-8 h-8 text-sm 3xl:!text-base hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
             onClick={() => setPage?.(paginationDetails.current_page - 1)}
             disabled={paginationDetails.current_page === 1}
             aria-label="Previous page"
@@ -128,7 +128,7 @@ export const Pagination = ({
             <React.Fragment key={index}>
               {typeof page === "number" ? (
                 <button
-                  className={`flex items-center justify-center w-7 h-7 text-sm font-medium rounded ${
+                  className={`flex items-center justify-center w-7 h-7 text-sm 3xl:!text-base font-medium rounded ${
                     paginationDetails.current_page === page
                       ? "bg-purple-600 text-white"
                       : "text-gray-600 hover:bg-gray-200"
@@ -139,7 +139,7 @@ export const Pagination = ({
                   {page}
                 </button>
               ) : (
-                <span className="flex items-center justify-center w-8 h-8 text-sm text-gray-500">
+                <span className="flex items-center justify-center w-8 h-8 text-sm 3xl:!text-base text-gray-500">
                   {page}
                 </span>
               )}
@@ -148,7 +148,7 @@ export const Pagination = ({
 
           {/* Next */}
           <button
-            className="flex items-center justify-center w-8 h-8 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center justify-center w-8 h-8 text-sm 3xl:!text-base hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
             onClick={() => setPage?.(paginationDetails.current_page + 1)}
             disabled={
               paginationDetails.current_page === paginationDetails.total_pages

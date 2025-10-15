@@ -23,15 +23,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
+import Loading from "../core/Loading";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search as string);
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
-
   const [time, setTime] = useState(new Date());
   const [todayFilter, setTodayFilter] = useState<string>("");
-
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +41,6 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const formattedTime = time.toLocaleTimeString("en-GB");
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
     day: "2-digit",
@@ -167,7 +165,7 @@ const Dashboard = () => {
       <div className="w-3/4 m-2">
         <div className="bg-white p-2 rounded-sm shadow-none mb-2">
           <div className="flex flex-wrap gap-3">
-            {isError ? (
+            {/* {isError ? (
               <p className="text-red-500">Error loading stats</p>
             ) : (
               dashboardCards.map((card) => {
@@ -203,7 +201,35 @@ const Dashboard = () => {
                   </div>
                 );
               })
-            )}
+            )} */}
+            {dashboardCards.map((card) => {
+  const isActive =
+    new URLSearchParams(location.search as string).get("task_status") ===
+    card.status;
+
+  return (
+    <div
+      key={card.title}
+      className={`cursor-pointer ${isActive ? "border border-purple-600 rounded-md" : ""}`}
+      onClick={() =>
+        navigate({
+          to: "/tasks",
+          search: {
+            page: 1,
+            page_size: pageSizeParam,
+            task_status: card.status || undefined,
+          },
+        })
+      }
+    >
+      <BigCard
+        title={card.title}
+        value={<CountUp start={0} end={card.value} duration={1.5} />}
+        icon={card.icon}
+      />
+    </div>
+  );
+})}
           </div>
         </div>
 
@@ -214,21 +240,18 @@ const Dashboard = () => {
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-lg font-semibold">Task Tracker</h2>
-            <p className="text-sm text-gray-500">{formattedDate}</p>
+            <h2 className="text-lg 3xl:!text-xl font-medium">Task Tracker</h2>
+            <p className="text-sm 3xl:!text-base text-gray-500">{formattedDate}</p>
           </div>
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
+            className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer text-xs 3xl:!text-sm"
             onClick={handleNavigation}
           >
             + New Task
           </Button>
         </div>
-        {/* <h2 className="text-lg font-semibold">Task Tracker</h2>
-        <p className="text-sm text-gray-500 mb-4">{formattedDate}</p> */}
-
         {/* Filters */}
-        <div className="flex items-center gap-2 mb-4 text-sm font-medium">
+        <div className="flex items-center gap-2 mb-4 text-sm 3xl:!text-base font-medium">
           {[
             {
               label: "All",
@@ -261,7 +284,7 @@ const Dashboard = () => {
               onClick={() => setTodayFilter(item.status)}
             >
               {item.label}
-              <span className="text-[11px] text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
+              <span className="text-[11px] 3xl:!text-xs text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
                 <CountUp end={item.count} duration={1} />
               </span>
             </div>
@@ -271,17 +294,16 @@ const Dashboard = () => {
         {/* Tasks List */}
         <div
           ref={containerRef}
-          className="space-y-2 h-[calc(100vh-250px)] overflow-y-auto pr-2"
+          className="space-y-2 h-[calc(100vh-190px)] overflow-y-auto pr-2"
         >
           {isFetching ? (
             <div className="flex items-center justify-center py-6">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="ml-2 text-sm text-gray-500">Loading tasks...</p>
+              <Loading loading={isFetching} />
             </div>
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true
             ).length === 0 ? (
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm 3xl:!text-base text-gray-500 text-center">
               {todayFilter
                 ? `No ${todayFilter.toLowerCase()} tasks today`
                 : "No tasks for today"}
@@ -298,69 +320,14 @@ const Dashboard = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-start gap-2 py-2 border-b border-gray-100 cursor-pointer"
+                    className="flex flex-col items-start gap-1 p-1 border-b border-gray-200 cursor-pointer"
                       onClick={() => navigate({ to: `/tasks/view/${task.id}` })}
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-600 capitalize text-sm 3xl:text-base">
+                    <div className="flex items-center justify-between w-full">
+                      <p className="font-medium text-gray-600 capitalize text-sm 3xl:!text-base">
                         {task.task_title}
                       </p>
-
-                      {/* Due Date */}
-                      <p className="text-[11px] font-normal text-gray-700">
-                        Due Date:{" "}
-                        <span className="text-gray-500 font-normal">
-                          {task.end_date
-                            ? new Date(task.end_date).toLocaleString("en-GB", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })
-                            : "No due date"}
-                        </span>
-                      </p>
-
-                      {/* Assigned Users */}
-                      {task.users && task.users.length > 0 && (
-                        <div className="flex -space-x-2 items-center mt-1">
-                          {visibleUsers.map((u: any) => (
-                            <div
-                              key={u.user_id}
-                              className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-[11px] font-medium text-white border-2 border-white"
-                              title={u.display_name}
-                            >
-                              {u.display_name.charAt(0).toUpperCase()}
-                            </div>
-                          ))}
-
-                          {remainingUsers.length > 0 && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs font-medium text-white border-2 border-white cursor-pointer">
-                                    +{remainingUsers.length}
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent
-                                  className="max-h-[150px] overflow-y-auto bg-white text-gray-700 rounded-md shadow-md p-2"
-                                  side="top"
-                                >
-                                  <div className="flex flex-col gap-1">
-                                    {remainingUsers.map((u: any) => (
-                                      <span key={u.user_id}>
-                                        {u.display_name}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Task Status Icon */}
+                      {/* Task Status Icon */}
                     <div
                       className={
                         task.task_status === "COMPLETED"
@@ -376,9 +343,64 @@ const Dashboard = () => {
                       }
                     >
                       {task.task_status === "COMPLETED" ? (
-                        <GreenThickIcon className="w-4 h-4" />
+                        <GreenThickIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
                       ) : (
-                        <ClockIcon className="w-4 h-4" />
+                        <ClockIcon className="w-4 h-4 3xl:!w-5 3xl:!h-5" />
+                      )}
+                    </div>
+                    </div>
+
+                  <div className="flex items-center justify-between w-full">
+                    {/* Due Date */}
+                    <p className="text-[11px] 3xl:!text-xs font-normal text-gray-700">
+                        Due Date:{" "}
+                        <span className="text-gray-500 font-normal">
+                          {task.end_date
+                            ? new Date(task.end_date).toLocaleString("en-GB", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "No due date"}
+                        </span>
+                      </p>
+                    {/* Assigned Users */}
+                    {task.users && task.users.length > 0 && (
+                        <div className="flex -space-x-2 items-center mt-1">
+                          {visibleUsers.map((u: any) => (
+                            <div
+                              key={u.user_id}
+                              className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] 3xl:!text-xs font-medium text-white border-2 border-white"
+                              title={u.display_name}
+                            >
+                              {u.display_name.charAt(0).toUpperCase()}
+                            </div>
+                          ))}
+
+                          {remainingUsers.length > 0 && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="w-7 h-7 rounded-full bg-gray-400 flex items-center justify-center text-xs 3xl:!text-sm font-medium text-white border-2 border-white cursor-pointer">
+                                    +{remainingUsers.length}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                  className="max-h-[150px] overflow-y-auto bg-white text-gray-700 rounded-md shadow-md p-2"
+                                  side="top"
+                                >
+                                  <div className="flex flex-col gap-1">
+                                    {remainingUsers.map((u: any) => (
+                                      <span key={u.user_id} className="capitalize">
+                                        {u.display_name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

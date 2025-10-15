@@ -8,15 +8,16 @@ import {
   CardTitle,
 } from "../ui/card";
 import { toast } from "sonner";
-import { Pencil, Loader, X } from "lucide-react";
+import { Pencil, Loader, X, SquarePen, ArrowLeft } from "lucide-react";
 import { getusersByIdAPI, UserUpdateAPI } from "@/https/services/users";
 import { Button } from "../ui/button";
 import { errPopper } from "@/lib/helpers/errPoppers";
+import { useRouter } from "@tanstack/react-router";
 
 function ViewProfile() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userId = storedUser?.id;
-
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [userType, setUserType] = useState<any>("");
@@ -58,10 +59,12 @@ function ViewProfile() {
         setLoading(false);
       }
     },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   // Update user
-  const { mutate: updateUser } = useMutation({
+  const updateUser = useMutation({
     mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
     onSuccess: (res: any) => {
       if (res?.success) {
@@ -112,7 +115,7 @@ function ViewProfile() {
       phone: userData.phone_number,
       designation: userData.disignation,
     };
-    updateUser(payload);
+    updateUser.mutate(payload);
   };
 
   const handleCancel = () => setIsEditing(false);
@@ -127,33 +130,16 @@ function ViewProfile() {
   }
 
   return (
-    <Card className="flex flex-col p-4 shadow-lg rounded-lg bg-transparent border-0">
-      <CardHeader className="flex-none mb-4 md:mb-0 md:mr-4 relative bg-white border shadow p-0 rounded-md divide-y divide-gray-300 space-y-2">
-        <CardTitle className="text-xl font-semibold p-2 relative">
-          {!isEditing ? (
-            <Button
-              className="bg-red-600 text-white px-4 py-2 rounded-md text-sm absolute right-2 top-1 hover:bg-red-700 cursor-pointer"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit Profile
-            </Button>
-          ) : (
-            <div className="absolute right-2 top-1 flex gap-2">
-              <Button
-                className="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 cursor-pointer"
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 cursor-pointer"
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-            </div>
-          )}
-          Profile Information
+    <Card className="flex flex-col p-4 shadow-none rounded-md bg-white m-4 border-0">
+      <CardHeader className="flex-none md:mb-0 md:mr-4 relative bg-white border-none shadow-none p-0 rounded-md">
+        <CardTitle className="text-xl font-medium p-0">
+          <Button
+            onClick={() => router.history.back()}
+            className="hover:bg-white p-0 px-2 cursor-pointer bg-white border-none shadow-none text-black"
+          >
+            <ArrowLeft />
+          </Button>
+          Profile
         </CardTitle>
 
         <div className="p-2 w-fit">
@@ -174,22 +160,8 @@ function ViewProfile() {
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 shadow"
+                  className="w-32 h-32 rounded-full object-cover shadow"
                 />
-                {isUploading && (
-                  <div className="absolute w-32 h-32 inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 rounded-full">
-                    <Loader className="text-white w-6 h-6 animate-spin" />
-                  </div>
-                )}
-                <button
-                  onClick={handleRemoveFile}
-                  className="absolute top-0 right-0 bg-red-500 p-1 rounded-full border border-white"
-                >
-                  <X className="text-white w-4 h-4" />
-                </button>
-                <span className="absolute inset-0 flex items-center justify-center w-10 h-10 bg-blue-500 text-white rounded-full">
-                  <Pencil className="w-4 h-4" />
-                </span>
               </div>
             ) : (
               <div className="relative">
@@ -200,23 +172,52 @@ function ViewProfile() {
                       : "/table/profile.webp"
                   }
                   alt="User Profile"
-                  className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 shadow"
+                  className="w-32 h-32 rounded-full object-cover shadow"
                 />
-                <span className="absolute bottom-2 left-3 bg-blue-700 text-white rounded-full p-1">
-                  {" "}
-                  <Pencil className="w-4 h-4" />{" "}
-                </span>
               </div>
             )}
           </label>
         </div>
       </CardHeader>
 
-      <CardContent className="space-x-4 bg-white shadow rounded-md p-2 divide-y divide-gray-300 space-y-2">
-        <div className="text-xl font-semibold p-2">Personal Information</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg text-gray-700">
+      <CardContent className="bg-white shadow-none rounded-md p-3 border">
+        <div className="flex items-center justify-between relative mb-4">
+          <div className="text-lg font-medium mb-2">Personal Information</div>
+          {!isEditing ? (
+            <Button
+              className="bg-violet-600 font-light text-white px-4 py-0 h-7 rounded-sm text-sm absolute right-2 top-1 hover:bg-violet-700 cursor-pointer"
+              onClick={() => setIsEditing(true)}
+            >
+              <SquarePen /> Edit
+            </Button>
+          ) : (
+            <div className="absolute right-2 top-1 flex gap-2">
+              <Button
+                className="bg-gray-400 text-white px-4 py-0 h-7 rounded-sm text-sm hover:bg-gray-500 cursor-pointer font-light"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-green-600 text-white px-6 py-0 h-7 rounded-sm text-sm hover:bg-green-700 cursor-pointer font-light"
+                onClick={handleSave}
+                disabled={updateUser.isPending}
+              >
+                {updateUser.isPending ? (
+                  <>
+                    <Loader className="animate-spin w-4 h-4" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-base text-gray-700">
           <div>
-            <strong>Full Name:</strong>
+            <p className="text-base text-neutral-400">Full Name</p>
             {isEditing ? (
               <input
                 type="text"
@@ -231,7 +232,7 @@ function ViewProfile() {
           </div>
 
           <div>
-            <strong>Email:</strong>
+            <p className="text-base text-neutral-400">Email</p>
             {isEditing ? (
               <input
                 type="email"
@@ -246,13 +247,19 @@ function ViewProfile() {
           </div>
 
           <div>
-            <strong>Phone Number:</strong>
+            <p className="text-base text-neutral-400">Phone Number</p>
             {isEditing ? (
               <input
                 type="text"
                 name="phone_number"
                 value={userData.phone_number}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d{0,10}$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                maxLength={10}
                 className="border p-1 rounded w-full mt-1"
               />
             ) : (
@@ -261,7 +268,7 @@ function ViewProfile() {
           </div>
 
           <div>
-            <strong>Designation:</strong>
+            <p className="text-base text-neutral-400">Designation</p>
             {isEditing ? (
               <input
                 type="text"
@@ -276,13 +283,22 @@ function ViewProfile() {
           </div>
 
           <div>
-            <strong>User Type:</strong>
-            <p>{userType.user_type || "-"}</p>
+            <p className="text-base text-neutral-400">User Type</p>
+            <p>
+              {userType?.user_type
+                ? userType.user_type
+                      .split("_")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      ) 
+                      .join(" ") 
+                : "-"}
+            </p>
           </div>
         </div>
       </CardContent>
-
-      <CardFooter className="mt-4 md:mt-0"></CardFooter>
     </Card>
   );
 }

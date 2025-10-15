@@ -15,7 +15,7 @@ const StatusCard = ({
 }: StatusCardProps) => {
   return (
     <div
-      className={`flex items-center justify-between w-[150px] h-[60px] rounded-md px-4 ${bg}`}
+      className={`flex items-center justify-between w-[150px] h-[60px] rounded-md px-2 ${bg}`}
     >
       <span className="text-sm font-semibold text-gray-700">{title}</span>
       <div
@@ -81,7 +81,7 @@ interface SmallCardProps {
 
 const SmallCard = ({ cards }: SmallCardProps) => {
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-1 flex-wrap">
       {cards.map((card, index) => {
         const config = statusConfig[card.title] || {
           bg: "bg-gray-200",

@@ -6,15 +6,17 @@ import {
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import React, { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import TaskSearchFilter from "../core/SearchFilter";
-import TanStackTable from "../core/TasksTanstacktable";
-import { usersColumns } from "./UsersColumns";
-import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 import SearchFilter from "../core/SearchFilter";
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import TanStackTable from "../core/TasksTanstacktable";
+import { Button } from "../ui/button";
+import { usersColumns } from "./UsersColumns";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Filter, X } from "lucide-react";
+import Loading from "../core/Loading";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
@@ -38,22 +40,19 @@ const UsersDetais = () => {
   const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
     null
   );
+  const [selectedUserType, setSelectedUserType] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const { isLoading, data, isFetching } = useQuery({
-    queryKey: ["users", pagination, debouncedSearch, del],
-    queryFn: async () => {
-      const response = await getAllPaginatedUsers({
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-        order_by: pagination.order_by,
-        search_string: debouncedSearch,
-      });
 
+  const { isLoading, data, isFetching } = useQuery({
+    queryKey: ["users", pagination, debouncedSearch, del, selectedUserType],
+    queryFn: async () => {
       if (location.pathname !== "/dashboard") {
         router.navigate({
           to: "/users",
@@ -62,15 +61,24 @@ const UsersDetais = () => {
             page_size: Number(pagination.pageSize),
             order_by: pagination.order_by || undefined,
             search: debouncedSearch || undefined,
+            user_type: selectedUserType || undefined,
           },
         });
       }
-
+      const response = await getAllPaginatedUsers({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        order_by: pagination.order_by,
+        search_string: debouncedSearch,
+        user_type: selectedUserType,
+      });
+      
       return response;
     },
     retry: false,
     refetchOnWindowFocus: false,
   });
+
   const users =
     addSerial(
       data?.data?.data?.records,
@@ -159,7 +167,7 @@ const UsersDetais = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchString]);
+  }, [searchString, selectedUserType]);
 
   const userActions = [
     {
@@ -169,11 +177,10 @@ const UsersDetais = () => {
       size: 90,
       cell: (info: any) => {
         const rowData = info.row.original;
-        const isActive = rowData.user_status === "ACTIVE"; // check user status
+        const isActive = rowData.user_status === "ACTIVE";
 
         return (
           <div className="flex gap-3">
-            {/* Edit button */}
             <Button
               title="Edit"
               size="sm"
@@ -200,6 +207,7 @@ const UsersDetais = () => {
               onClick={() => {
                 setUserToResetPassword(rowData.id);
                 setResetPasswordDialogOpen(true);
+                setSelectedUserType("");
               }}
             >
               <img
@@ -242,6 +250,44 @@ const UsersDetais = () => {
             setSearchString={setSearchString}
             title="Find your Users"
           />
+          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-2 border border-neutral-300 bg-white px-2 py-1 rounded-sm cursor-pointer text-sm h-7">
+                <div className="flex items-center gap-2">
+                  <Filter className="text-purple-500" size={16} />
+                  <span>{selectedUserType || "Sort by"}</span>
+                </div>
+
+                {selectedUserType && (
+                  <X
+                    size={16}
+                    className="text-gray-400 hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedUserType("");
+                    }}
+                  />
+                )}
+              </button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-40 p-2 border rounded-md shadow-md">
+              <div className="flex flex-col">
+                {["MANAGER", "EMPLOYEE"].map((option) => (
+                  <div
+                    key={option}
+                    className="cursor-pointer px-3 py-1 hover:bg-gray-100"
+                    onClick={() => {
+                      setSelectedUserType(option);
+                      setFilterOpen(false);
+                    }}
+                  >
+                    {option.charAt(0).toUpperCase() + option.slice(1).toLowerCase()}
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
             onClick={handleNavigation}
@@ -252,7 +298,7 @@ const UsersDetais = () => {
         <div className="bg-white relative">
           {(isLoading || isFetching) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-              <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <Loading loading={isLoading || isFetching} />
             </div>
           )}
           <div className="mt-5">

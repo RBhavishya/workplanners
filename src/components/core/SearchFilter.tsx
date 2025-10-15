@@ -9,7 +9,7 @@ const SearchFilter: React.FC<IReportsFilters> = ({
 }) => {
   return (
     <div className="relative w-65 h-7 border border-[#D1D1D1] bg-[#F6F6F6] rounded-sm shadow-none flex items-center px-2">
-       <SearchIcon className="w-4.5 h-4.5 text-gray-500" />
+       <SearchIcon className="w-4.5 h-4.5 3xl:!w-5 3xl:!h-5 text-gray-500" />
       <Input
         type="search"
         value={searchString}

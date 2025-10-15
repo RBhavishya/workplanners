@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-
-import loginimage from "src/assets/loginimage.png";
-import slackicon from "src/assets/slackicon.svg";
+import loginimage from "../../assets/loginimage.png";
+import slackicon from "../../assets/slackicon.svg";
 import {
   LoginAPI,
   slackAuthAPI,
@@ -16,7 +15,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { loginProps } from "@/interfaces";
 import { toast } from "sonner";
-import { errPopper } from "@/lib/helpers/errPoppers";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -136,13 +134,18 @@ const LoginPage: React.FC = () => {
       Cookies.set("token", access_token, { priority: "High" });
       localStorage.setItem("user", JSON.stringify(user_details));
       setErrors({});
+
       let redirectPath = "/dashboard";
-      if (user_details?.user_type === "ADMIN") {
-        redirectPath = "/dashboard";
-      } else if (user_details?.user_type === "MANAGER") {
-        redirectPath = "/dashboard";
-      } else if (user_details?.user_type === "EMPLOYEE") {
+      if (
+        user_details?.user_type === "EMPLOYEE" ||
+        user_details?.user_type === "TEAM_LEAD"
+      ) {
         redirectPath = "/tasks";
+      } else if (
+        user_details?.user_type === "ADMIN" ||
+        user_details?.user_type === "MANAGER"
+      ) {
+        redirectPath = "/dashboard";
       }
 
       navigate({ to: redirectPath });
@@ -153,7 +156,7 @@ const LoginPage: React.FC = () => {
         setErrors(error.data.errData);
       } else {
         toast.error(
-          error?.data?.message || "User not found or invalid credentials"
+          error?.message
         );
       }
     },

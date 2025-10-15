@@ -33,6 +33,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import Loading from "../core/Loading";
 
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
@@ -246,8 +247,8 @@ const AddTaskForm = ({
   };
 
   const Form_STYLES = {
-    label: "text-sm font-normal text-neutral-500",
-    input: "w-full border text-sm border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
+    label: "text-sm 3xl:!text-base font-normal text-neutral-500",
+    input: "w-full border text-sm 3xl:!text-base border-purple-200 rounded-sm shadow-none bg-gray-50 p-2 focus:outline-none focus:ring-0 focus-visible:ring-0 placeholder:text-purple-300"
   }
 
   return (
@@ -261,14 +262,14 @@ const AddTaskForm = ({
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg 3xl:!text-xl font-semibold">
           {mode === "edit" ? "Edit Task" : "Add Task"}
         </h2>
       </div>
 
       {/* Form Errors */}
       {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm 3xl:!text-base">
           {formError}
         </div>
       )}
@@ -289,7 +290,7 @@ const AddTaskForm = ({
           className={Form_STYLES.input}
         />
         {errors.task_title && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.task_title.join(", ")}
           </p>
         )}
@@ -311,7 +312,7 @@ const AddTaskForm = ({
           className={`${Form_STYLES.input} resize-none h-20`}
         />
         {errors.description && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
             {errors.description.join(", ")}
           </p>
         )}
@@ -361,7 +362,7 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.start_date && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.start_date.join(", ")}
             </p>
           )}
@@ -406,7 +407,7 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.end_date && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.end_date.join(", ")}
             </p>
           )}
@@ -434,7 +435,7 @@ const AddTaskForm = ({
                       (p: any) => p.id === selectedProject
                     );
                     return (
-                      <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1">
+                      <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm 3xl:!text-base gap-1">
                         <span>
                           {project?.title ?? `Project ${selectedProject}`}
                         </span>
@@ -462,10 +463,11 @@ const AddTaskForm = ({
                   placeholder="Search projects..."
                   value={searchProjects}
                   onValueChange={setSearchProjects}
+                  className="text-sm 3xl:!text-base"
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {loadingProjects ? (
-                    <div className="p-2 text-gray-500">Loading...</div>
+                    <Loading loading={loadingProjects} />
                   ) : projects.length === 0 ? (
                     <CommandEmpty>No projects found.</CommandEmpty>
                   ) : (
@@ -478,7 +480,7 @@ const AddTaskForm = ({
                             clearFieldError("project_id");
                           }}
                         >
-                          <span>{p.title}</span>
+                          <span className="capitalize text-sm 3xl:!text-base">{p.title}</span>
                           <Check
                             className={cn(
                               "h-4 w-4 ml-auto",
@@ -496,7 +498,7 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.project_id && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
               {errors.project_id.join(", ")}
             </p>
           )}
@@ -512,16 +514,16 @@ const AddTaskForm = ({
               <div className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer">
                 <div className="flex flex-wrap gap-1">
                   {assignedUsers.length === 0 ? (
-                    <span className="text-purple-300">Select users...</span>
+                    <span className="text-purple-300 text-sm 3xl:!text-base">Select users...</span>
                   ) : (
                     assignedUsers.map((id) => {
                       const user = usersResp.find((u: any) => u.id === id);
                       return (
                         <div
                           key={id}
-                          className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm gap-1"
+                          className="flex items-center px-2 py-1 rounded bg-purple-100 gap-1"
                         >
-                          <span>{user?.display_name ?? `User ${id}`}</span>
+                          <span className="capitalize text-sm 3xl:!text-base">{user?.display_name ?? `User ${id}`}</span>
                           <button
                             type="button"
                             onClick={() => removeOne(id, setAssignedUsers)}
@@ -555,10 +557,11 @@ const AddTaskForm = ({
                   placeholder="Search users..."
                   value={searchUsers}
                   onValueChange={setSearchUsers}
+                  className="text-sm 3xl:!text-base"
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {loadingUsers ? (
-                    <div className="p-2 text-gray-500">Loading...</div>
+                    <Loading loading={loadingUsers} />
                   ) : usersResp.length === 0 ? (
                     <CommandEmpty>No users found.</CommandEmpty>
                   ) : (
@@ -600,7 +603,7 @@ const AddTaskForm = ({
           type="button"
           variant="outline"
           onClick={handleNavigation}
-          className="px-4 py-2 border rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer font-normal shadow-none"
+          className="px-4 py-2 text-sm 3xl:!text-base border rounded-sm text-purple-500 hover:bg-gray-100 cursor-pointer font-normal shadow-none"
         >
           Cancel
         </Button>
@@ -613,7 +616,7 @@ const AddTaskForm = ({
               ? updateMutation.isPending
               : createMutation.isPending
           }
-          className={`px-6 py-2 bg-purple-600 text-white rounded-sm flex items-center gap-2 
+          className={`px-6 py-2 text-sm 3xl:!text-base bg-purple-600 text-white rounded-sm flex items-center gap-2 
     hover:bg-purple-700 font-normal
     ${
       mode === "edit"

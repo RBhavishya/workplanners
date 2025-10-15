@@ -19,6 +19,8 @@ import {
 import { useLocation } from "@tanstack/react-router";
 import TasksPagination from "./TasksPagination";
 import { pageProps } from "@/interfaces";
+import { NoTasksIcon } from "../icons/NoIcons/NoTasksIcon";
+import { NoUsersIcon } from "../icons/NoIcons/NoUsersIcon";
 
 const TanStackTable: FC<pageProps> = ({
   columns,
@@ -109,7 +111,7 @@ const TanStackTable: FC<pageProps> = ({
         >
           <Table className="w-full text-sm table-fixed">
             {/* Sticky Header */}
-            <TableHeader className="sticky top-0 z-20 bg-white text-neutral-400 text-xs font-normal">
+            <TableHeader className="sticky top-0 bg-white text-neutral-400 text-xs font-normal">
               {table?.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-none">
                   {headerGroup.headers.map((header: any, index: number) => (
@@ -187,7 +189,21 @@ const TanStackTable: FC<pageProps> = ({
                       colSpan={columns.length}
                       className="text-gray-500 text-center py-6"
                     >
-                      No Data Found
+                      {location.pathname.includes("tasks") ? (
+                        <div className="flex flex-col items-center justify-center gap-3">
+                        <NoTasksIcon />
+                        <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                          No Tasks found
+                        </p>
+                      </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-3 mt-10">
+                      <NoUsersIcon />
+                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                        No Users found
+                      </p>
+                    </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ) : (
