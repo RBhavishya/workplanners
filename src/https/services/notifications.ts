@@ -19,6 +19,22 @@ export const getAllNotificationsAPI = async ({
   }
 };
 
+export const getAllNotificationsCountsAPI = async () => {
+  try {
+    return await $fetch.get(`/notifications/unread-notifications-count`);
+  } catch (err: any) {
+    throw err;
+  }
+};
+
+export const markAsReadAllAPI = async () => {
+  try {
+    return await $fetch.put(`/notifications/mark-as-read/all`);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const markAsReadAPI = async (id: any) => {
   try {
     return await $fetch.patch(`/notifications/${id}`);

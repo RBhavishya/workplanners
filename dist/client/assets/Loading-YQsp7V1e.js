@@ -1,1 +1,0 @@
-import{j as e}from"./main-D1lBJW-B.js";const i=({loading:t})=>t?e.jsx("div",{className:"fixed inset-0 z-[999] flex items-center justify-center bg-white/60",children:e.jsx("img",{src:"/6-dots-scale.svg",alt:"loader",width:100,height:100})}):null;export{i as L};

@@ -41,13 +41,15 @@ const Projects = () => {
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const initialStatus = searchParams.get("project_status") || "";
   const initialSearch = searchParams.get("search") || "";
-  const orderBY = searchParams.get("order_by") || "";
+  const orderBY = searchParams.get("order_by")
+    ? searchParams.get("order_by")
+    : "";
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState(orderBY);
+  // const [selectedSort, setSelectedSort] = useState(orderBY);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
@@ -72,7 +74,6 @@ const Projects = () => {
       viewMode,
       debouncedSearch,
       selectedStatus,
-      selectedSort,
     ],
     queryFn: async () => {
       const response = await getAllUsersProjects({
@@ -80,7 +81,7 @@ const Projects = () => {
         pageSize: pagination.pageSize,
         viewMode,
         search_string: debouncedSearch,
-        order_by: selectedSort,
+        order_by: pagination.order_by,
         project_status: selectedStatus,
       });
       return response;
@@ -96,44 +97,57 @@ const Projects = () => {
       data?.data?.data?.pagination_info?.page_size
     ) || [];
 
-  const capturePageNum = (pageIndex: number) =>
+     const capturePageNum = (pageIndex: number) =>
     setPagination((prev) => ({ ...prev, pageIndex }));
   const captureRowPerItems = (pageSize: number) =>
     setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
 
-  const handleNavigation = () => navigate({ to: `/projects/add` });
 
-  const getData = (params: any) => {
-    setPagination({
-      pageIndex: params.pageIndex || 1,
-      pageSize: params.pageSize || 25,
-      order_by: params.order_by || "",
-    });
+    const getAllProjects = async ({ pageIndex, pageSize, order_by }: any) => {
+    setPagination({ pageIndex, pageSize, order_by });
   };
+
+
+  const handleNavigation = () => navigate({ to: `/projects/add` });
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
-      if (searchString === "") {
-        setPagination((prev) => ({ ...prev, pageIndex: 1 }));
+      if (searchString || selectedStatus) {
+        getAllProjects({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllProjects({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
       }
     }, 500);
-    return () => clearTimeout(handler);
+    return () => {
+      clearTimeout(handler);
+    };
   }, [searchString, selectedStatus]);
+
+
+  
 
   useEffect(() => {
     router.navigate({
       to: "/projects",
       search: {
-        page: pagination.pageIndex,
-        page_size: pagination.pageSize,
+         page: Number(pagination.pageIndex),
+        page_size: Number(pagination.pageSize),
         viewMode: viewMode || undefined,
-        order_by: selectedSort || undefined,
+        order_by: pagination.order_by || undefined,
         project_status: selectedStatus || undefined,
         search: debouncedSearch || undefined,
       },
     });
-  }, [pagination, viewMode, selectedSort, selectedStatus, debouncedSearch]);
+  }, [pagination, viewMode, selectedStatus, debouncedSearch]);
 
   return (
     <div className="relative overflow-x-auto rounded-xl p-2 flex flex-col">
@@ -337,20 +351,12 @@ const Projects = () => {
                 setDeleteTarget(project);
                 setShowDeleteDialog(true);
               })}
-              paginationDetails={
-                data?.data?.data?.pagination_info || {
-                  total_records: 0,
-                  total_pages: 1,
-                  current_page: pagination.pageIndex,
-                  page_size: pagination.pageSize,
-                  next_page: null,
-                  prev_page: null,
-                }
-              }
-              getData={getData}
+              paginationDetails={data?.data?.data?.pagination_info}
+              getData={getAllProjects}
               loading={isLoading}
               removeSortingForColumnIds={[
                 "serial",
+                "users",
                 "actions",
               ]}
               height='calc(100vh - 120px)'

@@ -156,7 +156,7 @@ const LoginPage: React.FC = () => {
         setErrors(error.data.errData);
       } else {
         toast.error(
-          error?.message
+          error?.data?.message || "invalid credentials"
         );
       }
     },
