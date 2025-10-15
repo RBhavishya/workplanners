@@ -7,6 +7,7 @@ import { NotificationIcon } from "../icons/NotificationIcon";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   getAllNotificationsAPI,
+  getAllNotificationsCountsAPI,
   markAsReadAPI,
 } from "@/https/services/notifications";
 import { tr } from "date-fns/locale";
@@ -85,6 +86,17 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     }
   };
 
+  const getAllNotificationsCount = async () => {
+    try {
+      const response = await getAllNotificationsCountsAPI();
+      if (response?.status === 200 || response?.status === 201) {
+        setNotificationCounts(response?.data?.data?.count[0].count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
+
   const markAsRead = async (id: any) => {
     try {
       const response = await markAsReadAPI(id);
@@ -98,7 +110,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
           )
         );
         setIsNotificationsOpen(false);
-        // getAllNotificationsCount();
+         getAllNotificationsCount();
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -111,6 +123,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
 
   useEffect(() => {
     getAllNotifications();
+     getAllNotificationsCount();
   }, []);
 
   const handleNotificationsScroll = (event: React.UIEvent<HTMLDivElement>) => {

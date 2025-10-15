@@ -27,7 +27,7 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
       enableSorting: false,
     },
     {
-      id: "project_name",
+      id: "title",
       header: "Project Name",
       accessorKey: "project_name",
       cell: ({ row }: any) => {
