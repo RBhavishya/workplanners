@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import dayjs from "dayjs";
+import { TruncatedText } from "../core/TruncatedText";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -39,7 +40,9 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
             <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
               {name !== "-" ? name.charAt(0).toUpperCase() : "-"}
             </div>
-            <p className="capitalize">{name}</p>
+            <p className="capitalize">
+              {name}
+            </p>
           </div>
         );
       },
@@ -126,7 +129,7 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
         const status = row.original.project_status?.toUpperCase();
         const cls = statusColors[status] || "bg-gray-100 text-gray-600";
         return (
-          <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
+          <span className={`px-3 py-0.5 rounded-sm text-xs font-medium ${cls}`}>
            {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
           </span>
         );

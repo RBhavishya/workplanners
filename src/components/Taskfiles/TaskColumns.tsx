@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { TruncatedText } from "../core/TruncatedText";
 
 const statusColors: Record<string, string> = {
   NEW: "bg-purple-100 text-purple-600",
@@ -23,9 +24,7 @@ export const taskColumns = [
     width: "20px",
     maxWidth: "20px",
     minWidth: "20px",
-    cell: (props: any) => (
-      <div>{props.getValue()}</div>
-    ),
+    cell: (props: any) => <div>{props.getValue()}</div>,
   },
   {
     accessorFn: (row: any) => row.task_title,
@@ -42,30 +41,19 @@ export const taskColumns = [
           <div className="w-6 h-6 rounded bg-purple-400 flex items-center justify-center text-white font-normal shrink-0 text-sm">
             {title !== "-" ? title.charAt(0).toUpperCase() : "-"}
           </div>
-
-          {/* Tooltip for long text */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className="capitalize font-medium truncate max-w-[150px] cursor-default"
-                  title={title} // fallback for browsers without tooltip lib
-                >
-                  {title}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{title}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <span
+            className="capitalize font-medium cursor-default"
+            title={title}
+          >
+            <TruncatedText text={title} />
+          </span>
         </div>
       );
     },
     footer: (props: any) => props.column.id,
-    width: 80,
-    minWidth: 80,
-    maxWidth: 80,
+    width: 100,
+    minWidth: 100,
+    maxWidth: 100,
   },
   {
     accessorFn: (row: any) => row.project?.title,
@@ -101,7 +89,10 @@ export const taskColumns = [
           <span
             className={`px-2 py-0.5 rounded-md !text-xs font-medium capitalize ${colorClass}`}
           >
-            {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
+            {status === "IN_PROGRESS"
+              ? "In Progress"
+              : status.charAt(0).toUpperCase() +
+                  status.slice(1).toLowerCase() || "-"}
           </span>
         </div>
       );

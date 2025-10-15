@@ -89,12 +89,14 @@ const Viewdetails = () => {
       setTriggerWidth(triggerRef.current.offsetWidth);
     }
   }, [triggerRef.current]);
+
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
       patchProjectStatusAPI(Number(id), { project_status: newStatus }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Status updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      await queryClient.refetchQueries({ queryKey: ["project", id] });
+      await queryClient.refetchQueries({ queryKey: ["projects"] });
     },
     onError: (err: any) => {
       toast.error(err?.data?.message || "Failed to update status");

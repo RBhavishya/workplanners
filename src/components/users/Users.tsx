@@ -184,7 +184,7 @@ const UsersDetais = () => {
               title="Edit"
               size="sm"
               variant="ghost"
-              disabled={!isActive} // disabled if INACTIVE
+              disabled={!isActive}
               className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
             >
@@ -196,12 +196,11 @@ const UsersDetais = () => {
               />
             </Button>
 
-            {/* Reset Password button */}
             <Button
               title="Reset password"
               size="sm"
               variant="ghost"
-              disabled={!isActive} // disabled if INACTIVE
+              disabled={!isActive}
               className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => {
                 setUserToResetPassword(rowData.id);
@@ -217,7 +216,6 @@ const UsersDetais = () => {
               />
             </Button>
 
-            {/* Delete button - always enabled */}
             <Button
               title="Delete"
               size="sm"

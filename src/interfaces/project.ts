@@ -17,6 +17,20 @@ export interface ProjectData {
   assigned_users?: number[];
 }
 
+export interface AddProjectData {
+  id?: number;
+  title: string;
+  project_status?: string;
+  description?: string;
+  status?: string;
+  created_by: string | number;
+  updated_by?: string | number;
+  start_date?: string;
+  due_date?: string;
+  links?: string[];
+  assigned_users?: number[];
+}
+
 export interface CreateProjectResponse {
   success: boolean;
   status: number;
