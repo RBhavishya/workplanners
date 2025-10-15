@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
   Calendar as CalendarIcon,
-  CheckCircle,
   ChevronDown,
-  MoveLeft,
   X,
   Check,
   Loader2,
@@ -20,7 +18,7 @@ import {
 } from "../ui/command";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   createTaskAPI,
@@ -56,6 +54,7 @@ const AddTaskForm = ({
   const params = useParams({ strict: false });
   const id = params?.id ? Number(params.id) : null;
   const mode = id ? "edit" : "create";
+  const queryClient = useQueryClient();
 
   // States
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -71,12 +70,10 @@ const AddTaskForm = ({
   const [dueDate, setDueDate] = useState<Date | undefined>(
     taskData?.end_date ? new Date(taskData.end_date) : undefined
   );
-
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [dueDateOpen, setDueDateOpen] = useState(false);
   const [projectPopoverOpen, setProjectPopoverOpen] = useState(false);
   const [userPopoverOpen, setUserPopoverOpen] = useState(false);
-
   const [selectedProject, setSelectedProject] = useState<number | null>(
     taskData?.project_id || null
   );
@@ -85,7 +82,6 @@ const AddTaskForm = ({
   );
   const [searchProjects, setSearchProjects] = useState("");
   const [searchUsers, setSearchUsers] = useState("");
-
   const triggerRef = useRef<HTMLDivElement>(null);
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
@@ -126,11 +122,12 @@ const AddTaskForm = ({
       setErrors({});
       return await createTaskAPI(payload);
     },
-    onSuccess: (res: any) => {
+    onSuccess: async (res: any) => {
       toast.success(res?.data?.message || "Task created successfully");
       setSuccessMessage("Task created successfully!");
       onSave?.(res?.data?.data);
       setTimeout(() => navigate({ to: "/tasks" }), 1000);
+      await queryClient.refetchQueries({ queryKey: ["tasks"] });
     },
     onError: (error: any) => {
       setErrors({});
@@ -155,9 +152,10 @@ const AddTaskForm = ({
     }) => {
       return await updateTasksAPI(taskId, payload);
     },
-    onSuccess: (res: any) => {
+    onSuccess: async (res: any) => {
       toast.success(res?.message || "Task updated successfully!");
       navigate({ to: "/tasks" });
+      await queryClient.refetchQueries({ queryKey: ["tasks"] });
     },
     onError: (error: any) => {
       setErrors({});

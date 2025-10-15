@@ -67,9 +67,12 @@ const TaskViewDetails = () => {
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
       TasksStatusAPI(Number(id), { task_status: newStatus }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Status updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      await queryClient.refetchQueries({ queryKey: ["project", id] });
+      await queryClient.refetchQueries({ queryKey: ["tasks"]});
+      await queryClient.refetchQueries({ queryKey: ["todayTasks"]});
+      await queryClient.refetchQueries({ queryKey: ["todayStats"]});
     },
     onError: (err: any) => {
       toast.error(err?.data?.message || "Failed to update status");
@@ -155,12 +158,7 @@ const TaskViewDetails = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-              <img
-                src="/6-dots-scale.svg"
-                alt="loader"
-                width={60}
-                height={60}
-              />
+        <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
       </div>
     );
   }
@@ -192,7 +190,10 @@ const TaskViewDetails = () => {
                     "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {taskdata.task_status.charAt(0).toUpperCase() + taskdata.task_status.slice(1).toLowerCase()}
+                  {taskdata.task_status === "IN_PROGRESS"
+                    ? "In Progress"
+                    : taskdata.task_status.charAt(0).toUpperCase() +
+                      taskdata.task_status.slice(1).toLowerCase()}
                 </span>
               </div>
               <p className="text-gray-700 text-sm 3xl:!text-base">

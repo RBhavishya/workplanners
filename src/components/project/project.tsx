@@ -25,6 +25,7 @@ import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 import TanStackTable from "../core/Tanstacktable";
 import { getProjectColumns } from "./projectColumns";
 import { getAllUsersProjects } from "@/https/services/project";
+import { TruncatedText } from "../core/TruncatedText";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -184,13 +185,13 @@ const Projects = () => {
               </button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-48 p-0 border rounded-md shadow-md">
+            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
               <div className="flex flex-col">
                 {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
                   (option) => (
                     <div
                       key={option}
-                      className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      className="cursor-pointer hover:bg-gray-100 text-sm p-1"
                       onClick={() => {
                         setSelectedStatus(option);
                         setStatusPopoverOpen(false);
@@ -248,15 +249,15 @@ const Projects = () => {
 
           {/* Grid Cards */}
           {projectsData.length === 0 && !isLoading ? (
-             <div className="flex flex-col items-center justify-center gap-2 bg-white h-[calc(100vh-165px)]">
-             <NoProjectIcon />
-             <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
-               No Project found
-             </p>
-           </div>
+            <div className="flex flex-col items-center justify-center gap-2 bg-white h-[calc(100vh-165px)]">
+              <NoProjectIcon />
+              <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                No Project found
+              </p>
+            </div>
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {projectsData?.map((project: ProjectData) => (
                   <Card
                     key={project.id}
@@ -268,10 +269,11 @@ const Projects = () => {
                       <div className="flex gap-1 items-center justify-between">
                         <div className="flex items-center">
                           <div className="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white text-lg font-normal">
-                            {project.project_name?.charAt(0).toUpperCase() || "?"}
+                            {project.project_name?.charAt(0).toUpperCase() ||
+                              "?"}
                           </div>
-                          <h2 className="text-sm 3xl:!text-base font-medium break-words px-2 capitalize">
-                            {project.project_name || "Untitled"}
+                          <h2 className="text-sm 3xl:!text-base font-medium px-2 capitalize">
+                            <TruncatedText text={project.project_name || "-"} />
                           </h2>
                         </div>
                         {user?.user_type !== "EMPLOYEE" && (
@@ -316,7 +318,10 @@ const Projects = () => {
                           ] || "bg-gray-100 text-gray-700"
                         }`}
                       >
-                        {project.project_status || ""}
+                        {project.project_status === "IN_PROGRESS"
+                          ? "In Progress"
+                          : project.project_status?.charAt(0).toUpperCase() +
+                            (project.project_status as string)?.slice(1).toLowerCase() || '-'}
                       </span>
                     </CardContent>
                   </Card>
@@ -346,21 +351,30 @@ const Projects = () => {
       ) : (
         <div className="w-full">
           <TanStackTable
-              data={projectsData}
-              columns={getProjectColumns(navigate, user, (project: ProjectData) => {
+            data={projectsData}
+            columns={getProjectColumns(
+              navigate,
+              user,
+              (project: ProjectData) => {
                 setDeleteTarget(project);
                 setShowDeleteDialog(true);
-              })}
-              paginationDetails={data?.data?.data?.pagination_info}
-              getData={getAllProjects}
-              loading={isLoading}
-              removeSortingForColumnIds={[
-                "serial",
-                "users",
-                "actions",
-              ]}
-              height='calc(100vh - 120px)'
-            />
+              }
+            )}
+            paginationDetails={
+              data?.data?.data?.pagination_info || {
+                total_records: 0,
+                total_pages: 1,
+                current_page: pagination.pageIndex,
+                page_size: pagination.pageSize,
+                next_page: null,
+                prev_page: null,
+              }
+            }
+            getData={getAllProjects}
+            loading={isLoading}
+            removeSortingForColumnIds={["serial", "actions"]}
+            height="calc(100vh - 155px)"
+          />
         </div>
       )}
 

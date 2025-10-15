@@ -2,6 +2,8 @@ import { updateUserStatusAPI } from "@/https/services/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { TruncatedText } from "../core/TruncatedText";
 
 export const usersColumns = [
   {
@@ -96,7 +98,8 @@ export const usersColumns = [
       const title = info.getValue();
       return (
         <div style={{ textAlign: "left" }}>
-          <span>{title || "-"}</span>
+          <span>
+            <TruncatedText text={title || "-"} /></span>
         </div>
       );
     },
@@ -173,52 +176,43 @@ export const usersColumns = [
         setIsActive(info.getValue() === "ACTIVE");
       }, [info.getValue()]);
 
-      useEffect(() => {
-        const handleClickOutside = (event: any) => {
-          if (
-            popoverRef.current &&
-            !popoverRef.current.contains(event.target)
-          ) {
-            setIsOpen(false);
-          }
-        };
-
-        if (isOpen) {
-          document.addEventListener("mousedown", handleClickOutside);
-        } else {
-          document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-          document.removeEventListener("mousedown", handleClickOutside);
-        };
-      }, [isOpen]);
-
       return (
         <div className="flex items-center relative">
-          <div className={`${isActive ? "text-green-600" : "text-red-600"} rounded-full cursor-pointer flex items-center gap-2 w-fit`}
-            onClick={togglePopover}
+      <Select
+        value={isActive ? "active" : "inactive"}
+        onValueChange={(value) => updateUserStatus(value === "active")}
+      >
+        <SelectTrigger
+          className={`w-fit !h-5 text-xs rounded-full border-none cursor-pointer flex items-center gap-1 ${
+            isActive
+              ? "text-green-600 bg-emerald-100"
+              : "text-red-600 bg-red-100"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              isActive ? "bg-green-600" : "bg-red-600"
+            }`}
+          ></span>
+          <SelectValue placeholder="Select status" />
+        </SelectTrigger>
+
+        <SelectContent align="start" className="w-fit">
+          <SelectItem
+            value="active"
+            className="text-green-600 cursor-pointer hover:bg-gray-100 rounded"
           >
-            <span className={`h-1.5 w-1.5 rounded-lg  ${isActive ? "bg-green-600" : "bg-red-600"}`}></span>
-            {isActive ? "Active" : "Inactive"}
-          </div>
-          {isOpen && (
-            <div
-              ref={popoverRef}
-              className="absolute top-0 left-0 mt-2 p-2 bg-white border border-neutral-300 rounded shadow-[(0,2px,10px,rgba(0,0,0,0.1)] z-100">
-              <div className="p-2 cursor-pointer text-green-600"
-                onClick={() => updateUserStatus(true)}
-              >
-                Active
-              </div>
-              <div className="p-2 cursor-pointer text-red-600"
-                onClick={() => updateUserStatus(false)}
-              >
-                Inactive
-              </div>
-            </div>
-          )}
-        </div>
+            Active
+          </SelectItem>
+          <SelectItem
+            value="inactive"
+            className="text-red-600 cursor-pointer hover:bg-gray-100 rounded"
+          >
+            Inactive
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
       );
     },
     width: "80px",

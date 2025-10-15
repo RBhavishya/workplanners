@@ -29,7 +29,7 @@ export interface AddUserFormProps {
   onCancel?: () => void;
 }
 
-const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
+const AddUser = ({ userId, onSave}: AddUserFormProps) => {
   const [name, setName] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState("");
@@ -41,26 +41,13 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
    const [rolePopoverOpen, setRolePopoverOpen] = useState(false);
   const [designationPopoverOpen, setDesignationPopoverOpen] = useState(false);
-  const [designationTriggerWidth, setDesignationTriggerWidth] = useState<
-    number | null
-  >(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [open, setOpen] = useState(false);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
-
-  const triggerRef = useRef<HTMLDivElement>(null);
-
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params?.id ? Number(params.id) : null;
   const mode = id ? "edit" : "create";
-
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [open]);
 
   const {
     data: userResp,
@@ -78,11 +65,12 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       setErrors({});
       return await createUserAPI(payload);
     },
-    onSuccess: (res: any) => {
+    onSuccess: async (res: any) => {
       toast.success(res?.data?.message || "User created successfully");
       setSuccessMessage("User created successfully!");
       onSave?.(res?.data?.data);
       setTimeout(() => navigate({ to: "/users" }), 1000);
+      await queryClient.refetchQueries({ queryKey: ["users"] });
     },
     onError: (error: any) => {
       setErrors({});
@@ -103,8 +91,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
       setErrors({});
       return await UserUpdateAPI(userId!, payload);
     },
-    onSuccess: (res: any) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+    onSuccess: async (res: any) => {
+      await queryClient.refetchQueries({ queryKey: ["users"] });
       toast.success(res?.data?.message || "User updated successfully");
       onSave?.(res?.data?.data);
       navigate({ to: "/users" });
@@ -116,7 +104,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
         setErrors(error.data.errData);
       } else {
         const message = error?.data?.message || "Failed to update user";
-        toast.error(message);
+        toast.error(message); 
         setFormError(message);
       }
     },
@@ -316,14 +304,10 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           onOpenChange={setDesignationPopoverOpen}
         >
           <PopoverTrigger asChild>
-            <div
-              ref={triggerRef}
-              className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer"
-            >
+            <div className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer">
               {designation ? (
                 <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm 3xl:!text-base gap-1">
                   <span>{designation}</span>
-                  {/* Optional clear button */}
                   <button type="button" onClick={() => setDesignation("")}>
                     <X className="w-3 h-3 text-gray-500 hover:text-gray-700" />
                   </button>
@@ -336,8 +320,8 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           </PopoverTrigger>
 
           <PopoverContent
-            align="start" // align left to the trigger
-            sideOffset={4} // optional spacing from trigger
+            align="start"
+            sideOffset={4}
             className="p-2 max-w-150"
           >
             <div className="max-h-40 overflow-y-auto">
@@ -377,10 +361,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
           onOpenChange={setRolePopoverOpen}
         >
           <PopoverTrigger asChild>
-            <div
-              ref={triggerRef}
-              className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer"
-            >
+            <div className="rounded border border-purple-200 bg-gray-50 flex items-center justify-between px-2 py-1.5 cursor-pointer">
               {userType ? (
                 <div className="flex items-center px-2 py-1 rounded bg-purple-100 text-sm 3xl:!text-base gap-1">
                   <span>{userType}</span>
@@ -390,7 +371,7 @@ const AddUser = ({ userId, onSave, onCancel }: AddUserFormProps) => {
                   </button>
                 </div>
               ) : (
-                <span className="text-purple-300 !font-normal">Select role...</span>
+                <span className="text-purple-300 !font-normal">Select role...</span>  
               )}
               <ChevronDown className="text-purple-300" strokeWidth={1.5}/>
             </div>

@@ -25,7 +25,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { useNavigate } from "@tanstack/react-router";
-import { ProjectData, UsersDropdownResponse } from "@/interfaces/project";
+import { AddProjectData, ProjectData, UsersDropdownResponse } from "@/interfaces/project";
 import {
   createProjectAPI,
   getAllUsersAPI,
@@ -42,7 +42,6 @@ export interface AddProjectFormProps {
   nextId: number | null;
   projectId?: number;
   onSave?: (data: ProjectData) => void;
-  onCancel?: () => void;
 }
 
 const AddProjectForm = ({
@@ -50,7 +49,6 @@ const AddProjectForm = ({
   nextId,
   projectId,
   onSave,
-  onCancel,
 }: AddProjectFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -66,12 +64,9 @@ const AddProjectForm = ({
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [visibleDueMonth, setVisibleDueMonth] = useState<Date | undefined>();
   const [dueDateOpen, setDueDateOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const { data: projectResp, isLoading: loadingProject } = useQuery({
@@ -99,9 +94,9 @@ const AddProjectForm = ({
   });
 
   const mutation = useMutation({
-    mutationFn: (newProject: ProjectData) => createProjectAPI(newProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    mutationFn: (newProject: AddProjectData) => createProjectAPI(newProject),
+    onSuccess: async (data) => {
+      await queryClient.refetchQueries({ queryKey: ["projects"] });
       toast.success(data.message || "Project created successfully");
 
       navigate({ to: "/projects" });
@@ -119,14 +114,15 @@ const AddProjectForm = ({
         setFormError(message);
       }
     },
+    retry: false,
   });
 
   const updateMutation = useMutation({
-    mutationFn: (updatedProject: ProjectData) =>
+    mutationFn: (updatedProject: AddProjectData) =>
       updateProjectAPI(projectId!, updatedProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    onSuccess: async (data) => {
+      await queryClient.refetchQueries({ queryKey: ["projects"] });
+      await queryClient.refetchQueries({ queryKey: ["project", projectId] });
       toast.success(data.message || "Project updated successfully");
       onSave?.(data.data);
       navigate({ to: "/projects" });
@@ -143,12 +139,8 @@ const AddProjectForm = ({
         setFormError(message);
       }
     },
+    retry: false,
   });
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [open]);
 
   const clearFieldError = (field: string) => {
     if (errors[field]) {
@@ -191,7 +183,7 @@ const AddProjectForm = ({
   const handleSave = () => {
     setFormError(null);
     setErrors({});
-    const projectData: ProjectData = {
+    const projectData: AddProjectData = {
       id: projectId ?? nextId ?? 0,
       title,
       description,
@@ -206,19 +198,6 @@ const AddProjectForm = ({
     } else {
       mutation.mutate(projectData);
     }
-  };
-
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setLinks([]);
-    setLinkInput("");
-    setStartDate(undefined);
-    setDueDate(undefined);
-    setAssignedUsers([]);
-    setSearch("");
-    setFormError(null);
-    setErrors({});
   };
 
   const handleNavigation = () => {
@@ -393,7 +372,6 @@ const AddProjectForm = ({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <div
-                ref={triggerRef}
                 className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer"
               >
                 <div className="flex flex-wrap gap-1">
@@ -440,7 +418,6 @@ const AddProjectForm = ({
               </div>
             </PopoverTrigger>
             <PopoverContent
-              style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
               className="p-0"
             >
               <Command>
@@ -531,7 +508,7 @@ const AddProjectForm = ({
         <Button
           onClick={handleSave}
           variant={mode === "edit" ? "outline" : "default"}
-          className="px-6 py-2 bg-purple-600 text-white text-sm 3xl:!text-base rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 font-normal"
+          className="px-6 py-2 bg-purple-600 text-white hover:text-white text-sm 3xl:!text-base rounded-sm hover:bg-purple-700 cursor-pointer flex items-center gap-2 font-normal"
           disabled={mutation.isPending || updateMutation.isPending}
         >
           {(mutation.isPending || updateMutation.isPending) && (

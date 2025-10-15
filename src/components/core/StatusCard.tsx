@@ -32,7 +32,12 @@ const statusConfig: Record<
   string,
   { bg: string; circleBg: string; circleText: string }
 > = {
-  "Total": {
+  "Total" : {
+    bg: "bg-pink-100",
+    circleBg: "bg-rose-400",
+    circleText: "text-white",
+  },
+  "New": {
     bg: "bg-purple-100",
     circleBg: "bg-purple-600",
     circleText: "text-white",
@@ -47,12 +52,12 @@ const statusConfig: Record<
     circleBg: "bg-blue-600",
     circleText: "text-white",
   },
-  "Overdue": {
+  "Review": {
     bg: "bg-yellow-100",
     circleBg: "bg-yellow-600",
     circleText: "text-white",
   },
-  "Review": {
+  "Overdue": {
     bg: "bg-orange-100",
     circleBg: "bg-orange-600",
     circleText: "text-white",

@@ -1,4 +1,4 @@
-import { ProjectData, TaskResponse, UsersDropdownResponse } from "@/interfaces/project";
+import { AddProjectData, ProjectData, TaskResponse, UsersDropdownResponse } from "@/interfaces/project";
 import { $fetch } from "../fetch";
 
 interface GetAllPaginatedUsersPropTypes {
@@ -42,7 +42,7 @@ export const getProjectByIdAPI = async (id: number) => {
   }
 };
 
-export const createProjectAPI = async (newProject: ProjectData) => {
+export const createProjectAPI = async (newProject: AddProjectData) => {
   try {
     const response = await $fetch.post(`/projects`, newProject);
     return response;

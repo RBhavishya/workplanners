@@ -167,7 +167,7 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
                 handlePageChange(currentPage - 1);
               }}
               aria-disabled={currentPage === 1}
-              className={`${
+              className={` h-6 ${
                 currentPage === 1
                   ? "pointer-events-none cursor-not-allowed opacity-50 font-normal"
                   : "cursor-pointer opacity-100 font-normal"
@@ -213,7 +213,7 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
                 handlePageChange(currentPage + 1);
               }}
               aria-disabled={currentPage === totalPages}
-              className={`${
+              className={` h-6 ${
                 currentPage === totalPages
                   ? "pointer-events-none cursor-not-allowed opacity-50 font-normal"
                   : "cursor-pointer opacity-100 font-normal"
