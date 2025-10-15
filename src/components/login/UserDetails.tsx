@@ -108,9 +108,18 @@ const UserDetails: React.FC = () => {
               {user.display_name || "User"}
             </span>
             <span className="text-xs 3xl:!text-sm text-neutral-500">
-              {user.user_type === 'EMPLOYEE' ? user.designation : 
-              user.user_type.charAt(0).toUpperCase() +
-                user.user_type.slice(1).toLowerCase()} 
+              {
+                user.user_type === "EMPLOYEE"
+                  ? user.designation
+                  : user.user_type
+                      .split("_")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      ) 
+                      .join(" ") 
+              }
             </span>
           </div>
           <ChevronDown size={18} className="text-gray-600" />

@@ -1,1 +1,0 @@
-import{j as s}from"./main-BbgUlrnB.js";const i=({loading:e})=>e?s.jsx("div",{className:"fixed inset-0 z-[999] flex items-center justify-center bg-white/60",children:s.jsx("img",{src:"/src/assets/6-dots-scale.svg",alt:"loader",width:100,height:100})}):null;export{i as L};

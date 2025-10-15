@@ -12,9 +12,7 @@ export const usersColumns = [
     width: "50px",
     maxWidth: "50px",
     minWidth: "50px",
-    cell: (props: any) => (
-      <div className="pl-2">{props.getValue()}</div>
-    ),
+    cell: (props: any) => <div className="pl-2">{props.getValue()}</div>,
   },
   {
     accessorFn: (row: any) => row.display_name,
@@ -66,10 +64,17 @@ export const usersColumns = [
     accessorFn: (row: any) => row.user_type,
     id: "user_type",
     cell: (info: any) => {
-      const title = info.getValue();
+      const title = info.getValue() || "";
+      // Convert "team_lead" -> "Teamlead"
+      const formattedTitle = title
+        .split("_")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" "); // join without space
       return (
         <div>
-          <span>{title.charAt(0).toUpperCase() + title.slice(1).toLowerCase() || "-"}</span>
+          <span>{formattedTitle || "-"}</span>
         </div>
       );
     },
@@ -78,7 +83,7 @@ export const usersColumns = [
     minWidth: "80px",
     header: () => (
       <div className="flex justify-center">
-        <span>User Type</span>
+        <span>Role</span>
       </div>
     ),
     footer: (props: any) => props.column.id,
