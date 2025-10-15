@@ -101,7 +101,7 @@ export const taskColumns = [
           <span
             className={`px-2 py-0.5 rounded-md !text-xs font-medium capitalize ${colorClass}`}
           >
-            {status || "-"}
+            {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
           </span>
         </div>
       );

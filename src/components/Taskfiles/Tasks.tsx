@@ -270,7 +270,7 @@ const Tasks = () => {
               />
 
               <BigCard
-                title="In Progress Task"
+                title="In Progress Tasks"
                 value={
                   <CountUp
                     start={0}
@@ -278,7 +278,7 @@ const Tasks = () => {
                     duration={1.5}
                   />
                 }
-                icon={<ProgressIcon />}
+                icon={<ProgressIcon className="text-blue-700"/>}
               />
               <BigCard
                 title="Overdue Tasks"
@@ -330,13 +330,13 @@ const Tasks = () => {
               </button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-48 p-0 border rounded-md shadow-md">
+            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
               <div className="flex flex-col">
                 {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
                   (option) => (
                     <div
                       key={option}
-                      className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      className="cursor-pointer hover:bg-gray-100 text-sm p-1"
                       onClick={() => {
                         setSelectedStatus(option);
                         setStatusPopoverOpen(false);
@@ -371,7 +371,7 @@ const Tasks = () => {
               "task_status",
               "actions",
             ]}
-            height='calc(100vh - 260px)'
+            height='calc(100vh - 295px)'
           />
         </div>
         <DeleteTaskDialog

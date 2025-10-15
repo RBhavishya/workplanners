@@ -38,9 +38,9 @@ export const DashboardCards = ({ stats, isError, error }: DashboardCardsProps) =
       status: "COMPLETED",
     },
     {
-      title: "In Progress Task",
+      title: "In Progress Tasks",
       value: stats?.in_progress_tasks ?? 0,
-      icon: <ProgressIcon />,
+      icon: <ProgressIcon className = "text-blue-700"/>,
       status: "IN_PROGRESS",
     },
     {

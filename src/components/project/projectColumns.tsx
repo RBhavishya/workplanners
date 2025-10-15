@@ -127,7 +127,7 @@ export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
         const cls = statusColors[status] || "bg-gray-100 text-gray-600";
         return (
           <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
-            {status || "Unknown"}
+           {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
           </span>
         );
       },

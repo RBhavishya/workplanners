@@ -31,7 +31,6 @@ const Dashboard = () => {
   const [time, setTime] = useState(new Date());
   const [todayFilter, setTodayFilter] = useState<string>("");
 
-  // Update clock every second
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -157,7 +156,6 @@ const Dashboard = () => {
 
   return (
     <div className="p-0 flex">
-      {/* Left Side - Cards & Table */}
       <div className="w-3/4 m-2">
         <DashboardCards stats={stats} isError={isError} error={error as any} />
 
@@ -185,7 +183,7 @@ const Dashboard = () => {
                 prev_page: null,
               }
             }
-            height="calc(100vh - 215px)"
+            height="calc(100vh - 250px)"
             removeSortingForColumnIds={[
               "sno",
               "name",
@@ -202,7 +200,7 @@ const Dashboard = () => {
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-lg 3xl:!text-xl font-medium">Task Tracker</h2>
+            <h2 className="text-lg 3xl:!text-xl font-medium">Task's Tracker</h2>
             <p className="text-sm 3xl:!text-base text-gray-500">
               {formattedDate}
             </p>
