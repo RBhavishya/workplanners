@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import UserDetails from "../login/UserDetails";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { Bell } from "lucide-react";
-import { Button } from "../ui/button";
 import { NotificationIcon } from "../icons/NotificationIcon";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   getAllNotificationsAPI,
   getAllNotificationsCountsAPI,
+  markAsReadAllAPI,
   markAsReadAPI,
 } from "@/https/services/notifications";
 import { tr } from "date-fns/locale";
+import { toast } from "sonner";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
@@ -59,38 +59,55 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
 
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
+
   const getAllNotifications = async (page = 1) => {
-    try {
-      const response = await getAllNotificationsAPI({
-        current_page: page,
-        page_size: paginationInfo.page_size,
-      });
+  try {
+    const response = await getAllNotificationsAPI({
+      current_page: page,
+      page_size: paginationInfo.page_size,
+    });
 
-      if (response?.status === 200 || response?.status === 201) {
-        const { records, pagination_records } = response.data.data || {};
+    if (response?.status === 200 || response?.status === 201) {
+      const { records, pagination_records } = response.data.data || {};
 
-        if (Array.isArray(records)) {
-          setNotificationsData((prev: any[]) =>
-            page === 1 ? records : [...prev, ...records]
-          );
-          setPaginationInfo(pagination_records);
-          setNotificationCounts(pagination_records?.total_records || 0);
-        } else {
-          setNotificationsData([]);
-        }
+      if (Array.isArray(records)) {
+        setNotificationsData((prev: any[]) =>
+          page === 1 ? records : [...prev, ...records]
+        );
+        setPaginationInfo(pagination_records);
+      } else {
+        setNotificationsData([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      // setIsNotificationLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Failed to fetch notifications:", error);
+  }
+};
 
-  const getAllNotificationsCount = async () => {
+ const getAllNotificationsCount = async () => {
+  try {
+    const response = await getAllNotificationsCountsAPI();
+    if (response?.status === 200 || response?.status === 201) {
+      setNotificationCounts(response?.data?.data?.count || 0);
+    }
+  } catch (error) {
+    console.error("Failed to fetch notifications:", error);
+  }
+};
+
+const markAsReadAll = async () => {
     try {
-      const response = await getAllNotificationsCountsAPI();
+      const response = await markAsReadAllAPI();
       if (response?.status === 200 || response?.status === 201) {
-        setNotificationCounts(response?.data?.data?.count[0].count);
+        setNotificationsData((prev = []) =>
+          prev.map((notification) => ({
+            ...notification,
+            is_marked: true,
+          }))
+        );
+        setIsNotificationsOpen(false);
+        getAllNotificationsCount();
+        toast.success(response?.data?.message);
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -178,7 +195,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                 className="relative cursor-pointer"
                 onClick={handlePopoverToggle}
               >
-                <NotificationIcon className="h-8 w-8" />
+                <NotificationIcon className="h-10 w-10" />
                 {notificationCounts > 0 && (
                   <span className="absolute top-0 right-[-10px] text-xs bg-red-500 text-white rounded-full h-4 min-w-[1rem] px-1 flex items-center justify-center">
                     {notificationCounts}
@@ -196,7 +213,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                   <button
                     className="text-blue-500 text-xs font-semibold hover:underline"
                     onClick={() => {
-                      // markAsReadAll();
+                       markAsReadAll();
                     }}
                   >
                     Mark All as Read
