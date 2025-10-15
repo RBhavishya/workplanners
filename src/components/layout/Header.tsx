@@ -9,11 +9,19 @@ import {
   markAsReadAllAPI,
   markAsReadAPI,
 } from "@/https/services/notifications";
-import { tr } from "date-fns/locale";
 import { toast } from "sonner";
+import dayjs from "dayjs";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
+};
+
+const statusColors: Record<string, string> = {
+  NEW: "text-purple-600",
+  IN_PROGRESS: "text-blue-600",
+  REVIEW: "text-yellow-700",
+  OVERDUE: "text-red-600",
+  COMPLETED: "text-green-600",
 };
 
 const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
@@ -59,43 +67,42 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
 
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
-
   const getAllNotifications = async (page = 1) => {
-  try {
-    const response = await getAllNotificationsAPI({
-      current_page: page,
-      page_size: paginationInfo.page_size,
-    });
+    try {
+      const response = await getAllNotificationsAPI({
+        current_page: page,
+        page_size: paginationInfo.page_size,
+      });
 
-    if (response?.status === 200 || response?.status === 201) {
-      const { records, pagination_records } = response.data.data || {};
+      if (response?.status === 200 || response?.status === 201) {
+        const { records, pagination_records } = response.data.data || {};
 
-      if (Array.isArray(records)) {
-        setNotificationsData((prev: any[]) =>
-          page === 1 ? records : [...prev, ...records]
-        );
-        setPaginationInfo(pagination_records);
-      } else {
-        setNotificationsData([]);
+        if (Array.isArray(records)) {
+          setNotificationsData((prev: any[]) =>
+            page === 1 ? records : [...prev, ...records]
+          );
+          setPaginationInfo(pagination_records);
+        } else {
+          setNotificationsData([]);
+        }
       }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
     }
-  } catch (error) {
-    console.error("Failed to fetch notifications:", error);
-  }
-};
+  };
 
- const getAllNotificationsCount = async () => {
-  try {
-    const response = await getAllNotificationsCountsAPI();
-    if (response?.status === 200 || response?.status === 201) {
-      setNotificationCounts(response?.data?.data ?? 0);
+  const getAllNotificationsCount = async () => {
+    try {
+      const response = await getAllNotificationsCountsAPI();
+      if (response?.status === 200 || response?.status === 201) {
+        setNotificationCounts(response?.data?.data ?? 0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
     }
-  } catch (error) {
-    console.error("Failed to fetch notifications:", error);
-  }
-};
+  };
 
-const markAsReadAll = async () => {
+  const markAsReadAll = async () => {
     try {
       const response = await markAsReadAllAPI();
       if (response?.status === 200 || response?.status === 201) {
@@ -127,7 +134,7 @@ const markAsReadAll = async () => {
           )
         );
         setIsNotificationsOpen(false);
-         getAllNotificationsCount();
+        getAllNotificationsCount();
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -140,7 +147,7 @@ const markAsReadAll = async () => {
 
   useEffect(() => {
     getAllNotifications();
-     getAllNotificationsCount();
+    getAllNotificationsCount();
   }, []);
 
   const handleNotificationsScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -204,7 +211,7 @@ const markAsReadAll = async () => {
               </div>
             </PopoverTrigger>
 
-            <PopoverContent className="w-[420px] bg-white p-3 shadow-md rounded-md">
+            <PopoverContent className="w-[420px] bg-white p-2 shadow-md rounded-md">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-semibold text-sm">
                   Notifications ({notificationCounts || 0})
@@ -213,7 +220,7 @@ const markAsReadAll = async () => {
                   <button
                     className="text-blue-500 text-xs font-semibold hover:underline"
                     onClick={() => {
-                       markAsReadAll();
+                      markAsReadAll();
                     }}
                   >
                     Mark All as Read
@@ -225,7 +232,7 @@ const markAsReadAll = async () => {
                 <p className="text-center">Loading...</p>
               ) : notificationsData?.length > 0 ? (
                 <div
-                  className="flex flex-col rounded-md max-h-[500px] h-[500px] min-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200"
+                  className="flex flex-col rounded-md max-h-[500px] h-[500px] min-h-[500px] overflow-y-auto"
                   onScroll={handleNotificationsScroll}
                 >
                   <ul>
@@ -262,30 +269,31 @@ const markAsReadAll = async () => {
                           setIsNotificationsOpen(false);
                         }}
                       >
-                        {/* Notification title/description */}
                         <p
-                          className={`text-sm ${
+                          className={`text-[13px] ${
                             notification.is_marked === false
                               ? "font-semibold text-gray-900"
                               : "font-normal text-gray-700"
                           }`}
-                        >
-                          {notification.description || "-"}
-                        </p>
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              notification.description?.replace(
+                                /NEW|IN_PROGRESS|REVIEW|OVERDUE|COMPLETED/gi,
+                                (match) => {
+                                  const colorClass =
+                                    statusColors[match.toUpperCase()] ||
+                                    "bg-gray-100 text-gray-700";
+                                  return `<span class="${colorClass} px-1 py-0.5 rounded-md text-[12px] font-medium">${match}</span>`;
+                                }
+                              ) || "-",
+                          }}
+                        />
 
                         {/* Timestamp */}
                         <p className="text-xs text-gray-400 mt-1">
                           {notification.created_at
-                            ? new Date(notification.created_at).toLocaleString(
-                                "en-IN",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                }
+                            ? dayjs(notification.created_at).format(
+                                "DD MMM YYYY, HH:mm A"
                               )
                             : "--"}
                         </p>
