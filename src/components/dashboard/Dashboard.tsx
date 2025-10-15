@@ -23,6 +23,7 @@ import { getStatisticsColumns } from "./StatisticsColumns";
 import TanStackTable from "../core/Tanstacktable";
 import SearchFilter from "../core/SearchFilter";
 import { DashboardCards } from "./DashboardCards";
+import { useDebounce } from "@/lib/helpers/useDebounce";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ const Dashboard = () => {
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
   const [time, setTime] = useState(new Date());
   const [todayFilter, setTodayFilter] = useState<string>("");
+  const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 25 });
+  const [searchString, setSearchString] = useState("");
+  const debounceSearch = useDebounce(searchString, 500);
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -44,7 +48,6 @@ const Dashboard = () => {
   const parts = time.toLocaleDateString("en-GB", options).split(" ");
   const formattedDate = `${parts[0]}, ${parts[1]} ${parts[2]}`;
 
-  // Dashboard Stats
   const {
     data: stats,
     isError,
@@ -59,7 +62,6 @@ const Dashboard = () => {
     retry: false,
   });
 
-  // Today Stats
   const { data: todaystats } = useQuery({
     queryKey: ["todayStats"],
     queryFn: async () => {
@@ -70,21 +72,18 @@ const Dashboard = () => {
     retry: false,
   });
 
-  const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 25 });
-  const [searchString, setSearchString] = useState("");
-
   const { data, isLoading } = useQuery({
     queryKey: [
       "dashboard-stats",
       pagination.pageIndex,
       pagination.pageSize,
-      searchString,
+      debounceSearch,
     ],
     queryFn: () =>
       getDashboardStatistics({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        search_string: searchString,
+        search_string: debounceSearch,
       }),
     refetchOnWindowFocus: false,
     retry: false,
@@ -113,7 +112,7 @@ const Dashboard = () => {
     isFetching,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["todayTasks", todayFilter],
+    queryKey: ["todayTasks", todayFilter, ],
     queryFn: async ({ pageParam = 1 }) => {
       const queryParams: SettingsHistoryQueryParams = {
         pageIndex: pageParam,
@@ -134,8 +133,6 @@ const Dashboard = () => {
       const { current_page, total_pages } = lastPage.pagination_info;
       return current_page < total_pages ? current_page + 1 : undefined;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const todaytasks = todaytasksPages?.pages.flatMap((page) => page.tasks) || [];
