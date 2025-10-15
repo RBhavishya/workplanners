@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { TruncatedText } from "../core/TruncatedText";
 
 export const usersColumns = [
   {
@@ -97,7 +98,8 @@ export const usersColumns = [
       const title = info.getValue();
       return (
         <div style={{ textAlign: "left" }}>
-          <span>{title || "-"}</span>
+          <span>
+            <TruncatedText text={title || "-"} /></span>
         </div>
       );
     },

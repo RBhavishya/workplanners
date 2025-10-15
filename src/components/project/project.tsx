@@ -25,6 +25,7 @@ import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 import TanStackTable from "../core/Tanstacktable";
 import { getProjectColumns } from "./projectColumns";
 import { getAllUsersProjects } from "@/https/services/project";
+import { TruncatedText } from "../core/TruncatedText";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -256,7 +257,7 @@ const Projects = () => {
             </div>
           ) : (
             <div className="h-[calc(100vh-165px)] overflow-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {projectsData?.map((project: ProjectData) => (
                   <Card
                     key={project.id}
@@ -271,8 +272,8 @@ const Projects = () => {
                             {project.project_name?.charAt(0).toUpperCase() ||
                               "?"}
                           </div>
-                          <h2 className="text-sm 3xl:!text-base font-medium break-words px-2 capitalize">
-                            {project.project_name || "Untitled"}
+                          <h2 className="text-sm 3xl:!text-base font-medium px-2 capitalize">
+                            <TruncatedText text={project.project_name || "-"} />
                           </h2>
                         </div>
                         {user?.user_type !== "EMPLOYEE" && (
