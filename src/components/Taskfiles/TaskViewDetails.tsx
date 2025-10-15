@@ -192,7 +192,7 @@ const TaskViewDetails = () => {
                     "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {taskdata.task_status.charAt(0).toUpperCase() + taskdata.task_status.slice(1).toLowerCase()}
+                  {taskdata.task_status==='IN_PROGRESS' ? "In Progress" : taskdata.task_status.charAt(0).toUpperCase() + taskdata.task_status.slice(1).toLowerCase()}
                 </span>
               </div>
               <p className="text-gray-700 text-sm 3xl:!text-base">

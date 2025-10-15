@@ -11,7 +11,17 @@ import {
 import type { ReactNode } from 'react'
 import { Toaster } from 'sonner'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: 1000 * 60 * 5,
+      retry: false,
+    },
+  },
+});
 
 export const Route = createRootRoute({
   head: () => ({

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react"; // default icons
+import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react";
 
 interface BigCardProps {
   title: string;
@@ -9,20 +9,20 @@ interface BigCardProps {
 
 const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {
   "Total Tasks": {
-    bg: "bg-[rgba(255,200,73,0.20)]",
-    icon: <ClipboardList className="text-purple-500" size={20} />,
+    bg: "bg-pink-100",
+    icon: <ClipboardList className="text-pink-500" size={20} />,
   },
   "Completed Tasks": {
-    bg: "bg-sky-100",
-    icon: <ListChecks className="text-blue-500" size={28} />,
+    bg: "bg-emerald-50",
+    icon: <ListChecks className="text-green-500" size={28} />,
   },
-  "In Progress Task": {
-    bg: "bg-red-50",
-    icon: <ListTodo className="text-orange-500" size={28} />,
+  "In Progress Tasks": {
+    bg: "bg-sky-100",
+    icon: <ListTodo className="text-blue-500" size={28} />,
   },
   "Overdue Tasks": {
-    bg: "bg-emerald-50",
-    icon: <RefreshCw className="text-green-500" size={28} />,
+    bg: "bg-red-50",
+    icon: <RefreshCw className="text-orange-500" size={28} />,
   },
 };
 

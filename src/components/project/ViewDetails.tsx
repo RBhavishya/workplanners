@@ -30,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import Loading from "../core/Loading";
 
 const statuses = [
   { value: "NEW", label: "New" },

@@ -270,9 +270,9 @@ const UsersDetais = () => {
               </button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-40 p-2 border rounded-md shadow-md">
+            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
               <div className="flex flex-col">
-                {["MANAGER", "EMPLOYEE"].map((option) => (
+                {["MANAGER", "EMPLOYEE", "TEAM_LEAD"].map((option) => (
                   <div
                     key={option}
                     className="cursor-pointer px-3 py-1 hover:bg-gray-100"
@@ -310,7 +310,7 @@ const UsersDetais = () => {
                 "task_status",
                 "actions",
               ]}
-              height='calc(100vh - 145px)'
+              height='calc(100vh - 185px)'
             />
           </div>
         </div>

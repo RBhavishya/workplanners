@@ -97,10 +97,10 @@ const TanStackTable: FC<pageProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <div className="w-full relative bg-white" style={{ height: height }}>
-        <table className="w-full text-sm table-fixed h-full">
-          <thead className="!sticky top-0 bg-white text-neutral-400 font-normal">
+    <div className="flex flex-col w-full bg-white">
+      <div className="overflow-auto" style={{ height: height }}>
+        <table className="w-full text-sm table-fixed">
+          <thead className="!sticky top-0 bg-white text-neutral-400 font-normal z-10">
             {table?.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-none h-10">
                 {headerGroup.headers.map((header: any, index: number) => (
@@ -212,6 +212,7 @@ const TanStackTable: FC<pageProps> = ({
             )}
           </tbody>
         </table>
+        </div>
         <div className="sticky bottom-0">
           <TasksPagination
             paginationDetails={paginationDetails}
@@ -220,7 +221,6 @@ const TanStackTable: FC<pageProps> = ({
           />
         </div>
       </div>
-    </div>
   );
 };
 
