@@ -29,7 +29,7 @@ export const getAllNotificationsCountsAPI = async () => {
 
 export const markAsReadAllAPI = async () => {
   try {
-    return await $fetch.put(`/notifications/mark-as-read/all`);
+    return await $fetch.put(`/notifications`);
   } catch (err) {
     throw err;
   }
