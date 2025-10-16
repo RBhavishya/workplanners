@@ -107,10 +107,9 @@ function ViewProfile() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
-        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-2 text-sm text-gray-500">Loading user details...</p>
-      </div>
+      <div className="flex items-center justify-center h-full">
+      <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+    </div>
     );
   }
 

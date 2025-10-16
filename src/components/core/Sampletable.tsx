@@ -173,8 +173,8 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
 
   if (error) return <p>Error: {error.message}</p>;
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center">
+    return ( 
+      <div className="flex items-center justify-center min-h-100">
         <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
       </div>
     );
@@ -215,20 +215,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
                   </div>
                 </td>
               </tr>
-            ) : isLoading ? (
-              <tr>
-                <td colSpan={taskColumns.length}>
-                <div className="flex items-center justify-center">
-              <img
-                src="/6-dots-scale.svg"
-                alt="loader"
-                width={60}
-                height={60}
-              />
-            </div>
-                </td>
-              </tr>
-            ) : (
+            ) :(
               table.getRowModel().rows.map((row, rowIndex) => (
                 <tr key={row.id} 
                 className={`${

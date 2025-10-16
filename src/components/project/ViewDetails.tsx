@@ -32,6 +32,7 @@ import {
 } from "../ui/select";
 import { statuses } from "@/lib/helpers/StatusFilter";
 import { statusColors } from "@/lib/helpers/statusColors";
+import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
@@ -151,7 +152,6 @@ const Viewdetails = () => {
   const formatDate = (dateStr: string | null) =>
     dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
 
-  // --- Loading state in center ---
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
@@ -162,7 +162,14 @@ const Viewdetails = () => {
 
   if (error)
     return <p className="text-center text-red-500">Error loading project</p>;
-  if (!projectdata) return <p className="text-center">No project found</p>;
+  if (!projectdata) {
+    <div className="flex flex-col items-center justify-center gap-3">
+      <NoProjectIcon />
+      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+        No Projects Found
+      </p>
+    </div>;
+  }
 
   return (
     <div className="flex">
@@ -176,29 +183,29 @@ const Viewdetails = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="w-12 h-12 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
-              {projectdata.title?.charAt(0) || "P"}
+              {projectdata?.title?.charAt(0) || "P"}
             </div>
             <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
-              <span className="capitalize">{projectdata.title}</span>
-              <span
+              <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
+                <span className="capitalize">{projectdata?.title}</span>
+                <span
                   className={`ml-2 text-sm px-2 py-1 rounded ${
-                    statusColors[projectdata.project_status] ||
+                    statusColors[projectdata?.project_status] ||
                     "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {projectdata.project_status === "IN_PROGRESS"
+                  {projectdata?.project_status === "IN_PROGRESS"
                     ? "In Progress"
-                    : projectdata.project_status.charAt(0).toUpperCase() +
-                      projectdata.project_status.slice(1).toLowerCase()}
+                    : projectdata?.project_status.charAt(0).toUpperCase() +
+                      projectdata?.project_status.slice(1).toLowerCase()}
                 </span>
+              </div>
+              <p className="text-gray-700 text-sm 3xl:!text-base max-w-200 max-h-15 overflow-auto">
+                {projectdata?.description || "No description available"}
+              </p>
             </div>
-          <p className="text-gray-700 text-sm 3xl:!text-base max-w-200 max-h-15 overflow-auto">
-            {projectdata.description || "No description available"}
-          </p>
           </div>
         </div>
-      </div>
 
         <div className="flex flex-col bg-white rounded-md">
           <p className="text-base 3xl:!text-lg font-medium px-2 pt-1">Tasks</p>
@@ -234,20 +241,20 @@ const Viewdetails = () => {
         <div className="flex flex-col gap-3">
           {/* Created By */}
           <div className="flex items-center gap-3 mb-4">
-            {projectdata.createdByUser?.profile_pic ? (
+            {projectdata?.createdByUser?.profile_pic ? (
               <img
-                src={projectdata.createdByUser.profile_pic}
-                alt={projectdata.createdByUser.display_name || "User"}
+                src={projectdata?.createdByUser.profile_pic}
+                alt={projectdata?.createdByUser.display_name || "User"}
                 className="w-10 h-10 rounded-full object-cover border"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
-                {projectdata.createdByUser?.display_name?.charAt(0) || "U"}
+                {projectdata?.createdByUser?.display_name?.charAt(0) || "U"}
               </div>
             )}
             <div>
               <p className="font-medium">
-                {projectdata.createdByUser?.display_name || "Unknown"}
+                {projectdata?.createdByUser?.display_name || "Unknown"}
               </p>
               <p className="text-xs text-gray-500">Created By</p>
             </div>
@@ -257,7 +264,7 @@ const Viewdetails = () => {
           <div className="flex items-center">
             <p className="text-base 3xl:!text-lg">Status:</p>{" "}
             <Select
-              value={projectdata.project_status}
+              value={projectdata?.project_status}
               onValueChange={(value) => handleStatusChange(value)}
               disabled={loggedInUser.user_type === "EMPLOYEE"}
             >
@@ -286,7 +293,7 @@ const Viewdetails = () => {
                 Start Date:
               </span>
               <span className="text-sm">
-                {formatDate(projectdata.start_date)}
+                {formatDate(projectdata?.start_date)}
               </span>
             </p>
             <p className="flex flex-col">
@@ -294,7 +301,7 @@ const Viewdetails = () => {
                 Due Date:
               </span>
               <span className="text-sm">
-                {formatDate(projectdata.due_date)}
+                {formatDate(projectdata?.due_date)}
               </span>
             </p>
           </div>
