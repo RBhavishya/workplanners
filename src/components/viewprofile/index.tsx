@@ -13,6 +13,7 @@ import { getusersByIdAPI, UserUpdateAPI } from "@/https/services/users";
 import { Button } from "../ui/button";
 import { errPopper } from "@/lib/helpers/errPoppers";
 import { useRouter } from "@tanstack/react-router";
+import { Input } from "../ui/input";
 
 function ViewProfile() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -20,6 +21,7 @@ function ViewProfile() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [userType, setUserType] = useState<any>("");
   const [userData, setUserData] = useState<any>({
     name: "",
@@ -63,12 +65,41 @@ function ViewProfile() {
   });
 
   // Update user
+  // const updateUser = useMutation({
+  //   mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
+  //   onSuccess: (res: any) => {
+  //     if (res?.success) {
+  //       toast.success("Profile updated successfully!");
+  //       setIsEditing(false);
+
+  //       // Update localStorage
+  //       const updatedUser = {
+  //         ...storedUser,
+  //         display_name: userData.name,
+  //         email: userData.email,
+  //         phone: userData.phone_number,
+  //         designation: userData.disignation,
+  //         user_type: userType.user_type,
+  //       };
+  //       localStorage.setItem("user", JSON.stringify(updatedUser));
+
+  //       // Dispatch event for header update
+  //       window.dispatchEvent(new Event("userUpdated"));
+  //     } else {
+  //       toast.error(res?.message || "Failed to update profile");
+  //     }
+  //   },
+  //   onError: (err) => errPopper(err),
+  // });
+
   const updateUser = useMutation({
     mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
     onSuccess: (res: any) => {
       if (res?.success) {
         toast.success("Profile updated successfully!");
         setIsEditing(false);
+        setErrors({});
+        // setFormError("");
 
         // Update localStorage
         const updatedUser = {
@@ -77,16 +108,25 @@ function ViewProfile() {
           email: userData.email,
           phone: userData.phone_number,
           designation: userData.disignation,
+          user_type: userType.user_type,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
-        // Dispatch event for header update
         window.dispatchEvent(new Event("userUpdated"));
       } else {
-        toast.error(res?.message || "Failed to update profile");
+        const message = res?.message || "Failed to update profile";
+        toast.error(message);
       }
     },
-    onError: (err) => errPopper(err),
+    onError: (error: any) => {
+      if (error?.status === 422 && error?.data?.errData) {
+        // directly set backend validation errors
+        setErrors(error.data.errData);
+      } else {
+        const message = error?.data?.message || "Failed to update user";
+        toast.error(message);
+      }
+    },
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,8 +139,19 @@ function ViewProfile() {
       email: userData.email,
       phone: userData.phone_number,
       designation: userData.disignation,
+      user_type: userType.user_type,
     };
     updateUser.mutate(payload);
+  };
+
+  const clearFieldError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const handleCancel = () => setIsEditing(false);
@@ -172,39 +223,60 @@ function ViewProfile() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-base text-gray-700">
           <div>
-            <p className="text-base text-neutral-400">Full Name</p>
+            <p className="text-base text-neutral-400 flex items-center gap-1">
+              Full Name
+              {isEditing && <span className="text-red-500">*</span>}
+            </p>
             {isEditing ? (
-              <input
+              <Input
                 type="text"
                 name="name"
                 value={userData.name}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  clearFieldError("display_name");
+                }}
                 className="border p-1 rounded w-full mt-1"
               />
             ) : (
               <p>{userData.name || "-"}</p>
             )}
+            {errors.display_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.display_name}</p>
+            )}
           </div>
 
           <div>
-            <p className="text-base text-neutral-400">Email</p>
+            <p className="text-base text-neutral-400 flex items-center gap-1">
+              Email
+              {isEditing && <span className="text-red-500">*</span>}
+            </p>
             {isEditing ? (
-              <input
+              <Input
                 type="email"
                 name="email"
                 value={userData.email}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  clearFieldError("email");
+                }}
                 className="border p-1 rounded w-full mt-1"
               />
             ) : (
               <p>{userData.email || "-"}</p>
             )}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
-            <p className="text-base text-neutral-400">Phone Number</p>
+            <p className="text-base text-neutral-400 flex items-center gap-1">
+              Phone Number
+              {isEditing && <span className="text-red-500">*</span>}
+            </p>
             {isEditing ? (
-              <input
+              <Input
                 type="text"
                 name="phone_number"
                 value={userData.phone_number}
@@ -212,6 +284,7 @@ function ViewProfile() {
                   const value = e.target.value;
                   if (/^\d{0,10}$/.test(value)) {
                     handleInputChange(e);
+                    clearFieldError("phone");
                   }
                 }}
                 maxLength={10}
@@ -220,25 +293,40 @@ function ViewProfile() {
             ) : (
               <p>{userData.phone_number || "-"}</p>
             )}
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+            )}
           </div>
 
           <div>
-            <p className="text-base text-neutral-400">Designation</p>
+            <p className="text-base text-neutral-400 flex items-center gap-1">
+              Designation
+              {isEditing && <span className="text-red-500">*</span>}
+            </p>
             {isEditing ? (
-              <input
+              <Input
                 type="text"
                 name="disignation"
                 value={userData.disignation}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  clearFieldError("designation");
+                }}
                 className="border p-1 rounded w-full mt-1"
               />
             ) : (
               <p>{userData.disignation || "-"}</p>
             )}
+            {errors.designation && (
+              <p className="text-red-500 text-sm mt-1">{errors.designation}</p>
+            )}
           </div>
 
           <div>
-            <p className="text-base text-neutral-400">User Type</p>
+            <p className="text-base text-neutral-400 flex items-center gap-1">
+              Role
+              {isEditing && <span className="text-red-500">*</span>}
+            </p>
             <p>
               {userType.user_type.charAt(0).toUpperCase() +
                 userType.user_type.slice(1).toLowerCase()}

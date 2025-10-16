@@ -223,7 +223,7 @@ const Viewdetails = () => {
                   value: status?.data?.completed_count,
                 },
                 { title: "Review", value: status?.data?.review_count },
-                { title: "Overdue", value: status?.data?.pending_count },
+                { title: "Overdue", value: status?.data?.overdue_count },
               ]}
             />
           </div>
