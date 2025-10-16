@@ -1,4 +1,4 @@
-import { GetAllPaginatedTasksPropTypes } from "@/interfaces/tasks";
+import { AddChatsAPIPayload, GetAllPaginatedTasksPropTypes } from "@/interfaces/tasks";
 import { $fetch } from "../fetch";
 
 export const getAllPaginatedTasks = async ({
@@ -156,4 +156,20 @@ export const getWeaklySummaryAPI = async () => {
     }
 };
 
+export const getChatsByIdAPI = async (id: number, queryParams) => {
+  try {
+    const response = await $fetch.get(`/chats/${id}`, queryParams);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
+export const addChatsByIdAPI = async (payload: AddChatsAPIPayload) => {
+  try {
+    const response = await $fetch.post(`/chats`, payload);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

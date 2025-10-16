@@ -27,6 +27,7 @@ import { getAllUsersProjects } from "@/https/services/project";
 import { TruncatedText } from "../core/TruncatedText";
 import { SelectStatus } from "../core/SelectStatus";
 import { statusColors } from "@/lib/helpers/statusColors";
+import { useDebounce } from "@/lib/helpers/useDebounce";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
@@ -46,14 +47,14 @@ const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
-  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("status"));
+  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("project_status") || '');
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
   const [searchString, setSearchString] = useState(searchParams.get("search") || "");
-  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  const debouncedSearch = useDebounce(searchString, 500);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const { isLoading, isError, error, data, isFetching } = useQuery({
@@ -105,28 +106,6 @@ const Projects = () => {
       setSelectedStatus(newStatus);
     }
   }
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchString);
-      if (searchString || selectedStatus) {
-        getAllProjects({
-          pageIndex: 1,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      } else {
-        getAllProjects({
-          pageIndex: pageIndexParam,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      }
-    }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchString, selectedStatus]);
 
   useEffect(() => {
     router.navigate({

@@ -32,7 +32,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
     is_increase: summary?.overdue_tasks?.is_increase ?? false,
   };
 
-  const radius = 24;
+  const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const progress = productivity_percentage / 100;
 
@@ -68,7 +68,7 @@ const WeeklySummary: React.FC<WeeklySummaryProps> = ({ data: summary }) => {
               strokeLinecap="round"
             />
           </svg>
-          <div className="absolute inset-0 flex items-center justify-center text-purple-600 font-semibold text-lg">
+          <div className="absolute inset-0 flex items-center justify-center text-purple-600 font-semibold text-base">
             {productivity_percentage}%
           </div>
         </div>

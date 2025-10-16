@@ -30,6 +30,7 @@ import {
 import { TaskComments } from "./TaskComments";
 import { statusColors } from "@/lib/helpers/statusColors";
 import { statuses } from "@/lib/helpers/StatusFilter";
+import dayjs from "dayjs";
 
 const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
@@ -44,10 +45,15 @@ const TaskViewDetails = () => {
     data: taskResponse,
     isLoading,
     error,
+    isError
   } = useQuery({
     queryKey: ["project", id],
     queryFn: () => getTaskByIdAPI(Number(id)),
   });
+
+  if(isError){
+    toast.error(error?.message || "Failed to fetch task details");
+  }
 
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
@@ -103,9 +109,6 @@ const TaskViewDetails = () => {
   const taskdata = taskResponse?.data?.data || {};
   const availableUsers = availableUsersData?.data?.data || [];
 
-  const formatDate = (dateStr: string | null) =>
-    dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
-
   const handleStatusChange = (newStatus: string) => {
     patchStatusMutation.mutate(newStatus);
   };
@@ -158,25 +161,25 @@ const TaskViewDetails = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="w-12 h-12 flex items-center justify-center rounded-sm bg-blue-600 text-white text-lg font-medium capitalize">
-              {taskdata.task_title?.charAt(0) || "T"}
+              {taskdata?.task_title?.charAt(0) || "T"}
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
-                <span className="capitalize">{taskdata.task_title}</span>
+                <span className="capitalize">{taskdata?.task_title}</span>
                 <span
                   className={`ml-2 text-sm px-2 py-1 rounded ${
-                    statusColors[taskdata.task_status] ||
+                    statusColors[taskdata?.task_status] ||
                     "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {taskdata.task_status === "IN_PROGRESS"
+                  {taskdata?.task_status === "IN_PROGRESS"
                     ? "In Progress"
-                    : taskdata.task_status.charAt(0).toUpperCase() +
-                      taskdata.task_status.slice(1).toLowerCase()}
+                    : taskdata?.task_status?.charAt(0).toUpperCase() +
+                      taskdata?.task_status?.slice(1).toLowerCase()}
                 </span>
               </div>
               <p className="text-gray-700 text-sm 3xl:!text-base">
-                {taskdata.description || "No description available"}
+                {taskdata?.description || "No description available"}
               </p>
             </div>
           </div>
@@ -236,13 +239,13 @@ const TaskViewDetails = () => {
               <span className="text-neutral-400 text-sm 3xl:!text-base">
                 Start Date
               </span>
-              <span className="text-sm">{formatDate(taskdata.start_date)}</span>
+              <span className="text-sm">{dayjs(taskdata.start_date).format("DD-MM-YYYY")}</span>
             </p>
             <p className="flex flex-col">
               <span className="text-neutral-400 text-sm 3xl:!text-base">
                 Due Date
               </span>
-              <span className="text-sm">{formatDate(taskdata.end_date)}</span>
+              <span className="text-sm">{dayjs(taskdata.end_date).format("DD-MM-YYYY")}</span>
             </p>
           </div>
 

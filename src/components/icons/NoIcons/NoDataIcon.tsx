@@ -1,9 +1,8 @@
-export function NoDataIcon() {
+export function NoDataIcon({className}: {className: string}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="250"
-      height="250"
+      className={className}
       viewBox="0 0 648 633"
       fill="none"
     >
