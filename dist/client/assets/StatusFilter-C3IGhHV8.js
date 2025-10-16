@@ -1,0 +1,1 @@
+const e=[{value:"NEW",label:"New"},{value:"IN_PROGRESS",label:"In Progress"},{value:"COMPLETED",label:"Completed"},{value:"OVERDUE",label:"Overdue"},{value:"REVIEW",label:"Review"}],l=[{value:"MANAGER",label:"Manager"},{value:"EMPLOYEE",label:"Employee"},{value:"TEAM_LEAD",label:"Team Lead"}];export{e as s,l as u};
