@@ -8,8 +8,8 @@ import {
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useDebounce } from "@/lib/helpers/useDebounce";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocation, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import CountUp from "react-countup";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
@@ -29,6 +29,7 @@ import { getTaskActions } from "./TaskActions";
 const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
@@ -87,7 +88,6 @@ const Tasks = () => {
             ? formatDate(dateValue[1])
             : undefined,
       });
-
       return response;
     },
   });
@@ -170,6 +170,27 @@ const Tasks = () => {
     },
 
   ]
+
+  useEffect(() => {
+      router.navigate({
+        to: "/tasks",
+        search: {
+          page: Number(pagination.pageIndex),
+          page_size: Number(pagination.pageSize),
+          order_by: pagination.order_by || undefined,
+          search: debouncedSearch || undefined,
+          from_date:
+            dateValue?.length && dateValue[0]
+              ? formatDate(dateValue[0])
+              : undefined,
+          to_date:
+            dateValue?.length && dateValue[1]
+              ? formatDate(dateValue[1])
+              : undefined,
+          task_status: selectedStatus || undefined,
+        },
+      });
+  }, [ pagination, debouncedSearch, dateValue, selectedStatus]);
 
   return (
     <div className="flex flex-col overflow-hidden gap-2 m-2 rounded-md">

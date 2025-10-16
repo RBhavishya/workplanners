@@ -6,7 +6,7 @@ import {
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 import SearchFilter from "../core/SearchFilter";
@@ -59,18 +59,6 @@ const UsersDetais = () => {
   const { isLoading, data } = useQuery({
     queryKey: ["users", pagination, debouncedSearch, del, selectedRole],
     queryFn: async () => {
-      if (location.pathname !== "/dashboard") {
-        router.navigate({
-          to: "/users",
-          search: {
-            page: Number(pagination.pageIndex),
-            page_size: Number(pagination.pageSize),
-            order_by: pagination.order_by || undefined,
-            search: debouncedSearch || undefined,
-            user_type: selectedRole || undefined,
-          },
-        });
-      }
       const response = await getAllPaginatedUsers({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -82,6 +70,25 @@ const UsersDetais = () => {
       return response;
     },
   });
+
+  useEffect(() => {
+    router.navigate({
+      to: "/users",
+      search: {
+        page: Number(pagination.pageIndex),
+        page_size: Number(pagination.pageSize),
+        order_by: pagination.order_by || undefined,
+        search: debouncedSearch || undefined,
+        user_type: selectedRole || undefined,
+      },
+    });
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    pagination.order_by,
+    debouncedSearch,
+    selectedRole,
+  ]);
 
   const users =
     addSerial(
