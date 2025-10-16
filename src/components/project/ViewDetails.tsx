@@ -2,7 +2,6 @@ import { useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import TasksInProjectTable from "../core/Sampletable";
 import {
   assignUserAPI,
   deleteAssignedUserAPI,
@@ -33,6 +32,7 @@ import {
 import { statuses } from "@/lib/helpers/StatusFilter";
 import { statusColors } from "@/lib/helpers/statusColors";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
+import TasksTable from "./ProjectView/ProjectViewTable";
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
@@ -231,7 +231,7 @@ const Viewdetails = () => {
 
         {/* Tasks Table */}
         <div className="w-full">
-          <TasksInProjectTable projectId={Number(id)} />
+          <TasksTable projectId={Number(id)} />
         </div>
       </div>
 

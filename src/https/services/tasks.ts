@@ -1,13 +1,5 @@
+import { GetAllPaginatedTasksPropTypes } from "@/interfaces/tasks";
 import { $fetch } from "../fetch";
-interface GetAllPaginatedUsersPropTypes {
-  pageIndex: number;
-  pageSize: number;
-  order_by: any;
-  search_string: any;
-  from_date: any;
-  to_date: any;
-  task_status: string;
-}
 
 export const getAllPaginatedTasks = async ({
   pageIndex,
@@ -17,7 +9,7 @@ export const getAllPaginatedTasks = async ({
   from_date,
   to_date,
   task_status,
-}: GetAllPaginatedUsersPropTypes) => {
+}: GetAllPaginatedTasksPropTypes) => {
   try {
     const queryParams = {
       page: pageIndex,
@@ -50,7 +42,7 @@ export const getDropDownForProjectsTasksAPI = async () => {
   }
 };
 
-export const getSingleDropDownForAssignedUsersAPI = async ( project_id:any) => {
+export const getSingleDropDownForAssignedUsersAPI = async ( project_id: number) => {
   try {
     return await $fetch.get(`/projects/${project_id}/users/assigned`);
   } catch (err: any) {
@@ -58,7 +50,7 @@ export const getSingleDropDownForAssignedUsersAPI = async ( project_id:any) => {
   }
 };
 
-export const updateTasksAPI = async (id: any, payload: any) => {
+export const updateTasksAPI = async (id: number, payload: any) => {
   try {
     return await $fetch.patch(`/tasks/${id}`, payload);
   } catch (err) {

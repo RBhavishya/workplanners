@@ -256,7 +256,7 @@ const Dashboard = () => {
           className="space-y-2 h-[calc(100vh-190px)] overflow-y-auto pr-2"
         >
           {isFetching ? (
-            <div className="flex items-center justify-center py-6">
+            <div className="flex items-center justify-center py-6 h-full">
               <img
                 src="/6-dots-scale.svg"
                 alt="loader"
@@ -267,11 +267,11 @@ const Dashboard = () => {
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true
             ).length === 0 ? (
-            <p className="text-sm 3xl:!text-base text-gray-500 text-center">
+            <div className="text-sm 3xl:!text-base text-gray-500 flex items-center justify-center h-full">
               {todayFilter
-                ? `No ${todayFilter.toLowerCase()} tasks today`
+                ? `No ${todayFilter.toUpperCase()} tasks today`
                 : "No tasks for today"}
-            </p>
+            </div>
           ) : (
             todaytasks
               .filter((task) =>

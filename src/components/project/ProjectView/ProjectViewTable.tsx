@@ -1,23 +1,18 @@
-import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  useReactTable,
-  getCoreRowModel,
-  ColumnDef,
-  flexRender,
-} from "@tanstack/react-table";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import DeleteTaskDialog from "@/components/core/TaskDeleteFilter";
+import TasksPagination from "@/components/core/TasksPagination";
+import { NoTasksIcon } from "@/components/icons/NoIcons/NoTasksIcon";
 import { getTasksByProjectId } from "@/https/services/project";
-import { Task } from "@/interfaces/project";
-import { useLocation, useNavigate } from "@tanstack/react-router";
 import { deleteTasksAPI } from "@/https/services/tasks";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable
+} from "@tanstack/react-table";
+import React, { useState } from "react";
 import { toast } from "sonner";
-import DeleteTaskDialog from "../core/TaskDeleteFilter";
-import TasksPagination from "./TasksPagination";
-import { Button } from "../ui/button";
-import { NoTasksIcon } from "../icons/NoIcons/NoTasksIcon";
-import { statusColors } from "@/lib/helpers/statusColors";
-import dayjs from "dayjs";
+import { projectViewColumns } from "./ProjectViewColumns";
 
 interface TasksTableProps {
   projectId: number;
@@ -82,88 +77,14 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
   };
 
-  const taskColumns: ColumnDef<Task>[] = [
-    {
-      header: "S. No",
-      accessorFn: (_row, index) =>
-        (pagination.pageIndex - 1) * pagination.pageSize + index + 1,
-      cell: ({ getValue }) => (
-        <span className="text-gray-600 text-sm">{getValue() as number}</span>
-      ),
+  const taskColumns = projectViewColumns({
+    pagination,
+    navigate,
+    onDeleteClick: (id) => {
+      setTaskToDelete(id);
+      setDeleteDialogOpen(true);
     },
-    {
-      header: "Task Name",
-      accessorKey: "task_title",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-          <div className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-100 text-indigo-600">
-            📌
-          </div>
-          <span className="capitalize">{row.original.task_title}</span>
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "task_status",
-      cell: ({ row }) => {
-        const status = row.original.task_status;
-        const cls = statusColors[status] || "bg-gray-100 text-gray-600";
-        return (
-          <span className={`px-3 py-0.5 rounded-sm text-xs font-medium ${cls}`}>
-           {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
-          </span>
-        );
-      },
-    },
-    {
-      header: "Due Date",
-      accessorFn: (row) => dayjs(row.end_date).format("DD MMM YYYY"),
-      cell: ({ getValue }) => (
-        <span className="px-3 py-1 rounded-md bg-blue-100 text-blue-600 text-xs font-medium">
-          {getValue() as string}
-        </span>
-      ),
-    },
-    {
-      header: "Actions",
-      id: "actions",
-      cell: (info: any) => {
-        const rowData = info.row.original;
-        return (
-          <div className="flex gap-3 justify-center text-gray-500">
-            <Button
-              title="View"
-              variant="ghost"
-              className=" hover:text-indigo-600 text-gray-600 cursor-pointer p-0"
-              onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
-            >
-              <Eye size={16} />
-            </Button>
-            <Button
-              title="Edit"
-              variant="ghost"
-              className=" hover:text-green-600 text-gray-600 cursor-pointer p-0"
-              onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
-            >
-              <Edit size={16} />
-            </Button>
-            <Button
-              title="Delete"
-              variant="ghost"
-              className=" hover:text-red-600 text-gray-600 cursor-pointer p-0"
-              onClick={() => {
-                setTaskToDelete(rowData.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
+  });
 
   const table = useReactTable({
     data: data?.data.data.records || [],

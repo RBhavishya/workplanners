@@ -1,12 +1,6 @@
 import { ProjectData } from "@/interfaces/project";
 import { $fetch } from "../fetch";
-interface GetAllPaginatedUsersPropTypes {
-  pageIndex: number;
-  pageSize: number;
-  order_by: any;
-  search_string: any;
-  user_type: string;
-}
+import { GetAllPaginatedUsersPropTypes } from "@/interfaces/users";
 
 export const getAllPaginatedUsers = async ({
   pageIndex,
@@ -48,7 +42,7 @@ export const createUserAPI = async (payload: ProjectData) => {
   }
 };
 
-export const UserUpdateAPI = async (id: any, payload: any) => {
+export const UserUpdateAPI = async (id: number, payload: any) => {
   try {
     return await $fetch.patch(`/users/${id}`, payload);
   } catch (err) {
@@ -56,7 +50,7 @@ export const UserUpdateAPI = async (id: any, payload: any) => {
   }
 };
 
-export const updateUserStatusAPI = async (userId: any, payload: any) => {
+export const updateUserStatusAPI = async (userId: string, payload: any) => {
   try {
     return await $fetch.patch(`/users/${userId}/status`, payload);
   } catch (err) {
