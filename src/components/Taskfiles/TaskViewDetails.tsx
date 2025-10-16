@@ -28,14 +28,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { TaskComments } from "./TaskComments";
-
-const statuses = [
-  { value: "NEW", label: "New" },
-  { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "COMPLETED", label: "Completed" },
-  { value: "OVERDUE", label: "Overdue" },
-  { value: "REVIEW", label: "Review" },
-];
+import { statusColors } from "@/lib/helpers/statusColors";
+import { statuses } from "@/lib/helpers/StatusFilter";
 
 const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
@@ -44,15 +38,6 @@ const TaskViewDetails = () => {
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement | null>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
-  const statusColors: Record<string, string> = {
-    NEW: "bg-purple-100 text-purple-600",
-    OVERDUE: "bg-red-100 text-red-600",
-    IN_PROGRESS: "bg-blue-100 text-blue-600",
-    REVIEW: "bg-yellow-100 text-yellow-700",
-    COMPLETED: "bg-green-100 text-green-600",
-  };
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const {
@@ -148,12 +133,6 @@ const TaskViewDetails = () => {
       setAssignedUsers(assignedUsersData.data.data);
     }
   }, [assignedUsersData]);
-
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [open]);
 
   if (isLoading) {
     return (
@@ -275,7 +254,6 @@ const TaskViewDetails = () => {
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <div
-                    ref={triggerRef}
                     className="rounded border flex items-center justify-between px-2 py-1 cursor-pointer flex-1"
                   >
                     <span className="text-gray-500">
@@ -288,12 +266,7 @@ const TaskViewDetails = () => {
                     <ChevronDown className="w-5 h-5" />
                   </div>
                 </PopoverTrigger>
-                <PopoverContent
-                  style={{
-                    width: triggerWidth ? `${triggerWidth}px` : "auto",
-                  }}
-                  className="p-0"
-                >
+                <PopoverContent className="p-0">
                   <Command>
                     <CommandInput
                       placeholder="Search users..."
@@ -357,13 +330,16 @@ const TaskViewDetails = () => {
                   No users assigned.
                 </p>
               )}
-              {assignedUsers.map((user) => (
-                <p
+              {assignedUsers.map((user, index) => (
+                <div
                   key={user.id}
-                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
+                  className={cn(
+                    "flex items-center justify-between gap-2 mb-1 px-2 py-1",
+                    index % 2 === 0 ? "bg-sky-50" : "bg-white"
+                  )}
                 >
                   <span className="capitalize text-sm 3xl:!text-base">
-                    {user.display_name || "Unnamed"}
+                    {user.display_name || "-"}
                   </span>
                   <button
                     onClick={() => handleRemoveUser(user.id)}
@@ -381,7 +357,7 @@ const TaskViewDetails = () => {
                   >
                     <X className="w-4 h-4" />
                   </button>
-                </p>
+                </div>
               ))}
             </div>
           </div>

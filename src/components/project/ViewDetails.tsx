@@ -30,14 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-
-const statuses = [
-  { value: "NEW", label: "New" },
-  { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "COMPLETED", label: "Completed" },
-  { value: "OVERDUE", label: "Overdue" },
-  { value: "REVIEW", label: "Review" },
-];
+import { statuses } from "@/lib/helpers/StatusFilter";
+import { statusColors } from "@/lib/helpers/statusColors";
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
@@ -154,14 +148,6 @@ const Viewdetails = () => {
   const projectdata = projectResponse?.data?.data;
   const availableUsers = availableUsersData?.data?.data || [];
 
-  const statusColors: Record<string, string> = {
-    NEW: "bg-purple-100 text-purple-600",
-    IN_PROGRESS: "bg-blue-100 text-blue-600",
-    REVIEW: "bg-yellow-100 text-yellow-700",
-    OVERDUE: "bg-red-100 text-red-600",
-    COMPLETED: "bg-green-100 text-green-600",
-  };
-
   const formatDate = (dateStr: string | null) =>
     dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
 
@@ -180,7 +166,7 @@ const Viewdetails = () => {
 
   return (
     <div className="flex">
-      <div className="flex flex-col m-2 gap-3">
+      <div className="flex flex-col m-2 gap-2">
         <div className="rounded-md p-3 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
           <div className="flex items-start gap-3">
             <button
@@ -196,22 +182,25 @@ const Viewdetails = () => {
             <div className="flex items-center gap-2 text-lg 3xl:!text-xl font-medium">
               <span className="capitalize">{projectdata.title}</span>
               <span
-                className={`ml-2 text-sm px-2 py-1 rounded ${
-                  statusColors[projectdata.project_status] ||
-                  "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {projectdata.project_status}
-              </span>
+                  className={`ml-2 text-sm px-2 py-1 rounded ${
+                    statusColors[projectdata.project_status] ||
+                    "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {projectdata.project_status === "IN_PROGRESS"
+                    ? "In Progress"
+                    : projectdata.project_status.charAt(0).toUpperCase() +
+                      projectdata.project_status.slice(1).toLowerCase()}
+                </span>
             </div>
-          <p className="text-gray-700 text-sm 3xl:!text-base">
+          <p className="text-gray-700 text-sm 3xl:!text-base max-w-200 max-h-15 overflow-auto">
             {projectdata.description || "No description available"}
           </p>
           </div>
         </div>
       </div>
 
-        <div className="flex flex-col bg-white">
+        <div className="flex flex-col bg-white rounded-md">
           <p className="text-base 3xl:!text-lg font-medium px-2 pt-1">Tasks</p>
           <div className="flex items-center w-full p-2 rounded-sm">
             <SmallCard
@@ -400,10 +389,13 @@ const Viewdetails = () => {
               {assignedUsers.length === 0 && (
                 <p className="text-gray-500">No users assigned.</p>
               )}
-              {assignedUsers.map((user) => (
+              {assignedUsers.map((user, index) => (
                 <p
                   key={user.id}
-                  className="flex items-center justify-between gap-2 mb-1 px-2 py-1"
+                  className={cn(
+                    "flex items-center justify-between gap-2 mb-1 px-2 py-1",
+                    index % 2 === 0 ? "bg-sky-50" : "bg-white"
+                  )}
                 >
                   <span className="capitalize text-sm 3xl:!text-base">
                     {user.display_name || "Unnamed"}

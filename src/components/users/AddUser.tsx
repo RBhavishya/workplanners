@@ -1,26 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { toast } from "sonner";
 import {
   createUserAPI,
   getusersByIdAPI,
   UserUpdateAPI,
-} from "@/https/services/users"; // <-- make sure updateUserAPI exists
+} from "@/https/services/users";
+import { ProjectData } from "@/interfaces/project";
+import { userRole } from "@/lib/helpers/StatusFilter";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Check,
-  CheckCircle,
   ChevronDown,
   Eye,
   EyeOff,
-  MoveLeft,
-  X,
+  X
 } from "lucide-react";
-import { ProjectData } from "@/interfaces/project";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
 
 export interface AddUserFormProps {
   mode: "create" | "edit";
@@ -328,7 +327,7 @@ const AddUser = ({ userId, onSave}: AddUserFormProps) => {
               {["Frontend Developer", "Backend Developer", "QA", "Mobile Developer", "Designer", "UI Developer"].map((option) => (
                 <div
                   key={option}
-                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
+                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between text-sm"
                   onClick={() => {
                     setDesignation(option);
                     setDesignationPopoverOpen(false);
@@ -383,18 +382,18 @@ const AddUser = ({ userId, onSave}: AddUserFormProps) => {
             className="p-2 max-w-150"
           >
             <div className="max-h-40 overflow-y-auto">
-              {["EMPLOYEE", "TEAM_LEAD"].map((option) => (
+              {userRole.map((option) => (
                 <div
-                  key={option}
-                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between"
+                  key={option.value}
+                  className="cursor-pointer p-1 rounded hover:bg-gray-100 flex items-center justify-between text-sm"
                   onClick={() => {
-                    setUserType(option);
+                    setUserType(option.value);
                     setRolePopoverOpen(false);
                     clearFieldError("userType");
                   }}
                 >
-                  <span>{option}</span>
-                  {userType === option && (
+                  <span>{option.label}</span>
+                  {userType === option.value && (
                     <Check className="w-4 h-4 text-purple-500" />
                   )}
                 </div>

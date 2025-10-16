@@ -16,6 +16,8 @@ import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import TasksPagination from "./TasksPagination";
 import { Button } from "../ui/button";
 import { NoTasksIcon } from "../icons/NoIcons/NoTasksIcon";
+import { statusColors } from "@/lib/helpers/statusColors";
+import dayjs from "dayjs";
 
 interface TasksTableProps {
   projectId: number;
@@ -26,6 +28,10 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -42,19 +48,6 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       }),
     enabled: !!projectId,
   });
-
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
-
-  const statusColors: Record<string, string> = {
-    NEW: "bg-purple-100 text-purple-600",
-    IN_PROGRESS: "bg-blue-100 text-blue-600",
-    REVIEW: "bg-yellow-100 text-yellow-700",
-    OVERDUE: "bg-red-100 text-red-600",
-    COMPLETED: "bg-green-100 text-green-600",
-  };
 
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
     mutationFn: (id: number) => deleteTasksAPI(id),
@@ -89,15 +82,6 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     setPagination((prev) => ({ ...prev, pageIndex: 1, pageSize }));
   };
 
-  const formatDate = (dateStr: string | null) =>
-    dateStr
-      ? new Date(dateStr).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
-      : "NA";
-
   const taskColumns: ColumnDef<Task>[] = [
     {
       header: "S. No",
@@ -123,18 +107,18 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
       header: "Status",
       accessorKey: "task_status",
       cell: ({ row }) => {
-        const status = row.original.task_status?.toUpperCase();
+        const status = row.original.task_status;
         const cls = statusColors[status] || "bg-gray-100 text-gray-600";
         return (
-          <span className={`px-3 py-1 rounded-md text-xs font-medium ${cls}`}>
-            {status || "Unknown"}
+          <span className={`px-3 py-0.5 rounded-sm text-xs font-medium ${cls}`}>
+           {status === 'IN_PROGRESS' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() || "-"}
           </span>
         );
       },
     },
     {
       header: "Due Date",
-      accessorFn: (row) => formatDate(row.end_date),
+      accessorFn: (row) => dayjs(row.end_date).format("DD MMM YYYY"),
       cell: ({ getValue }) => (
         <span className="px-3 py-1 rounded-md bg-blue-100 text-blue-600 text-xs font-medium">
           {getValue() as string}
@@ -245,8 +229,12 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
                 </td>
               </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="bg-white">
+              table.getRowModel().rows.map((row, rowIndex) => (
+                <tr key={row.id} 
+                className={`${
+                  rowIndex % 2 === 0 ? "bg-slate-100" : "bg-white"
+                } hover:bg-gray-50 border-none`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="py-1 px-4 ext-[13px] 3xl:!text-base">
                       {flexRender(
