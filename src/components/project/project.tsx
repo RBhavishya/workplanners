@@ -64,6 +64,7 @@ const Projects = () => {
       viewMode,
       debouncedSearch,
       selectedStatus,
+      user?.id,
     ],
     queryFn: async () => {
       const response = await getAllUsersProjects({

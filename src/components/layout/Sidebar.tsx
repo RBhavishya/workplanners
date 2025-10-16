@@ -20,6 +20,8 @@ const Sidebar = () => {
     icon: "mr-3 w-4 h-4 3xl:!w-5 3xl:!h-5 group:text-violet-600",
   };
 
+  
+
   return (
     <aside className="w-54 bg-white border-r fixed left-0 top-0 h-full p-0 flex flex-col shadow-none z-10">
       {/* <div className='border-b p-3'> <UserDetails/></div> */}

@@ -60,10 +60,14 @@ const Tasks = () => {
   );
   const debouncedSearch = useDebounce(searchString, 500);
 
+    const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const user_id = user?.id;
+
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
-  const { isLoading, data } = useQuery({
+  const {  data, isFetching } = useQuery({
     queryKey: [
       "tasks",
       pagination,
@@ -71,6 +75,7 @@ const Tasks = () => {
       dateValue,
       del,
       selectedStatus,
+      user_id
     ],
     queryFn: async () => {
       const response = await getAllPaginatedTasks({
@@ -250,7 +255,7 @@ const Tasks = () => {
             }),]}
             paginationDetails={data?.data?.data?.pagination_info}
             getData={getAllTasks}
-            loading={isLoading}
+            loading={isFetching}
             removeSortingForColumnIds={[
               "serial",
               "actions",

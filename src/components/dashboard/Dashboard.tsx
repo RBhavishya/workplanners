@@ -101,7 +101,7 @@ const Dashboard = () => {
     data: todaytasksPages,
     fetchNextPage,
     hasNextPage,
-    isFetching,
+    isLoading: todaytasksLoading,
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ["todayTasks", todayFilter, ],
@@ -246,7 +246,7 @@ const Dashboard = () => {
           onScroll={handleScroll}
           className="space-y-2 h-[calc(100vh-190px)] overflow-y-auto pr-2"
         >
-          {isFetching ? (
+          {todaytasksLoading ? (
             <div className="flex items-center justify-center py-6 h-full">
               <img
                 src="/6-dots-scale.svg"
