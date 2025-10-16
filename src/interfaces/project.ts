@@ -3,6 +3,15 @@ export interface User {
   display_name: string; 
 }
 
+export interface GetAllPaginatedProjectsPropTypes {
+  pageIndex: number;
+  pageSize: number;
+  viewMode: any;
+  order_by: any;
+  project_status: any;
+  search_string: any;
+}
+
 export interface ProjectData {
   id?: number;
   project_name: string;
@@ -97,4 +106,10 @@ export interface TaskResponse {
         prev_page: number | null;
       };
     };
+}
+
+export interface GetTasksByProjectIdParams {
+  projectId: number;
+  pageIndex: number;
+  pageSize: number;
 }

@@ -4,7 +4,7 @@ import { ClipboardList, ListChecks, ListTodo, RefreshCw } from "lucide-react";
 interface BigCardProps {
   title: string;
   value?: any;
-  icon?: React.ReactNode; // allow custom icon later
+  icon?: React.ReactNode;
 }
 
 const cardConfig: Record<string, { bg: string; icon: React.ReactNode }> = {

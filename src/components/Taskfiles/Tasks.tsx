@@ -1,13 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import {
-  Edit,
-  Eye,
-  Filter,
-  Trash,
-  X
-} from "lucide-react";
-import { useEffect, useState } from "react";
 import {
   deleteTasksAPI,
   getAllPaginatedTasks,
@@ -15,29 +6,30 @@ import {
   getWeaklySummaryAPI,
 } from "@/https/services/tasks";
 import { addSerial } from "@/lib/helpers/addSerial";
+import { useDebounce } from "@/lib/helpers/useDebounce";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { Edit, Eye, Trash } from "lucide-react";
+import { useState } from "react";
 import CountUp from "react-countup";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
 import { toast } from "sonner";
 import BigCard from "../core/Cards";
 import SearchFilter from "../core/SearchFilter";
-import DeleteTaskDialog from "../core/TaskDeleteFilter";
+import { SelectStatus } from "../core/SelectStatus";
 import TanStackTable from "../core/Tanstacktable";
+import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import WeeklySummary from "../core/WeakelySummary";
 import { PendingIcon } from "../icons/Dashboard/PendingIcon";
 import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
 import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { taskColumns } from "./TaskColumns";
-import Loading from "../core/Loading";
 
 const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const router = useRouter();
   const queryClient = useQueryClient();
-
   const searchParams = new URLSearchParams(location.search);
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
@@ -46,16 +38,15 @@ const Tasks = () => {
     : "";
   const initialStartDate = searchParams.get("from_date") || null;
   const initialEndDate = searchParams.get("to_date") || null;
-  const initialSearch = searchParams.get("search") || "";
-  const initialStatus = searchParams.get("task_status") || "";
-  const [searchString, setSearchString] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
-  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+  const [searchString, setSearchString] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedStatus, setSelectedStatus] = useState(
+    searchParams.get("status") || ""
+  );
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [del, setDel] = useState<any>(1);
-  const [time, setTime] = useState(new Date());
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
@@ -66,6 +57,7 @@ const Tasks = () => {
       ? [new Date(initialStartDate), new Date(initialEndDate)]
       : null
   );
+  const debouncedSearch = useDebounce(searchString, 500);
 
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
@@ -80,26 +72,6 @@ const Tasks = () => {
       selectedStatus,
     ],
     queryFn: async () => {
-      if (location.pathname !== "/dashboard") {
-        router.navigate({
-          to: "/tasks",
-          search: {
-            page: Number(pagination.pageIndex),
-            page_size: Number(pagination.pageSize),
-            order_by: pagination.order_by || undefined,
-            search: debouncedSearch || undefined,
-            from_date:
-              dateValue?.length && dateValue[0]
-                ? formatDate(dateValue[0])
-                : undefined,
-            to_date:
-              dateValue?.length && dateValue[1]
-                ? formatDate(dateValue[1])
-                : undefined,
-            task_status: selectedStatus || undefined,
-          },
-        });
-      }
       const response = await getAllPaginatedTasks({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -118,8 +90,6 @@ const Tasks = () => {
 
       return response;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const { data: stats } = useQuery({
@@ -128,8 +98,6 @@ const Tasks = () => {
       const response = await getTasksStatsAPI();
       return response.data;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const { data: summary } = useQuery({
@@ -138,8 +106,6 @@ const Tasks = () => {
       const response = await getWeaklySummaryAPI();
       return response.data;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const { mutate: deleteTask, isPending: deleteLoading } = useMutation({
@@ -163,6 +129,13 @@ const Tasks = () => {
   const handleDeleteClick = () => {
     if (taskToDelete) {
       deleteTask(taskToDelete);
+    }
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+    if (newStatus !== "") {
+      setSelectedStatus(newStatus);
     }
   };
 
@@ -225,76 +198,49 @@ const Tasks = () => {
     },
   ];
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchString);
-      if (searchString || selectedStatus || dateValue) {
-        getAllTasks({
-          pageIndex: 1,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      } else {
-        getAllTasks({
-          pageIndex: pageIndexParam,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      }
-    }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchString, selectedStatus, dateValue]);
-
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="flex flex-col overflow-hidden gap-2 m-2 rounded-md">
-        <div className="flex gap-6 bg-white p-2 rounded-md">
-          <div className="flex justify-around rounded gap-1">
-            <div className="flex flex-wrap gap-3">
-              <BigCard
-                title="Total Tasks"
-                value={
-                  <CountUp
-                    start={0}
-                    end={stats?.total_tasks ?? 0}
-                    duration={1.5}
-                  />
-                }
-                icon={<TotalTaskIcon />}
-              />
+      <div className="flex gap-6 bg-white p-2 rounded-md">
+        <div className="flex justify-around rounded gap-1">
+          <div className="flex flex-wrap gap-3">
+            <BigCard
+              title="Total Tasks"
+              value={
+                <CountUp
+                  start={0}
+                  end={stats?.total_tasks ?? 0}
+                  duration={1.5}
+                />
+              }
+              icon={<TotalTaskIcon />}
+            />
 
-              <BigCard
-                title="In Progress Tasks"
-                value={
-                  <CountUp
-                    start={0}
-                    end={stats?.total_in_progress_tasks ?? 0}
-                    duration={1.5}
-                  />
-                }
-                icon={<ProgressIcon className="text-blue-700"/>}
-              />
-              <BigCard
-                title="Overdue Tasks"
-                value={
-                  <CountUp
-                    start={0}
-                    end={stats?.total_overdue_tasks ?? 0}
-                    duration={1.5}
-                  />
-                }
-                icon={<PendingIcon />}
-              />
-            </div>
+            <BigCard
+              title="In Progress Tasks"
+              value={
+                <CountUp
+                  start={0}
+                  end={stats?.total_in_progress_tasks ?? 0}
+                  duration={1.5}
+                />
+              }
+              icon={<ProgressIcon className="text-blue-700" />}
+            />
+            <BigCard
+              title="Overdue Tasks"
+              value={
+                <CountUp
+                  start={0}
+                  end={stats?.total_overdue_tasks ?? 0}
+                  duration={1.5}
+                />
+              }
+              icon={<PendingIcon />}
+            />
           </div>
-          <WeeklySummary data={summary} />
         </div>
+        <WeeklySummary data={summary} />
+      </div>
       <div className="bg-white rounded-md ">
         <div className="flex justify-end items-center m-1 gap-3">
           <SearchFilter
@@ -307,48 +253,12 @@ const Tasks = () => {
             value={dateValue}
             onChange={(range) => setDateValue(range)}
             placeholder="Select Date Range"
-            className="h-8 text-sm"
+            className="!h-8 text-sm"
           />
-          <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 border px-2 py-1 rounded-md cursor-pointer text-sm h-8">
-                <div className="flex items-center gap-2">
-                  <Filter className="text-purple-500" size={16} />
-                  <span>{selectedStatus || "Sort by"}</span>
-                </div>
-
-                {selectedStatus && (
-                  <X
-                    size={16}
-                    className="text-gray-400 hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedStatus("");
-                    }}
-                  />
-                )}
-              </button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
-              <div className="flex flex-col">
-                {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
-                  (option) => (
-                    <div
-                      key={option}
-                      className="cursor-pointer hover:bg-gray-100 text-sm p-1"
-                      onClick={() => {
-                        setSelectedStatus(option);
-                        setStatusPopoverOpen(false);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  )
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
+          <SelectStatus
+            selectedStatus={selectedStatus}
+            handleStatusChange={handleStatusChange}
+            />
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
             onClick={handleNavigation}
@@ -371,7 +281,7 @@ const Tasks = () => {
               "task_status",
               "actions",
             ]}
-            height='calc(100vh - 295px)'
+            height="calc(100vh - 295px)"
           />
         </div>
         <DeleteTaskDialog

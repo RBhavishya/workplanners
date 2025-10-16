@@ -64,34 +64,6 @@ function ViewProfile() {
     refetchOnWindowFocus: false,
   });
 
-  // Update user
-  // const updateUser = useMutation({
-  //   mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
-  //   onSuccess: (res: any) => {
-  //     if (res?.success) {
-  //       toast.success("Profile updated successfully!");
-  //       setIsEditing(false);
-
-  //       // Update localStorage
-  //       const updatedUser = {
-  //         ...storedUser,
-  //         display_name: userData.name,
-  //         email: userData.email,
-  //         phone: userData.phone_number,
-  //         designation: userData.disignation,
-  //         user_type: userType.user_type,
-  //       };
-  //       localStorage.setItem("user", JSON.stringify(updatedUser));
-
-  //       // Dispatch event for header update
-  //       window.dispatchEvent(new Event("userUpdated"));
-  //     } else {
-  //       toast.error(res?.message || "Failed to update profile");
-  //     }
-  //   },
-  //   onError: (err) => errPopper(err),
-  // });
-
   const updateUser = useMutation({
     mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
     onSuccess: (res: any) => {
@@ -99,9 +71,7 @@ function ViewProfile() {
         toast.success("Profile updated successfully!");
         setIsEditing(false);
         setErrors({});
-        // setFormError("");
 
-        // Update localStorage
         const updatedUser = {
           ...storedUser,
           display_name: userData.name,
@@ -158,10 +128,9 @@ function ViewProfile() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
-        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-2 text-sm text-gray-500">Loading user details...</p>
-      </div>
+      <div className="flex items-center justify-center h-full">
+      <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+    </div>
     );
   }
 
