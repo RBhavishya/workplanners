@@ -102,11 +102,11 @@ export function TaskComments() {
     <div className="flex flex-col bg-white rounded-lg p-4 pb-2">
       <div className="flex items-center gap-2">
         <MessageSquareIcon className="text-blue-700" />
-        <span className="text-sm 3xl:!text-base font-medium text-[#000]">
-          Comments{" "}
-          <span className="bg-blue-600 text-white rounded-full px-3 ml-3 py-0 text-xs 3xl:!text-sm">
+        <span className="text-base 3xl:!text-lg font-medium text-[#000]">
+          Chats{" "}
+          {/* <span className="bg-blue-600 text-white rounded-full px-3 ml-3 py-0 text-xs 3xl:!text-sm">
             {total_records || 0}
-          </span>
+          </span> */}
         </span>
       </div>
 
