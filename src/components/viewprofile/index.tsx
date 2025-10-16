@@ -21,6 +21,7 @@ function ViewProfile() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+   const [originalData, setOriginalData] = useState<any>();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [userType, setUserType] = useState<any>("");
   const [userData, setUserData] = useState<any>({
@@ -63,34 +64,6 @@ function ViewProfile() {
     retry: false,
     refetchOnWindowFocus: false,
   });
-
-  // Update user
-  // const updateUser = useMutation({
-  //   mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
-  //   onSuccess: (res: any) => {
-  //     if (res?.success) {
-  //       toast.success("Profile updated successfully!");
-  //       setIsEditing(false);
-
-  //       // Update localStorage
-  //       const updatedUser = {
-  //         ...storedUser,
-  //         display_name: userData.name,
-  //         email: userData.email,
-  //         phone: userData.phone_number,
-  //         designation: userData.disignation,
-  //         user_type: userType.user_type,
-  //       };
-  //       localStorage.setItem("user", JSON.stringify(updatedUser));
-
-  //       // Dispatch event for header update
-  //       window.dispatchEvent(new Event("userUpdated"));
-  //     } else {
-  //       toast.error(res?.message || "Failed to update profile");
-  //     }
-  //   },
-  //   onError: (err) => errPopper(err),
-  // });
 
   const updateUser = useMutation({
     mutationFn: async (payload: any) => UserUpdateAPI(userId, payload),
@@ -154,7 +127,26 @@ function ViewProfile() {
     }
   };
 
-  const handleCancel = () => setIsEditing(false);
+  // const handleCancel = () => setIsEditing(false);
+  const handleCancel = () => {
+    if (originalData) {
+      setUserData({
+        name: originalData.name,
+        email: originalData.email,
+        phone_number: originalData.phone_number,
+        disignation: originalData.disignation,
+      });
+      setUserType(originalData.userType);
+    }
+    setIsEditing(false);
+    setErrors({});
+  };
+
+   const handleEditClick = () => {
+    setOriginalData({ ...userData, userType }); // save original
+    setIsEditing(true);
+  };
+
 
   if (isLoading) {
     return (
@@ -193,7 +185,7 @@ function ViewProfile() {
           {!isEditing ? (
             <Button
               className="bg-violet-600 font-light text-white px-4 py-0 h-7 rounded-sm text-sm absolute right-2 top-1 hover:bg-violet-700 cursor-pointer"
-              onClick={() => setIsEditing(true)}
+              onClick={handleEditClick}
             >
               <SquarePen /> Edit
             </Button>
