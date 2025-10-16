@@ -33,6 +33,7 @@ import { statuses } from "@/lib/helpers/StatusFilter";
 import { statusColors } from "@/lib/helpers/statusColors";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 import TasksTable from "./ProjectView/ProjectViewTable";
+import dayjs from "dayjs";
 
 const Viewdetails = () => {
   const { id } = useParams({ from: "/_layout/projects/$id/" });
@@ -41,16 +42,12 @@ const Viewdetails = () => {
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // --- Queries ---
   const {
     data: projectResponse,
     isLoading,
     error,
-    isFetching,
   } = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectByIdAPI(Number(id)),
@@ -71,19 +68,11 @@ const Viewdetails = () => {
     queryFn: () => getTaskStatusCountsAPI(Number(id)),
   });
 
-  // --- Initialize assigned users ---
   useEffect(() => {
     if (assignedUsersData?.data?.data) {
       setAssignedUsers(assignedUsersData.data.data);
     }
   }, [assignedUsersData]);
-
-  // --- Get trigger width for popover ---
-  useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [triggerRef.current]);
 
   const patchStatusMutation = useMutation({
     mutationFn: (newStatus: string) =>
@@ -123,7 +112,6 @@ const Viewdetails = () => {
     },
   });
 
-  // --- Handlers ---
   const handleStatusChange = (newStatus: string) => {
     patchStatusMutation.mutate(newStatus);
   };
@@ -148,9 +136,6 @@ const Viewdetails = () => {
 
   const projectdata = projectResponse?.data?.data;
   const availableUsers = availableUsersData?.data?.data || [];
-
-  const formatDate = (dateStr: string | null) =>
-    dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
 
   if (isLoading) {
     return (
@@ -293,7 +278,7 @@ const Viewdetails = () => {
                 Start Date:
               </span>
               <span className="text-sm">
-                {formatDate(projectdata?.start_date)}
+                {dayjs(projectdata?.start_date).format("DD-MM-YYYY")}
               </span>
             </p>
             <p className="flex flex-col">
@@ -301,7 +286,7 @@ const Viewdetails = () => {
                 Due Date:
               </span>
               <span className="text-sm">
-                {formatDate(projectdata?.due_date)}
+                {dayjs(projectdata?.due_date).format("DD-MM-YYYY")}
               </span>
             </p>
           </div>
@@ -314,10 +299,7 @@ const Viewdetails = () => {
               <div className="flex items-center gap-2">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
-                    <div
-                      ref={triggerRef}
-                      className="rounded border flex items-center justify-between px-2 py-1 cursor-pointer flex-1"
-                    >
+                    <div className="rounded border flex items-center justify-between px-2 py-1 cursor-pointer flex-1">
                       <span className="text-gray-500">
                         {selectedUsers.length > 0
                           ? selectedUsers
@@ -328,12 +310,7 @@ const Viewdetails = () => {
                       <ChevronDown className="w-5 h-5" />
                     </div>
                   </PopoverTrigger>
-                  <PopoverContent
-                    style={{
-                      width: triggerWidth ? `${triggerWidth}px` : "auto",
-                    }}
-                    className="p-0"
-                  >
+                  <PopoverContent className="p-0">
                     <Command>
                       <CommandInput
                         placeholder="Search users..."

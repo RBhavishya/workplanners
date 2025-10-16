@@ -30,6 +30,7 @@ import {
 import { TaskComments } from "./TaskComments";
 import { statusColors } from "@/lib/helpers/statusColors";
 import { statuses } from "@/lib/helpers/StatusFilter";
+import dayjs from "dayjs";
 
 const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
@@ -107,9 +108,6 @@ const TaskViewDetails = () => {
 
   const taskdata = taskResponse?.data?.data || {};
   const availableUsers = availableUsersData?.data?.data || [];
-
-  const formatDate = (dateStr: string | null) =>
-    dateStr ? new Date(dateStr).toLocaleDateString("en-CA") : "NA";
 
   const handleStatusChange = (newStatus: string) => {
     patchStatusMutation.mutate(newStatus);
@@ -241,13 +239,13 @@ const TaskViewDetails = () => {
               <span className="text-neutral-400 text-sm 3xl:!text-base">
                 Start Date
               </span>
-              <span className="text-sm">{formatDate(taskdata.start_date)}</span>
+              <span className="text-sm">{dayjs(taskdata.start_date).format("DD-MM-YYYY")}</span>
             </p>
             <p className="flex flex-col">
               <span className="text-neutral-400 text-sm 3xl:!text-base">
                 Due Date
               </span>
-              <span className="text-sm">{formatDate(taskdata.end_date)}</span>
+              <span className="text-sm">{dayjs(taskdata.end_date).format("DD-MM-YYYY")}</span>
             </p>
           </div>
 

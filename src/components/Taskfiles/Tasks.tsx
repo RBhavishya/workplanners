@@ -9,7 +9,6 @@ import { addSerial } from "@/lib/helpers/addSerial";
 import { useDebounce } from "@/lib/helpers/useDebounce";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { Edit, Eye, Trash } from "lucide-react";
 import { useState } from "react";
 import CountUp from "react-countup";
 import { DateRangePicker } from "rsuite";
@@ -25,6 +24,7 @@ import { PendingIcon } from "../icons/Dashboard/PendingIcon";
 import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
 import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
 import { taskColumns } from "./TaskColumns";
+import { getTaskActions } from "./TaskActions";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ const Tasks = () => {
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
-  const { isLoading, data, isFetching } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: [
       "tasks",
       pagination,
@@ -152,91 +152,44 @@ const Tasks = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-  const taskActions = [
+  const countData = [
     {
-      id: "actions",
-      header: () => <span>Actions</span>,
-      footer: (props: any) => props.column.id,
-      size: 50,
-      cell: (info: any) => {
-        const rowData = info.row.original;
-
-        return (
-          <div className="flex gap-3">
-            <Button
-              title="View"
-              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
-              variant={"ghost"}
-              onClick={() => navigate({ to: `/tasks/view/${rowData.id}` })}
-            >
-              <Eye size={16} />
-            </Button>
-
-            <Button
-              title="Edit"
-              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
-              variant={"ghost"}
-              onClick={() => navigate({ to: `/tasks/edit/${rowData.id}` })}
-            >
-              <Edit size={16} />
-            </Button>
-
-            <Button
-              title="Delete"
-              className="text-gray-600 hover:bg-gray-100 cursor-pointer p-0"
-              variant={"ghost"}
-              onClick={() => {
-                setTaskToDelete(rowData.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash size={16} />
-            </Button>
-          </div>
-        );
-      },
+      title: "Total Tasks",
+      value: stats?.total_tasks ?? 0,
+      icon: <TotalTaskIcon />,
     },
-  ];
+    {
+      title: "In Progress Tasks",
+      value: stats?.total_in_progress_tasks ?? 0,
+      icon: <ProgressIcon className="text-blue-700" />,
+    },
+    {
+      title: "Overdue Tasks",
+      value: stats?.total_overdue_tasks ?? 0,
+      icon: <PendingIcon />,
+    },
+
+  ]
 
   return (
     <div className="flex flex-col overflow-hidden gap-2 m-2 rounded-md">
       <div className="flex gap-6 bg-white p-2 rounded-md">
         <div className="flex justify-around rounded gap-1">
           <div className="flex flex-wrap gap-3">
-            <BigCard
-              title="Total Tasks"
-              value={
-                <CountUp
-                  start={0}
-                  end={stats?.total_tasks ?? 0}
-                  duration={1.5}
-                />
-              }
-              icon={<TotalTaskIcon />}
-            />
-
-            <BigCard
-              title="In Progress Tasks"
-              value={
-                <CountUp
-                  start={0}
-                  end={stats?.total_in_progress_tasks ?? 0}
-                  duration={1.5}
-                />
-              }
-              icon={<ProgressIcon className="text-blue-700" />}
-            />
-            <BigCard
-              title="Overdue Tasks"
-              value={
-                <CountUp
-                  start={0}
-                  end={stats?.total_overdue_tasks ?? 0}
-                  duration={1.5}
-                />
-              }
-              icon={<PendingIcon />}
-            />
+            {countData.map((item, index) => (
+              <BigCard
+                key={index}
+                title={item.title}
+                value={
+                  <CountUp
+                    start={0}
+                    end={item.value}
+                    duration={1.5}
+                  />
+                }
+                icon={item.icon}
+              />
+            ))}
           </div>
         </div>
         <WeeklySummary data={summary} />
@@ -269,7 +222,11 @@ const Tasks = () => {
         <div className="bg-white relative">
           <TanStackTable
             data={taksDataAfterSerial}
-            columns={[...taskColumns, ...taskActions]}
+            columns={[...taskColumns, ...getTaskActions({
+              navigate,
+              setTaskToDelete,
+              setDeleteDialogOpen,
+            }),]}
             paginationDetails={data?.data?.data?.pagination_info}
             getData={getAllTasks}
             loading={isLoading}

@@ -6,7 +6,7 @@ import {
 import { addSerial } from "@/lib/helpers/addSerial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 import SearchFilter from "../core/SearchFilter";
@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useDebounce } from "@/lib/helpers/useDebounce";
+import { getUserActions } from "./UserActions";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const UsersDetais = () => {
   const [searchString, setSearchString] = useState(
     searchParams.get("search") || ""
   );
-  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  const debouncedSearch = useDebounce(searchString, 500);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetError, setResetError] = useState("");
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
@@ -54,7 +56,7 @@ const UsersDetais = () => {
     order_by: orderBY,
   });
 
-  const { isLoading, data, isFetching } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["users", pagination, debouncedSearch, del, selectedRole],
     queryFn: async () => {
       if (location.pathname !== "/dashboard") {
@@ -79,8 +81,6 @@ const UsersDetais = () => {
 
       return response;
     },
-    retry: false,
-    refetchOnWindowFocus: false,
   });
 
   const users =
@@ -158,98 +158,6 @@ const UsersDetais = () => {
     }
   };
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchString);
-      if (searchString) {
-        getAllUsers({
-          pageIndex: 1,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      } else {
-        getAllUsers({
-          pageIndex: pageIndexParam,
-          pageSize: pageSizeParam,
-          order_by: orderBY,
-        });
-      }
-    }, 500);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchString, selectedRole]);
-
-  const userActions = [
-    {
-      id: "actions",
-      header: () => <span>Actions</span>,
-      footer: (props: any) => props.column.id,
-      size: 90,
-      cell: (info: any) => {
-        const rowData = info.row.original;
-        const isActive = rowData.user_status === "ACTIVE";
-
-        return (
-          <div className="flex gap-3">
-            <Button
-              title="Edit"
-              size="sm"
-              variant="ghost"
-              disabled={!isActive}
-              className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => navigate({ to: `/users/edit/${rowData.id}` })}
-            >
-              <img
-                src="/table/editicon.svg"
-                alt="edit"
-                height={16}
-                width={16}
-              />
-            </Button>
-
-            <Button
-              title="Reset password"
-              size="sm"
-              variant="ghost"
-              disabled={!isActive}
-              className="p-0 rounded-md border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => {
-                setUserToResetPassword(rowData.id);
-                setResetPasswordDialogOpen(true);
-                setSelectedRole("");
-              }}
-            >
-              <img
-                src="/table/resetpassword.svg"
-                alt="reset"
-                height={16}
-                width={16}
-              />
-            </Button>
-
-            <Button
-              title="Delete"
-              size="sm"
-              variant="ghost"
-              className="p-0 rounded-md  border-none flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer"
-              onClick={() => {
-                setUserToDelete(rowData.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <img
-                src="/table/deleteicon.svg"
-                alt="delete"
-                height={16}
-                width={16}
-              />
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
   return (
     <div className="card-container shadow-all border-none p-2 rounded-xl bg-white m-2">
       <div className="bg-white rounded-md ">
@@ -306,7 +214,14 @@ const UsersDetais = () => {
           <div className="mt-5">
             <TanStackTable
               data={users}
-              columns={[...usersColumns, ...userActions]}
+              columns={[...usersColumns, ...getUserActions({
+                navigate,
+                setUserToDelete,
+                setDeleteDialogOpen,
+                setUserToResetPassword,
+                setResetPasswordDialogOpen,
+                setSelectedRole,
+              })]}
               paginationDetails={data?.data?.data?.pagination_info}
               getData={getAllUsers}
               loading={isLoading}
@@ -333,7 +248,7 @@ const UsersDetais = () => {
           open={resetPasswordDialogOpen}
           onCancelClick={() => {
             setResetPasswordDialogOpen(false);
-            setResetError(""); // ✅ Clear error on cancel
+            setResetError("");
           }}
           onOKClick={handlePasswordUpdate}
           error={resetError}

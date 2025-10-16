@@ -7,7 +7,7 @@ import {
 } from "@/https/services/dashboard";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CountUp from "react-countup";
 import { ClockIcon } from "../icons/ClockIcon";
 import { GreenThickIcon } from "../icons/GreenThickIcon";
@@ -24,6 +24,8 @@ import TanStackTable from "../core/Tanstacktable";
 import SearchFilter from "../core/SearchFilter";
 import { DashboardCards } from "./DashboardCards";
 import { useDebounce } from "@/lib/helpers/useDebounce";
+import dayjs from "dayjs";
+import { NoDataIcon } from "../icons/NoIcons/NoDataIcon";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,11 +36,6 @@ const Dashboard = () => {
   const [pagination, setPagination] = useState({ pageIndex: 1, pageSize: 25 });
   const [searchString, setSearchString] = useState("");
   const debounceSearch = useDebounce(searchString, 500);
-
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
@@ -58,8 +55,6 @@ const Dashboard = () => {
       const response = await getDashboardStatsAPI();
       return response.data;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const { data: todaystats } = useQuery({
@@ -68,8 +63,6 @@ const Dashboard = () => {
       const response = await getTodayStatsAPI();
       return response.data;
     },
-    refetchOnWindowFocus: false,
-    retry: false,
   });
 
   const { data, isLoading } = useQuery({
@@ -104,7 +97,6 @@ const Dashboard = () => {
     if (search_string !== undefined) setSearchString(search_string);
   };
 
-  // Today Tasks with Infinite Scroll
   const {
     data: todaytasksPages,
     fetchNextPage,
@@ -193,7 +185,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Right Side - Today’s Task */}
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -267,10 +258,9 @@ const Dashboard = () => {
           ) : todaytasks.filter((task) =>
               todayFilter ? task.task_status === todayFilter : true
             ).length === 0 ? (
-            <div className="text-sm 3xl:!text-base text-gray-500 flex items-center justify-center h-full">
-              {todayFilter
-                ? `No ${todayFilter.toUpperCase()} tasks today`
-                : "No tasks for today"}
+            <div className="text-base text-gray-500 flex flex-col items-center justify-center h-full gap-2">
+              <NoDataIcon className="w-40 h-40"/>
+              No tasks found
             </div>
           ) : (
             todaytasks
@@ -291,7 +281,6 @@ const Dashboard = () => {
                       <p className="font-medium text-gray-600 capitalize text-sm 3xl:!text-base">
                         {task.task_title}
                       </p>
-                      {/* Task Status Icon */}
                       <div
                         className={
                           task.task_status === "COMPLETED"
@@ -319,13 +308,7 @@ const Dashboard = () => {
                       <p className="text-[11px] 3xl:!text-xs font-normal text-gray-700">
                         Due Date:{" "}
                         <span className="text-gray-500 font-normal">
-                          {task.end_date
-                            ? new Date(task.end_date).toLocaleString("en-GB", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })
-                            : "No due date"}
+                          {dayjs(task.end_date).format("DD-MM-YYYY")}
                         </span>
                       </p>
                       {/* Assigned Users */}

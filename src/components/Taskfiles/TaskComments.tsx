@@ -75,6 +75,7 @@ export function TaskComments() {
       handleChatSubmit();
     }
   };
+  
   const handleScroll = (e: any) => {
     const container = e.currentTarget as HTMLElement;
     if (
@@ -95,15 +96,6 @@ export function TaskComments() {
     );
   }
 
-  if (chatRecords.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-        <MessageSquareIcon size={40} className="mb-2 text-gray-400" />
-        <p className="text-sm">No comments yet. Be the first to comment!</p>
-      </div>
-    );
-  }
-
   let lastDate = "";
 
   return (
@@ -119,91 +111,101 @@ export function TaskComments() {
       </div>
 
       <div className="flex flex-col gap-2 h-[calc(100vh-270px)] overflow-y-auto pb-2" onScroll={handleScroll}>
-        {chatRecords.map((chat: any, index: number) => {
-          const isLoggedUser = chat.user?.id === loggedInUser.id;
-          const chatDate = dayjs(chat.created_at).format("DD-MM-YYYY");
-          const showDate = chatDate !== lastDate;
-          lastDate = chatDate;
+        {chatRecords.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-gray-500 h-full">
+            <MessageSquareIcon size={40} className="mb-2 text-gray-400" />
+            <p className="text-sm">No comments yet.</p>
+          </div>
+        ) : (
+          <>
+            {chatRecords.map((chat: any, index: number) => {
+              const isLoggedUser = chat.user?.id === loggedInUser.id;
+              const chatDate = dayjs(chat.created_at).format("DD-MM-YYYY");
+              const showDate = chatDate !== lastDate;
+              lastDate = chatDate;
 
-          return (
-            <div className="flex flex-col gap-2" key={index}>
-              {showDate && (
-                <p className="text-gray-400 text-xs 3xl:!text-sm text-center">
-                  ---- {chatDate} ----
-                </p>
-              )}
-
-              <div
-                className={`flex flex-col w-1/2 p-2 rounded ${
-                  isLoggedUser
-                    ? "ml-auto bg-violet-50 items-end"
-                    : "mr-auto bg-gray-100 items-start"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {isLoggedUser ? (
-                    <div className="flex flex-col items-end">
-                    <div className="flex items-center justify-between">
-                    <p className="text-[13px] text-black w-96 max-h-20 overflow-auto whitespace-pre-line break-words">
-                    {chat.description.charAt(0).toUpperCase() +
-                      chat.description.slice(1)}
-                  </p>
-                  <p className="text-[10px] text-black font-medium text-right">{dayjs(chat.created_at).format("hh:mm A")}</p>
-                  </div>
-                  </div>
-                  ) : (
-                    <div className="flex flex-col items-start">
-                    <div className="flex gap-2">
-                      <p className="w-6 h-6 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xs 3xl:!text-sm">
-                        {chat.user.display_name.charAt(0).toUpperCase()}
-                      </p>
-                      {chat.user && (
-                        <p className="capitalize text-sm 3xl:!text-base text-neutral-500 mb-1">
-                          {chat.user.display_name}
-                        </p>
-                      )}
-                      </div>
-                    <div className="flex items-center justify-between">
-                    <p className="text-[13px] text-black ml-8 w-88 max-h-20 overflow-auto whitespace-pre-line break-words ">
-                    {chat.description.charAt(0).toUpperCase() +
-                      chat.description.slice(1)}
-                  </p>
-                  <p className="text-[10px] text-black font-medium text-right">{dayjs(chat.created_at).format("hh:mm A")}</p>
-                  </div>
-                  </div>
+              return (
+                <div className="flex flex-col gap-2" key={index}>
+                  {showDate && (
+                    <p className="text-gray-400 text-xs 3xl:!text-sm text-center">
+                      ---- {chatDate} ----
+                    </p>
                   )}
+
+                  <div
+                    className={`flex flex-col w-1/2 p-2 rounded ${
+                      isLoggedUser
+                        ? "ml-auto bg-violet-50 items-end"
+                        : "mr-auto bg-gray-100 items-start"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {isLoggedUser ? (
+                        <div className="flex flex-col items-end">
+                        <div className="flex items-center justify-between">
+                        <p className="text-[13px] text-black w-96 overflow-auto whitespace-pre-line break-words">
+                        {chat.description.charAt(0).toUpperCase() +
+                          chat.description.slice(1)}
+                      </p>
+                      <p className="text-[10px] text-black font-medium text-right">{dayjs(chat.created_at).format("hh:mm A")}</p>
+                      </div>
+                      </div>
+                      ) : (
+                        <div className="flex flex-col items-start">
+                        <div className="flex gap-2">
+                          <p className="w-6 h-6 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xs 3xl:!text-sm">
+                            {chat.user.display_name.charAt(0).toUpperCase()}
+                          </p>
+                          {chat.user && (
+                            <p className="capitalize text-sm 3xl:!text-base text-neutral-500 mb-1">
+                              {chat.user.display_name}
+                            </p>
+                          )}
+                          </div>
+                        <div className="flex items-center justify-between">
+                        <p className="text-[13px] text-black ml-8 w-88 overflow-auto whitespace-pre-line break-words ">
+                        {chat.description.charAt(0).toUpperCase() +
+                          chat.description.slice(1)}
+                      </p>
+                      <p className="text-[10px] text-black font-medium text-right">{dayjs(chat.created_at).format("hh:mm A")}</p>
+                      </div>
+                      </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
-        {isFetchingNextPage && (
-            <div className="text-center py-2 text-gray-500">
-              Loading more...
-            </div>
-          )}
+              );
+            })}
+            {isFetchingNextPage && (
+                <div className="text-center py-2 text-gray-500">
+                  Loading more...
+                </div>
+              )}
+          </>
+        )}
       </div>
+      
       <div className="relative w-full border rounded-sm">
-      <Textarea
-        placeholder="Add a comment..."
-        className="w-205 h-10 p-2 placeholder:text-neutral-400 text-xs 3xl:!text-sm rounded resize-none pr-6 focus:ring-0 focus:outline-none border-none focus-visible:ring-0 break-words overflow-auto"
-        value={comment}
-        rows={3}
-        onChange={(e) => setComment(e.target.value)}
-        onKeyDown={(e) => handleKeyDown(e)}
-        onClick={handleChatSubmit}
-      />
-          <Button
-            type="button"
-            className="absolute top-2 right-2 bg-blue-700 hover:bg-blue-800 rounded-full cursor-pointer"
-          >
-            {addChatMutation.isPending ? (
-              <LoaderCircle className="text-white animate-spin w-5 h-5" />
-            ) : (
-              <Send className="!w-3.5 !h-3.5" />
-            )}
-          </Button>
-        </div>
+        <Textarea
+          placeholder="Add a comment..."
+          className="w-205 h-10 p-2 placeholder:text-neutral-400 text-xs 3xl:!text-sm rounded resize-none pr-6 focus:ring-0 focus:outline-none border-none focus-visible:ring-0 break-words overflow-auto"
+          value={comment}
+          rows={3}
+          onChange={(e) => setComment(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e)}
+        />
+        <Button
+          type="button"
+          className="absolute top-2 right-2 bg-blue-700 hover:bg-blue-800 rounded-full cursor-pointer"
+          onClick={handleChatSubmit}
+        >
+          {addChatMutation.isPending ? (
+            <LoaderCircle className="text-white animate-spin w-5 h-5" />
+          ) : (
+            <Send className="!w-3.5 !h-3.5" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
