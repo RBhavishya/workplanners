@@ -19,18 +19,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import DeleteProject from "./DeleteProject";
 import { NoProjectIcon } from "../icons/NoIcons/NoProjectIcon";
 import TanStackTable from "../core/Tanstacktable";
 import { getProjectColumns } from "./projectColumns";
 import { getAllUsersProjects } from "@/https/services/project";
 import { TruncatedText } from "../core/TruncatedText";
+import { SelectStatus } from "../core/SelectStatus";
+import { statusColors } from "@/lib/helpers/statusColors";
 
 const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
   const navigate = useNavigate();
   const router = useRouter();
   const location = useLocation();
@@ -40,32 +40,20 @@ const Projects = () => {
   };
   const pageIndexParam = Number(searchParams.get("page")) || 1;
   const pageSizeParam = Number(searchParams.get("page_size")) || 25;
-  const initialStatus = searchParams.get("project_status") || "";
-  const initialSearch = searchParams.get("search") || "";
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
-  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
-  // const [selectedSort, setSelectedSort] = useState(orderBY);
+  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("status"));
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const [searchString, setSearchString] = useState(initialSearch);
+  const [searchString, setSearchString] = useState(searchParams.get("search") || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
-
-  const statusColors: Record<string, string> = {
-    NEW: "bg-purple-100 text-purple-600",
-    IN_PROGRESS: "bg-blue-100 text-blue-600",
-    REVIEW: "bg-yellow-100 text-yellow-700",
-    OVERDUE: "bg-red-100 text-red-600",
-    COMPLETED: "bg-green-100 text-green-600",
-  };
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const { isLoading, isError, error, data, isFetching } = useQuery({
@@ -108,8 +96,14 @@ const Projects = () => {
     setPagination({ pageIndex, pageSize, order_by });
   };
 
-
   const handleNavigation = () => navigate({ to: `/projects/add` });
+
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+    if (newStatus !== "") {
+      setSelectedStatus(newStatus);
+    }
+  }
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -133,9 +127,6 @@ const Projects = () => {
     };
   }, [searchString, selectedStatus]);
 
-
-  
-
   useEffect(() => {
     router.navigate({
       to: "/projects",
@@ -153,58 +144,16 @@ const Projects = () => {
   return (
     <div className="relative overflow-x-auto rounded-xl p-2 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="font-medium text-xl 3xl:!text-2xl">Projects</h2>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3">
           <SearchFilter
             searchString={searchString}
             setSearchString={setSearchString}
             title="Search by Title"
           />
-
-          {/* Status Filter */}
-          <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 border border-neutral-300 bg-white px-2 py-1 rounded-sm cursor-pointer text-sm h-7">
-                <div className="flex items-center gap-2">
-                  <Filter className="text-purple-500" size={16} />
-                  <span>{selectedStatus || "Sort by"}</span>
-                </div>
-
-                {selectedStatus && (
-                  <X
-                    size={16}
-                    className="text-gray-400 hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedStatus("");
-                    }}
-                  />
-                )}
-              </button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
-              <div className="flex flex-col">
-                {["New", "In_Progress", "Review", "Overdue", "Completed"].map(
-                  (option) => (
-                    <div
-                      key={option}
-                      className="cursor-pointer hover:bg-gray-100 text-sm p-1"
-                      onClick={() => {
-                        setSelectedStatus(option);
-                        setStatusPopoverOpen(false);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  )
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
-
+          <SelectStatus selectedStatus={selectedStatus} handleStatusChange={handleStatusChange} />
           {/* View Toggle */}
           <div className="flex items-center bg-white p-0 border border-neutral-300 rounded-sm">
             <button

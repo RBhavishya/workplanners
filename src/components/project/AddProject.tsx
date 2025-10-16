@@ -35,7 +35,6 @@ import {
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import Loading from "../core/Loading";
 
 export interface AddProjectFormProps {
   mode: "create" | "edit";
@@ -429,7 +428,9 @@ const AddProjectForm = ({
                 />
                 <CommandList className="max-h-60 overflow-y-auto">
                   {isLoading ? (
-                    <Loading loading={isLoading} />
+                    <div className="flex items-center justify-center min-h-100">
+                    <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+                  </div>
                   ) : !Array.isArray(usersResp?.data.data) ||
                     usersResp?.data.data.length === 0 ? (
                     <CommandEmpty>No users found.</CommandEmpty>

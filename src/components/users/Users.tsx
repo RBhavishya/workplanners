@@ -14,9 +14,15 @@ import DeleteTaskDialog from "../core/TaskDeleteFilter";
 import TanStackTable from "../core/Tanstacktable";
 import { Button } from "../ui/button";
 import { usersColumns } from "./UsersColumns";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Filter, X } from "lucide-react";
-import Loading from "../core/Loading";
+import { userRole } from "@/lib/helpers/StatusFilter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const UsersDetais = () => {
   const navigate = useNavigate();
@@ -29,8 +35,9 @@ const UsersDetais = () => {
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
-  const initialSearch = searchParams.get("search") || "";
-  const [searchString, setSearchString] = useState(initialSearch);
+  const [searchString, setSearchString] = useState(
+    searchParams.get("search") || ""
+  );
   const [debouncedSearch, setDebouncedSearch] = useState(searchString);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetError, setResetError] = useState("");
@@ -39,9 +46,7 @@ const UsersDetais = () => {
   const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
     null
   );
-  const [selectedUserType, setSelectedUserType] = useState("");
-  const [filterOpen, setFilterOpen] = useState(false);
-
+  const [selectedRole, setSelectedRole] = useState("");
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -50,7 +55,7 @@ const UsersDetais = () => {
   });
 
   const { isLoading, data, isFetching } = useQuery({
-    queryKey: ["users", pagination, debouncedSearch, del, selectedUserType],
+    queryKey: ["users", pagination, debouncedSearch, del, selectedRole],
     queryFn: async () => {
       if (location.pathname !== "/dashboard") {
         router.navigate({
@@ -60,7 +65,7 @@ const UsersDetais = () => {
             page_size: Number(pagination.pageSize),
             order_by: pagination.order_by || undefined,
             search: debouncedSearch || undefined,
-            user_type: selectedUserType || undefined,
+            user_type: selectedRole || undefined,
           },
         });
       }
@@ -69,9 +74,9 @@ const UsersDetais = () => {
         pageSize: pagination.pageSize,
         order_by: pagination.order_by,
         search_string: debouncedSearch,
-        user_type: selectedUserType,
+        user_type: selectedRole,
       });
-      
+
       return response;
     },
     retry: false,
@@ -146,6 +151,13 @@ const UsersDetais = () => {
 
   const handleNavigation = () => navigate({ to: `/users/adduser` });
 
+  const handleRoleChange = (newRole: string) => {
+    setSelectedRole(newRole);
+    if (newRole !== "") {
+      setSelectedRole(newRole);
+    }
+  };
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchString);
@@ -166,7 +178,7 @@ const UsersDetais = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchString, selectedUserType]);
+  }, [searchString, selectedRole]);
 
   const userActions = [
     {
@@ -205,7 +217,7 @@ const UsersDetais = () => {
               onClick={() => {
                 setUserToResetPassword(rowData.id);
                 setResetPasswordDialogOpen(true);
-                setSelectedUserType("");
+                setSelectedRole("");
               }}
             >
               <img
@@ -247,44 +259,42 @@ const UsersDetais = () => {
             setSearchString={setSearchString}
             title="Find your Users"
           />
-          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 border border-neutral-300 bg-white px-2 py-1 rounded-sm cursor-pointer text-sm h-7">
-                <div className="flex items-center gap-2">
+          <div className="relative inline-block">
+            <Select value={selectedRole} onValueChange={handleRoleChange}>
+              <SelectTrigger className="flex items-center gap-2 bg-white border p-1 rounded-sm cursor-pointer text-sm !h-8 shadow-none focus-visible:ring-0 pr-5">
+                <div className="flex items-center gap-1">
                   <Filter className="text-purple-500" size={16} />
-                  <span>{selectedUserType || "Sort by"}</span>
+                  <SelectValue placeholder="Select role" />
                 </div>
+              </SelectTrigger>
 
-                {selectedUserType && (
-                  <X
-                    size={16}
-                    className="text-gray-400 hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedUserType("");
-                    }}
-                  />
-                )}
-              </button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-30 p-1 border rounded-md shadow-md">
-              <div className="flex flex-col">
-                {["MANAGER", "EMPLOYEE", "TEAM_LEAD"].map((option) => (
-                  <div
-                    key={option}
-                    className="cursor-pointer px-3 py-1 hover:bg-gray-100"
-                    onClick={() => {
-                      setSelectedUserType(option);
-                      setFilterOpen(false);
-                    }}
+              <SelectContent
+                className="max-w-38 border rounded-md shadow-md mx-auto"
+                align="center"
+              >
+                {userRole.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="cursor-pointer hover:bg-gray-100 text-sm p-1"
                   >
-                    {option.charAt(0).toUpperCase() + option.slice(1).toLowerCase()}
-                  </div>
+                    {option.label}
+                  </SelectItem>
                 ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+              </SelectContent>
+            </Select>
+
+            {selectedRole && (
+              <Button
+                type="button"
+                onClick={() => handleRoleChange("")}
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded flex items-center justify-center text-gray-400 hover:text-red-500 p-0 bg-transparent hover:bg-transparent shadow-none"
+                aria-label="Clear status"
+              >
+                <X size={16} />
+              </Button>
+            )}
+          </div>
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer"
             onClick={handleNavigation}
@@ -308,7 +318,7 @@ const UsersDetais = () => {
                 "task_status",
                 "actions",
               ]}
-              height='calc(100vh - 185px)'
+              height="calc(100vh - 185px)"
             />
           </div>
         </div>

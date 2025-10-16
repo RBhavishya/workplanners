@@ -1,14 +1,5 @@
-import { AddProjectData, ProjectData, TaskResponse, UsersDropdownResponse } from "@/interfaces/project";
+import { AddProjectData, GetAllPaginatedProjectsPropTypes, GetTasksByProjectIdParams, ProjectData, TaskResponse, UsersDropdownResponse } from "@/interfaces/project";
 import { $fetch } from "../fetch";
-
-interface GetAllPaginatedUsersPropTypes {
-  pageIndex: number;
-  pageSize: number;
-  viewMode: any;
-  order_by: any;
-  project_status: any;
-  search_string: any;
-}
 
 export const getAllUsersProjects = async ({
   pageIndex,
@@ -17,7 +8,7 @@ export const getAllUsersProjects = async ({
   order_by,
   project_status,
   search_string,
-}: GetAllPaginatedUsersPropTypes) => {
+}: GetAllPaginatedProjectsPropTypes) => {
   try {
     const queryParams = {
       page: pageIndex,
@@ -69,31 +60,12 @@ export const getAllUsersAPI = async (search: string = ""): Promise<UsersDropdown
   }
 };
 
-interface GetTasksByProjectIdParams {
-  projectId: number;
-  pageIndex: number;
-  pageSize: number;
-}
-
-interface GetTasksByProjectIdParams {
-  projectId: number;
-  pageIndex: number;
-  pageSize: number;
-}
-
-interface GetTasksByProjectIdParams {
-  projectId: number;
-  pageIndex: number;
-  pageSize: number;
-}
-
 export const getTasksByProjectId = async ({
   projectId,
   pageIndex,
   pageSize,
 }: GetTasksByProjectIdParams) => {
   try {
-    // Construct query string manually
     const query = `?page=${pageIndex}&page_size=${pageSize}`;
 
     const response = await $fetch.get(`/projects/${projectId}/tasks${query}`);
@@ -121,8 +93,6 @@ export const patchProjectStatusAPI = async(id: number, data: { project_status: s
   }
 }
 
-
-// GET /projects/:id/users/assigned
 export const getAssignedUsersAPI = async(id: number) =>{
   try{
     const response = await $fetch.get(`/projects/${id}/users/assigned`);
@@ -133,7 +103,6 @@ export const getAssignedUsersAPI = async(id: number) =>{
   }
 }
 
-// DELETE 
 export const deleteAssignedUserAPI = async (projectId: number, userId: number) => {
   try {
     const payload = { user_ids: [userId] };
@@ -144,10 +113,6 @@ export const deleteAssignedUserAPI = async (projectId: number, userId: number) =
   }
 };
 
-
-
-
-// GET /projects/:id/users/available
 export const getAvailableUsersAPI = async(id: number) =>{
   try{
     const response=await $fetch.get(`/projects/${id}/users/available`);
@@ -158,7 +123,6 @@ export const getAvailableUsersAPI = async(id: number) =>{
   }
 }
 
-// POST /projects/:id/users/:userId
 export const assignUserAPI = async (projectId: number, userId: number) => {
   try {
     const payload = {

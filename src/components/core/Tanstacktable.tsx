@@ -99,6 +99,14 @@ const TanStackTable: FC<pageProps> = ({
   return (
     <div className="flex flex-col w-full bg-white">
       <div className="overflow-auto" style={{ height: height }}>
+      {!data?.length && loading && (
+        <div
+        className="flex items-center justify-center overflow-hidden"
+        style={{ height: height }}
+      >
+        <img src="/6-dots-scale.svg" alt="loader" width={60} height={60} />
+      </div>
+      )}
         <table className="w-full text-sm table-fixed">
           <thead className="!sticky top-0 bg-white text-neutral-400 font-normal z-10">
             {table?.getHeaderGroups().map((headerGroup) => (
@@ -134,7 +142,7 @@ const TanStackTable: FC<pageProps> = ({
             ))}
           </thead>
           <tbody>
-            {data?.length ? (
+            {data?.length > 0 ? (
               table?.getRowModel().rows.map((row, rowIndex) => (
                 <tr
                   key={row.id}
@@ -159,7 +167,7 @@ const TanStackTable: FC<pageProps> = ({
                   ))}
                 </tr>
               ))
-            ) : !loading ? (
+            ) : (
               <tr>
                 <td
                   colSpan={columns.length}
@@ -196,31 +204,18 @@ const TanStackTable: FC<pageProps> = ({
                   )}
                 </td>
               </tr>
-            ) : (
-              <tr>
-                <td colSpan={columns.length}>
-                <div className="flex items-center justify-center">
-              <img
-                src="/6-dots-scale.svg"
-                alt="loader"
-                width={60}
-                height={60}
-              />
-            </div>
-                </td>
-              </tr>
             )}
           </tbody>
         </table>
-        </div>
-        <div className="sticky bottom-0">
-          <TasksPagination
-            paginationDetails={paginationDetails}
-            capturePageNum={capturePageNum}
-            captureRowPerItems={captureRowPerItems}
-          />
-        </div>
       </div>
+      <div className="sticky bottom-0">
+        <TasksPagination
+          paginationDetails={paginationDetails}
+          capturePageNum={capturePageNum}
+          captureRowPerItems={captureRowPerItems}
+        />
+      </div>
+    </div>
   );
 };
 
