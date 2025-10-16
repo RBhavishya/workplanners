@@ -48,7 +48,7 @@ const UsersDetais = () => {
   const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
     null
   );
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState(searchParams.get("user_type") || '');
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,

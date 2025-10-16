@@ -43,7 +43,7 @@ const Tasks = () => {
     searchParams.get("search") || ""
   );
   const [selectedStatus, setSelectedStatus] = useState(
-    searchParams.get("status") || ""
+    searchParams.get("task_status") || ""
   );
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

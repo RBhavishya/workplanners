@@ -47,7 +47,7 @@ const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
-  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("status"));
+  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("project_status") || '');
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
