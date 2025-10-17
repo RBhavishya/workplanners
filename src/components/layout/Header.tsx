@@ -13,11 +13,7 @@ import { toast } from "sonner";
 import dayjs from "dayjs";
 import { statusColors } from "@/lib/helpers/statusColors";
 
-type HeaderProps = {
-  renderCenter?: (() => React.ReactNode) | null;
-};
-
-const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
+export const Header = ({ renderCenter }) => {
   const [time, setTime] = useState(new Date("2025-09-12T13:43:00+05:30"));
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -289,5 +285,3 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
     </header>
   );
 };
-
-export default Header;

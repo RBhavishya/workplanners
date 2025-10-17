@@ -347,7 +347,7 @@ const AddProjectForm = ({
                   }
                 }}
                 disabled={(date) =>
-                  !startDate || dayjs(date).isBefore(dayjs(startDate), "day")
+                  !startDate || dayjs(date).isSame(dayjs(startDate), "day") || dayjs(date).isBefore(dayjs(startDate), "day")
                 }
               />
             </PopoverContent>
