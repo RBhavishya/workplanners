@@ -32,7 +32,7 @@ import { statusColors } from "@/lib/helpers/statusColors";
 import { statuses } from "@/lib/helpers/StatusFilter";
 import dayjs from "dayjs";
 
-const TaskViewDetails = () => {
+export const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
   const queryClient = useQueryClient();
   const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
@@ -369,5 +369,3 @@ const TaskViewDetails = () => {
     </div>
   );
 };
-
-export default TaskViewDetails;

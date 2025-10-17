@@ -24,7 +24,6 @@ const Sidebar = () => {
 
   return (
     <aside className="w-54 bg-white border-r fixed left-0 top-0 h-full p-0 flex flex-col shadow-none z-10">
-      {/* <div className='border-b p-3'> <UserDetails/></div> */}
       <nav className="flex flex-col space-y-4 mt-15 p-3 flex-grow">
         {user_type !== "EMPLOYEE" && user_type !== "TEAM_LEAD" && (
           <Link

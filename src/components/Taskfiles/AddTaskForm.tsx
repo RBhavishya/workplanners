@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar as CalendarIcon,
   ChevronDown,
@@ -35,23 +35,19 @@ import { Button } from "../ui/button";
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
 
-const AddTaskForm = ({
-  taskId = null,
+export const AddTaskForm = ({
   taskData = null,
   onSave,
 }: {
   mode?: "create" | "edit";
-  taskId?: any;
   taskData?: any;
   onSave?: (data: any) => void;
 }) => {
-  const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params?.id ? Number(params.id) : null;
   const mode = id ? "edit" : "create";
   const queryClient = useQueryClient();
   const router = useRouter();
-  // States
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -80,22 +76,25 @@ const AddTaskForm = ({
 
   const {
     data: taskResp,
-    isLoading: loadingTask,
     isError,
+    error
   } = useQuery({
     queryKey: ["task", id],
     queryFn: () => getTaskByIdAPI(Number(id)),
     enabled: !!id,
   });
 
-  // Fetch Projects
-  const { data: projects = [], isLoading: loadingProjects } = useQuery({
+  if(isError) toast.error(error?.message || "Failed to fetch task details");
+
+  const { data: projects = [], isLoading: loadingProjects, isError: isErrorProjects, error: errorProjects } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await getDropDownForProjectsTasksAPI();
       return res.data?.data ?? [];
     },
   });
+
+  if(isErrorProjects) toast.error(errorProjects?.message || "Failed to fetch projects");
 
   // Fetch Users for selected project (only create mode)
   const { data: usersResp = [], isLoading: loadingUsers } = useQuery({
@@ -627,5 +626,3 @@ const AddTaskForm = ({
     </div>
   );
 };
-
-export default AddTaskForm;
