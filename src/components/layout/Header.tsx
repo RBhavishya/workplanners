@@ -63,7 +63,7 @@ export const Header = ({ renderCenter }) => {
 
   const centerContent = renderCenter ? renderCenter() : defaultCenter;
 
-  const getAllNotifications = async (page = 1) => {
+  const getAllNotifications = async (page = paginationInfo.current_page) => {
     try {
       const response = await getAllNotificationsAPI({
         current_page: page,
@@ -71,13 +71,13 @@ export const Header = ({ renderCenter }) => {
       });
 
       if (response?.status === 200 || response?.status === 201) {
-        const { records, pagination_records } = response.data.data || {};
+        const { records, pagination_info } = response.data.data || {};
 
         if (Array.isArray(records)) {
           setNotificationsData((prev: any[]) =>
             page === 1 ? records : [...prev, ...records]
           );
-          setPaginationInfo(pagination_records);
+          setPaginationInfo(pagination_info);
         } else {
           setNotificationsData([]);
         }

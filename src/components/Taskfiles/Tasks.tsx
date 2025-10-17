@@ -62,6 +62,10 @@ const Tasks = () => {
 
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
+    const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const user_id = user?.id;
+
 
   const {  data, isFetching } = useQuery({
     queryKey: [
@@ -71,6 +75,7 @@ const Tasks = () => {
       dateValue,
       del,
       selectedStatus,
+      user_id
     ],
     queryFn: async () => {
       const response = await getAllPaginatedTasks({
@@ -93,7 +98,7 @@ const Tasks = () => {
   });
 
   const { data: stats } = useQuery({
-    queryKey: ["tasksStats"],
+    queryKey: ["tasksStats",user_id],
     queryFn: async () => {
       const response = await getTasksStatsAPI();
       return response.data;
@@ -101,7 +106,7 @@ const Tasks = () => {
   });
 
   const { data: summary } = useQuery({
-    queryKey: ["weeklySummary"],
+    queryKey: ["weeklySummary",user_id],
     queryFn: async () => {
       const response = await getWeaklySummaryAPI();
       return response.data;
