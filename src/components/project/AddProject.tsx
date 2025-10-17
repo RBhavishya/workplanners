@@ -88,7 +88,7 @@ const AddProjectForm = ({
 
   const { data: usersResp, isLoading } = useQuery<UsersDropdownResponse>({
     queryKey: ["users", search],
-    queryFn: () => getAllUsersAPI(search),
+    queryFn: () => getAllUsersAPI(),
     enabled: true,
   });
 
@@ -225,12 +225,7 @@ const AddProjectForm = ({
           </h2>
         </span>
       </div>
-      {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm 3xl:!text-base">
-          {formError}
-        </div>
-      )}
-
+      
       <div className="flex flex-col gap-2 mb-4">
         <label className={Form_STYLES.label}>
           Project Title <span className="text-red-500">*</span>
@@ -246,25 +241,24 @@ const AddProjectForm = ({
           className={Form_STYLES.input}
         />
         {errors.title && (
-          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">{errors.title.join(", ")}</p>
+          <p className="text-red-500 text-xs 3xl:!text-sm">{errors.title.join(", ")}</p>
         )}
       </div>
       <div className="flex flex-col gap-2 mb-4">
         <label className={Form_STYLES.label}>
-          Project Description <span className="text-red-500">*</span>
+          Project Description
         </label>
         <textarea
           placeholder="Enter project description"
           value={description}
-          // onChange={(e) => setDescription(e.target.value)}
           onChange={(e) => {
             setDescription(e.target.value);
-            clearFieldError("description"); // <-- remove error as user types
+            clearFieldError("description");
           }}
-          className={`${Form_STYLES.input} resize-none placeholder:font-normal`}
+          className={`${Form_STYLES.input} resize-none placeholder:font-normal h-20`}
         />
         {errors.description && (
-          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm">
             {errors.description.join(", ")}
           </p>
         )}
@@ -313,7 +307,7 @@ const AddProjectForm = ({
             </PopoverContent>
           </Popover>
           {errors?.start_date && (
-            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm">
               {errors.start_date.join(", ")}
             </p>
           )}
@@ -359,7 +353,7 @@ const AddProjectForm = ({
             </PopoverContent>
           </Popover>
           {errors?.due_date && (
-            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm">
               {errors.due_date.join(", ")}
             </p>
           )}
@@ -459,7 +453,7 @@ const AddProjectForm = ({
             </PopoverContent>
           </Popover>
           {errors.assigned_users && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="text-red-500 text-xs">
               {errors.assigned_users.join(", ")}
             </p>
           )}
@@ -493,7 +487,7 @@ const AddProjectForm = ({
           />
         </div>
         {errors.links && (
-          <p className="text-red-500 text-xs mt-1">{errors.links.join(", ")}</p>
+          <p className="text-red-500 text-xs">{errors.links.join(", ")}</p>
         )}
       </div>
       <div className="flex justify-end gap-2 mt-4">

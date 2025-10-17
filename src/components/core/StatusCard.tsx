@@ -37,7 +37,7 @@ const statusConfig: Record<
     circleBg: "bg-rose-400",
     circleText: "text-white",
   },
-  "New": {
+  "Todo": {
     bg: "bg-purple-100",
     circleBg: "bg-purple-600",
     circleText: "text-white",

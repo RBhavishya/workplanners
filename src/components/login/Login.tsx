@@ -64,27 +64,6 @@ const LoginPage: React.FC = () => {
     },
   });
 
-  // Slack Callback
-  // const slackCallbackMutation = useMutation({
-  //   mutationFn: slackCallbackAPI,
-  //   onSuccess: (data) => {
-  //     if (data?.status === 200) {
-  //       const user = data?.data?.data.user;
-  //       const jwt_token = data?.data?.data.jwt_token;
-
-  //       Cookies.set("user", JSON.stringify(user));
-  //       localStorage.setItem("user", JSON.stringify(user));
-  //       Cookies.set("token", jwt_token.access_token);
-  //       Cookies.set("refreshToken", jwt_token.refresh_token);
-
-  //       navigate({ to: "/dashboard" });
-  //     }
-  //   },
-  //   onError: () => {
-  //     navigate({ to: "/" });
-  //   },
-  // });
-
   const slackCallbackMutation = useMutation({
     mutationFn: slackCallbackAPI,
     onSuccess: (data: any) => {
@@ -99,7 +78,6 @@ const LoginPage: React.FC = () => {
         Cookies.set("token", jwt_token.access_token);
         Cookies.set("refreshToken", jwt_token.refresh_token);
 
-        // ✅ Role-based redirect
         let redirectPath = "/dashboard";
         switch (user.user_type) {
           case "EMPLOYEE":
@@ -131,7 +109,7 @@ const LoginPage: React.FC = () => {
       toast.success(res?.data?.message || "Login successful");
       const { access_token, user_details } = res?.data?.data;
 
-      Cookies.set("token", access_token, { priority: "High" });
+      Cookies.set("token", access_token);
       localStorage.setItem("user", JSON.stringify(user_details));
       setErrors({});
 

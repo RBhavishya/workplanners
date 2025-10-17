@@ -198,7 +198,7 @@ const Viewdetails = () => {
             <SmallCard
               cards={[
                 { title: "Total", value: status?.data?.total_count },
-                { title: "New", value: status?.data?.new_count },
+                { title: "TODO", value: status?.data?.new_count },
                 {
                   title: "In Progress",
                   value: status?.data?.inProgress_count,

@@ -11,17 +11,10 @@ import {
 } from "@/https/services/notifications";
 import { toast } from "sonner";
 import dayjs from "dayjs";
+import { statusColors } from "@/lib/helpers/statusColors";
 
 type HeaderProps = {
   renderCenter?: (() => React.ReactNode) | null;
-};
-
-const statusColors: Record<string, string> = {
-  NEW: "text-purple-600",
-  IN_PROGRESS: "text-blue-600",
-  REVIEW: "text-yellow-700",
-  OVERDUE: "text-red-600",
-  COMPLETED: "text-green-600",
 };
 
 const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
@@ -166,28 +159,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
       );
     }
   };
-
-  //  useEffect(() => {
-  //   // const socket = io("https://dev-api-tm.labsquire.com/", {
-  //   //   transports: ["polling", "websocket"],
-  //   // });
-  //   const socket = io(import.meta.env.VITE_SOCKET_URL, {
-  //     transports: ["polling", "websocket"],
-  //   });
-
-  //   socket.on("connect", () => {
-  //     console.log("Connected to echo server");
-  //   });
-  //   socket.on("notification", (count) => {
-  //     setNotificationCount(count);
-  //     // getAllNotificationsCount();
-  //     // getAllNotifications();
-  //   });
-  //   return () => {
-  //     socket.off("notification");
-  //   };
-  // }, []);
-
+  
   return (
     <header className="flex items-center justify-between p-2 bg-white border-b">
       {centerContent}
@@ -278,7 +250,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                           dangerouslySetInnerHTML={{
                             __html:
                               notification.description?.replace(
-                                /NEW|IN_PROGRESS|REVIEW|OVERDUE|COMPLETED/gi,
+                                /TODO|IN_PROGRESS|REVIEW|OVERDUE|COMPLETED/gi,
                                 (match) => {
                                   const colorClass =
                                     statusColors[match.toUpperCase()] ||
@@ -300,7 +272,7 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
                       </li>
                     ))}
                   </ul>
-                  {paginationInfo.current_page < paginationInfo.total_pages && (
+                  {paginationInfo?.current_page < paginationInfo?.total_pages && (
                     <div className="text-center text-xs text-gray-500 mt-2">
                       Loading more notifications...
                     </div>
@@ -311,8 +283,6 @@ const Header: React.FC<HeaderProps> = ({ renderCenter }) => {
               )}
             </PopoverContent>
           </Popover>
-
-          {/* User details */}
           <UserDetails />
         </div>
       </div>

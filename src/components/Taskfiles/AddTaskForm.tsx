@@ -24,7 +24,7 @@ import {
   createTaskAPI,
   getDropDownForProjectsTasksAPI,
   getSingleDropDownForAssignedUsersAPI,
-  gettasksByIdAPI,
+  getTaskByIdAPI,
   updateTasksAPI,
 } from "@/https/services/tasks";
 import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
@@ -77,8 +77,6 @@ const AddTaskForm = ({
   );
   const [searchProjects, setSearchProjects] = useState("");
   const [searchUsers, setSearchUsers] = useState("");
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
 
   const {
     data: taskResp,
@@ -86,7 +84,7 @@ const AddTaskForm = ({
     isError,
   } = useQuery({
     queryKey: ["task", id],
-    queryFn: () => gettasksByIdAPI(Number(id)),
+    queryFn: () => getTaskByIdAPI(Number(id)),
     enabled: !!id,
   });
 
@@ -207,10 +205,6 @@ const AddTaskForm = ({
 
   const removeAll = (setList: React.Dispatch<React.SetStateAction<number[]>>) =>
     setList([]);
-
-  useEffect(() => {
-    if (triggerRef.current) setTriggerWidth(triggerRef.current.offsetWidth);
-  }, [projectPopoverOpen, userPopoverOpen]);
 
   useEffect(() => {
     if (mode === "edit" && taskResp?.data?.data) {
@@ -419,7 +413,6 @@ const AddTaskForm = ({
           >
             <PopoverTrigger asChild>
               <div
-                ref={triggerRef}
                 className="rounded border border-purple-300 bg-gray-50 flex items-center justify-between px-2 py-2 cursor-pointer"
               >
                 {selectedProject ? (
@@ -448,7 +441,6 @@ const AddTaskForm = ({
               </div>
             </PopoverTrigger>
             <PopoverContent
-              style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
               className="p-0"
             >
               <Command>
@@ -544,7 +536,6 @@ const AddTaskForm = ({
               </div>
             </PopoverTrigger>
             <PopoverContent
-              style={{ width: triggerWidth ? `${triggerWidth}px` : "auto" }}
               className="p-0"
             >
               <Command>

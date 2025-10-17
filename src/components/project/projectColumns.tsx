@@ -7,15 +7,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import dayjs from "dayjs";
-import { TruncatedText } from "../core/TruncatedText";
-
-const statusColors: Record<string, string> = {
-  NEW: "bg-purple-100 text-purple-600",
-  IN_PROGRESS: "bg-blue-100 text-blue-600",
-  REVIEW: "bg-yellow-100 text-yellow-700",
-  OVERDUE: "bg-red-100 text-red-600",
-  COMPLETED: "bg-green-100 text-green-600",
-};
+import { statusColors } from "@/lib/helpers/statusColors";
 
 export const getProjectColumns = (navigate: any, user: any, onDelete: any) => {
   return [

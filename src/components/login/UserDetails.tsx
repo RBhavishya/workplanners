@@ -12,24 +12,11 @@ import ResetPasswordDialog from "../core/ResetPasswordDialoge";
 import { useMutation } from "@tanstack/react-query";
 import { resetPasswordUsersAPI } from "@/https/services/users";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
-
-interface User {
-  id: number;
-  slack_id: string;
-  user_name: string;
-  display_name: string;
-  email: string;
-  profile_pic: string;
-  designation: string;
-  phone: string;
-  user_type: string;
-  user_status: string;
-  created_at: string;
-}
+import Cookies from "js-cookie";
+import { UserDetailsProps } from "@/interfaces/users";
 
 const UserDetails: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserDetailsProps | null>(null);
   const navigate = useNavigate();
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [resetError, setResetError] = useState("");
@@ -85,6 +72,7 @@ const UserDetails: React.FC = () => {
   if (!user) return <p className="text-gray-500">No user data found</p>;
 
   const handleLogout = () => {
+    Cookies.remove("token");
     localStorage.removeItem("user");
     navigate({ to: "/" });
   };
