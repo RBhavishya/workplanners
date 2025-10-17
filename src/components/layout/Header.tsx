@@ -11,7 +11,14 @@ import {
 } from "@/https/services/notifications";
 import { toast } from "sonner";
 import dayjs from "dayjs";
-import { statusColors } from "@/lib/helpers/statusColors";
+
+export const statusColors: Record<string, string> = {
+  TODO: "text-purple-600",
+  IN_PROGRESS: "text-blue-600",
+  REVIEW: "text-yellow-700",
+  OVERDUE: "text-red-600",
+  COMPLETED: "text-green-600",
+};
 
 export const Header = ({ renderCenter }) => {
   const [time, setTime] = useState(new Date("2025-09-12T13:43:00+05:30"));
