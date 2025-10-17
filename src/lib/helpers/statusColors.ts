@@ -1,5 +1,5 @@
 export const statusColors: Record<string, string> = {
-  NEW: "bg-purple-100 text-purple-600",
+  TODO: "bg-purple-100 text-purple-600",
   IN_PROGRESS: "bg-blue-100 text-blue-600",
   REVIEW: "bg-yellow-100 text-yellow-700",
   OVERDUE: "bg-red-100 text-red-600",

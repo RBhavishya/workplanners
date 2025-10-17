@@ -1,5 +1,5 @@
 export const statuses = [
-    { value: "NEW", label: "New" },
+    { value: "TODO", label: "Todo" },
     { value: "IN_PROGRESS", label: "In Progress" },
     { value: "COMPLETED", label: "Completed" },
     { value: "OVERDUE", label: "Overdue" },

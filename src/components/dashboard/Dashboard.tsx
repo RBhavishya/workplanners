@@ -186,12 +186,9 @@ const Dashboard = () => {
       </div>
 
       <div className="w-1/3 bg-white rounded-none border-l p-2 flex flex-col h-[calc(100vh-60px)] overflow-auto">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mt-2 mb-6">
           <div>
             <h2 className="text-lg 3xl:!text-xl font-medium">Task's Tracker</h2>
-            <p className="text-sm 3xl:!text-base text-gray-500">
-              {formattedDate}
-            </p>
           </div>
           <Button
             className="bg-purple-600 hover:bg-purple-700 text-white h-7 rounded font-light px-3 cursor-pointer text-xs 3xl:!text-sm"
@@ -289,7 +286,7 @@ const Dashboard = () => {
                                   "IN_PROGRESS",
                                   "OVERDUE",
                                   "REVIEW",
-                                  "NEW",
+                                  "TODO",
                                 ].includes(task.task_status)
                               ? "text-yellow-500"
                               : "text-gray-400"

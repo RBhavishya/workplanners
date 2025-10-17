@@ -60,10 +60,6 @@ const Tasks = () => {
   );
   const debouncedSearch = useDebounce(searchString, 500);
 
-    const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const user_id = user?.id;
-
   const formatDate = (date: Date) =>
     date ? date.toLocaleDateString("en-CA") : undefined;
 
@@ -75,7 +71,6 @@ const Tasks = () => {
       dateValue,
       del,
       selectedStatus,
-      user_id
     ],
     queryFn: async () => {
       const response = await getAllPaginatedTasks({
@@ -264,7 +259,7 @@ const Tasks = () => {
               "task_status",
               "actions",
             ]}
-            height="calc(100vh - 295px)"
+            height="calc(100vh - 293px)"
           />
         </div>
         <DeleteTaskDialog

@@ -51,9 +51,9 @@ export const updateProjectAPI = async (id: number, updatedProject: Partial<Proje
   }
 };
 
-export const getAllUsersAPI = async (search: string = ""): Promise<UsersDropdownResponse> => {
+export const getAllUsersAPI = async (): Promise<UsersDropdownResponse> => {
   try {
-    const response = await $fetch.get(`/users/dropdown?search_string=${encodeURIComponent(search)}`);
+    const response = await $fetch.get(`/users/dropdown`);
     return response;
   } catch (error) {
     throw error;

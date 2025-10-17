@@ -58,15 +58,6 @@ export const updateTasksAPI = async (id: number, payload: any) => {
   }
 };
 
-export const gettasksByIdAPI = async (id: number) => {
-  try {
-    const response = await $fetch.get(`/tasks/${id}`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const deleteTasksAPI = async (id: number) => {
   try {
     const payload = { task_ids: [id] };

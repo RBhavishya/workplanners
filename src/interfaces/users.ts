@@ -14,3 +14,17 @@ export interface UserActionsProps {
   setResetPasswordDialogOpen: (value: boolean) => void;
   setSelectedRole: (value: string) => void;
 }
+
+export interface UserDetailsProps {
+  id: number;
+  slack_id: string;
+  user_name: string;
+  display_name: string;
+  email: string;
+  profile_pic: string;
+  designation: string;
+  phone: string;
+  user_type: string;
+  user_status: string;
+  created_at: string;
+}
