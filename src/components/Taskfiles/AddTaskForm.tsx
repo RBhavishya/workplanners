@@ -143,7 +143,7 @@ export const AddTaskForm = ({
       payload: any;
     }) => {
       return await updateTasksAPI(taskId, payload);
-    },
+    }, 
     onSuccess: async (res: any) => {
       toast.success(res?.message || "Task updated successfully!");
       router.history.back();
