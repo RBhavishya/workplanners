@@ -49,6 +49,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ projectId }) => {
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Task deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {

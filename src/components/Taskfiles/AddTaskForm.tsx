@@ -119,7 +119,7 @@ export const AddTaskForm = ({
       setSuccessMessage("Task created successfully!");
       onSave?.(res?.data?.data);
       router.history.back();
-      await queryClient.refetchQueries({ queryKey: ["tasks"] });
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"] });
     },
     onError: (error: any) => {
       setErrors({});
@@ -147,7 +147,7 @@ export const AddTaskForm = ({
     onSuccess: async (res: any) => {
       toast.success(res?.message || "Task updated successfully!");
       router.history.back();
-      await queryClient.refetchQueries({ queryKey: ["tasks"] });
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"] });
     },
     onError: (error: any) => {
       setErrors({});

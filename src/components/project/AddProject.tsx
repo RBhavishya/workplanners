@@ -119,9 +119,9 @@ const AddProjectForm = ({
   const updateMutation = useMutation({
     mutationFn: (updatedProject: AddProjectData) =>
       updateProjectAPI(projectId!, updatedProject),
-    onSuccess: async (data) => {
-      await queryClient.refetchQueries({ queryKey: ["projects"] });
-      await queryClient.refetchQueries({ queryKey: ["project", projectId] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", projectId!] });
       toast.success(data.message || "Project updated successfully");
       onSave?.(data.data);
       navigate({ to: "/projects" });

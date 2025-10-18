@@ -61,7 +61,7 @@ export const TaskViewDetails = () => {
     onSuccess: async () => {
       toast.success("Status updated successfully");
       await queryClient.refetchQueries({ queryKey: ["project", id] });
-      await queryClient.refetchQueries({ queryKey: ["tasks"]});
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayTasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayStats"]});
     },
