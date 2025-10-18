@@ -37,10 +37,11 @@ const UsersDetais = () => {
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
-  const [searchString, setSearchString] = useState(
-    searchParams.get("search") || ""
-  );
-  const debouncedSearch = useDebounce(searchString, 500);
+     const initialSearch = searchParams.get("search") || "";
+     const initialRole = searchParams.get("user_type") || '';
+    const [searchString, setSearchString] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  // const debouncedSearch = useDebounce(searchString, 500);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetError, setResetError] = useState("");
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
@@ -48,7 +49,7 @@ const UsersDetais = () => {
   const [userToResetPassword, setUserToResetPassword] = useState<number | null>(
     null
   );
-  const [selectedRole, setSelectedRole] = useState(searchParams.get("user_type") || '');
+  const [selectedRole, setSelectedRole] = useState(initialRole);
   const [del, setDel] = useState<any>(1);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
@@ -143,6 +144,28 @@ const UsersDetais = () => {
       }
     },
   });
+
+    useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString || selectedRole) {
+        getAllUsers({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllUsers({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchString,selectedRole]);
 
   const handleDeleteClick = () => {
     if (userToDelete) {

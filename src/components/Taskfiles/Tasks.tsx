@@ -38,14 +38,13 @@ const Tasks = () => {
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
+  const initialSearch = searchParams.get("search") || "";
   const initialStartDate = searchParams.get("from_date") || null;
   const initialEndDate = searchParams.get("to_date") || null;
-  const [searchString, setSearchString] = useState(
-    searchParams.get("search") || ""
-  );
-  const [selectedStatus, setSelectedStatus] = useState(
-    searchParams.get("task_status") || ""
-  );
+    const initialStatus = searchParams.get("task_status") || "";
+ const [searchString, setSearchString] = useState<any>(initialSearch);
+    const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [del, setDel] = useState<any>(1);
@@ -59,7 +58,7 @@ const Tasks = () => {
       ? [new Date(initialStartDate), new Date(initialEndDate)]
       : null
   );
-  const debouncedSearch = useDebounce(searchString, 500);
+  // const debouncedSearch = useDebounce(searchString, 500);
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -174,6 +173,29 @@ const Tasks = () => {
     },
 
   ]
+
+   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString || selectedStatus || dateValue) {
+        getAllTasks({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllTasks({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchString, selectedStatus, dateValue]);
+
 
   useEffect(() => {
       router.navigate({
