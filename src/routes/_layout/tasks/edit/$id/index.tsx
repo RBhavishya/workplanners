@@ -1,4 +1,4 @@
-import AddTaskForm from '@/components/Taskfiles/AddTaskForm';
+import { AddTaskForm } from '@/components/Taskfiles/AddTaskForm';
 import { createFileRoute, useParams } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_layout/tasks/edit/$id/')({

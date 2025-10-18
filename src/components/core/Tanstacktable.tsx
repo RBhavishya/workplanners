@@ -96,6 +96,12 @@ const TanStackTable: FC<pageProps> = ({
     });
   };
 
+  const NODATA_STYLES = {
+    div: "flex flex-col items-center justify-center gap-2 mt-20",
+    p: "text-base 3xl:!text-lg text-[#828282] font-normal"
+
+  }
+
   return (
     <div className="flex flex-col w-full bg-white">
       <div className="overflow-auto" style={{ height: height }}>
@@ -174,30 +180,30 @@ const TanStackTable: FC<pageProps> = ({
                   className="text-gray-500 text-center"
                 >
                   {location.pathname.includes("tasks") ? (
-                    <div className="flex flex-col items-center justify-center gap-2 mt-20">
+                    <div className={NODATA_STYLES.div}>
                       <NoTasksIcon className="w-60 h-60" />
-                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                      <p className={NODATA_STYLES.p}>
                         No Tasks Found
                       </p>
                     </div>
                   ) : location.pathname.includes("projects") ? (
-                    <div className="flex flex-col items-center justify-center gap-2 mt-20">
+                    <div className={NODATA_STYLES.div}>
                       <NoProjectIcon />
-                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                      <p className={NODATA_STYLES.p}>
                         No Projects Found
                       </p>
                     </div>
                   ) : location.pathname.includes("dashboard") ? (
-                    <div className="flex flex-col items-center justify-center gap-2 mt-20">
+                    <div className={NODATA_STYLES.div}>
                       <NoDataIcon className="w-50 h-50"/>
-                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                      <p className={NODATA_STYLES.p}>
                         No Data Found
                       </p>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-2 mt-20">
+                    <div className={NODATA_STYLES.div}>
                       <NoUsersIcon />
-                      <p className="text-base 3xl:!text-lg text-[#828282] font-normal">
+                      <p className={NODATA_STYLES.p}>
                         No Users Found
                       </p>
                     </div>

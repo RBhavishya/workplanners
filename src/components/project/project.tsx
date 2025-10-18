@@ -8,7 +8,7 @@ import {
   useRouter,
   useSearch,
 } from "@tanstack/react-router";
-import { Filter, LayoutGrid, List, MoreVertical, Plus, X } from "lucide-react";
+import { LayoutGrid, List, MoreVertical, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import SearchFilter from "../core/SearchFilter";
 import TasksPagination from "../core/TasksPagination";
@@ -29,7 +29,7 @@ import { SelectStatus } from "../core/SelectStatus";
 import { statusColors } from "@/lib/helpers/statusColors";
 import { useDebounce } from "@/lib/helpers/useDebounce";
 
-const Projects = () => {
+export const Projects = () => {
   const [deleteTarget, setDeleteTarget] = useState<ProjectData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const navigate = useNavigate();
@@ -320,5 +320,3 @@ const Projects = () => {
     </div>
   );
 };
-
-export default Projects;

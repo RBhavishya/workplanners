@@ -32,7 +32,7 @@ import { statusColors } from "@/lib/helpers/statusColors";
 import { statuses } from "@/lib/helpers/StatusFilter";
 import dayjs from "dayjs";
 
-const TaskViewDetails = () => {
+export const TaskViewDetails = () => {
   const { id } = useParams({ from: "/_layout/tasks/view/$id/" });
   const queryClient = useQueryClient();
   const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
@@ -61,7 +61,7 @@ const TaskViewDetails = () => {
     onSuccess: async () => {
       toast.success("Status updated successfully");
       await queryClient.refetchQueries({ queryKey: ["project", id] });
-      await queryClient.refetchQueries({ queryKey: ["tasks"]});
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayTasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayStats"]});
     },
@@ -369,5 +369,3 @@ const TaskViewDetails = () => {
     </div>
   );
 };
-
-export default TaskViewDetails;

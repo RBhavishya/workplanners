@@ -1,4 +1,3 @@
-import React from 'react';
 import SmallCard from '../core/StatusCard';
 const CustomCenter = ({ cards }) => {
   return (

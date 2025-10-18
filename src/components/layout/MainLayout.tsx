@@ -1,6 +1,6 @@
 import { Outlet } from '@tanstack/react-router';
 import Sidebar from './Sidebar';
-import Header from './Header';
+import { Header } from './Header';
 
 const MainLayout = () => {
   return (

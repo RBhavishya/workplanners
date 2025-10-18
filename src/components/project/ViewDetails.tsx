@@ -1,6 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   assignUserAPI,
@@ -158,7 +158,7 @@ const Viewdetails = () => {
 
   return (
     <div className="flex">
-      <div className="flex flex-col m-2 gap-2">
+      <div className="flex flex-col m-2 gap-2 w-full">
         <div className="rounded-md p-3 bg-gray-50 shadow-[0_0_5px_0_rgba(0,0,0,0.2)]">
           <div className="flex items-start gap-3">
             <button
@@ -221,7 +221,7 @@ const Viewdetails = () => {
       </div>
 
       {/* Project Details */}
-      <div className="w-90 border-l border-gray-200 p-3 bg-white">
+      <div className="w-2/5 border-l border-gray-200 p-3 bg-white">
         <div className="text-xl font-medium mb-4">Project Details</div>
         <div className="flex flex-col gap-3">
           {/* Created By */}

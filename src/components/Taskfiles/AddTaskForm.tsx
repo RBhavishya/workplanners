@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar as CalendarIcon,
   ChevronDown,
@@ -35,23 +35,19 @@ import { Button } from "../ui/button";
 const formatDate = (date?: Date) =>
   date ? dayjs(date).format("YYYY-MM-DD") : "";
 
-const AddTaskForm = ({
-  taskId = null,
+export const AddTaskForm = ({
   taskData = null,
   onSave,
 }: {
   mode?: "create" | "edit";
-  taskId?: any;
   taskData?: any;
   onSave?: (data: any) => void;
 }) => {
-  const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params?.id ? Number(params.id) : null;
   const mode = id ? "edit" : "create";
   const queryClient = useQueryClient();
   const router = useRouter();
-  // States
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -80,22 +76,25 @@ const AddTaskForm = ({
 
   const {
     data: taskResp,
-    isLoading: loadingTask,
     isError,
+    error
   } = useQuery({
     queryKey: ["task", id],
     queryFn: () => getTaskByIdAPI(Number(id)),
     enabled: !!id,
   });
 
-  // Fetch Projects
-  const { data: projects = [], isLoading: loadingProjects } = useQuery({
+  if(isError) toast.error(error?.message || "Failed to fetch task details");
+
+  const { data: projects = [], isLoading: loadingProjects, isError: isErrorProjects, error: errorProjects } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await getDropDownForProjectsTasksAPI();
       return res.data?.data ?? [];
     },
   });
+
+  if(isErrorProjects) toast.error(errorProjects?.message || "Failed to fetch projects");
 
   // Fetch Users for selected project (only create mode)
   const { data: usersResp = [], isLoading: loadingUsers } = useQuery({
@@ -120,7 +119,7 @@ const AddTaskForm = ({
       setSuccessMessage("Task created successfully!");
       onSave?.(res?.data?.data);
       router.history.back();
-      await queryClient.refetchQueries({ queryKey: ["tasks"] });
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"] });
     },
     onError: (error: any) => {
       setErrors({});
@@ -148,7 +147,7 @@ const AddTaskForm = ({
     onSuccess: async (res: any) => {
       toast.success(res?.message || "Task updated successfully!");
       router.history.back();
-      await queryClient.refetchQueries({ queryKey: ["tasks"] });
+      await queryClient.refetchQueries({ queryKey: ["all-tasks"] });
     },
     onError: (error: any) => {
       setErrors({});
@@ -240,7 +239,6 @@ const AddTaskForm = ({
 
   return (
     <div className="mt-6 mx-auto p-4 bg-white shadow rounded-xl border-none max-w-lg">
-      {/* Header */}
       <div className="flex items-center justify-start mb-4">
         <button
           type="button"
@@ -254,13 +252,6 @@ const AddTaskForm = ({
         </h2>
       </div>
 
-      {/* Form Errors */}
-      {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm 3xl:!text-base">
-          {formError}
-        </div>
-      )}
-
       {/* Task Title */}
       <div className="flex flex-col gap-2 mb-4">
         <label className={Form_STYLES.label}>
@@ -272,12 +263,12 @@ const AddTaskForm = ({
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
-            clearFieldError("task_title"); // <-- remove error as user types
+            clearFieldError("task_title");
           }}
           className={Form_STYLES.input}
         />
         {errors.task_title && (
-          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm">
             {errors.task_title.join(", ")}
           </p>
         )}
@@ -291,15 +282,14 @@ const AddTaskForm = ({
         <textarea
           placeholder="Enter Task Description"
           value={description}
-          // onChange={(e) => setDescription(e.target.value)}
           onChange={(e) => {
             setDescription(e.target.value);
-            clearFieldError("description"); // <-- remove error as user types
+            clearFieldError("description"); 
           }}
           className={`${Form_STYLES.input} resize-none h-20`}
         />
         {errors.description && (
-          <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+          <p className="text-red-500 text-xs 3xl:!text-sm">
             {errors.description.join(", ")}
           </p>
         )}
@@ -349,7 +339,7 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.start_date && (
-            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm">
               {errors.start_date.join(", ")}
             </p>
           )}
@@ -377,12 +367,12 @@ const AddTaskForm = ({
               <Calendar
                 mode="single"
                 selected={dueDate}
-                month={visibleDueMonth || startDate || undefined} // open in startDate's month
-                onMonthChange={(month) => setVisibleDueMonth(month)} // allow navigation
+                month={visibleDueMonth || startDate || undefined} 
+                onMonthChange={(month) => setVisibleDueMonth(month)}
                 onSelect={(date) => {
                   if (date) {
                     setDueDate(date);
-                    setVisibleDueMonth(date); // keep calendar on selected due date
+                    setVisibleDueMonth(date);
                     setDueDateOpen(false);
                     clearFieldError("end_date");
                   }
@@ -394,7 +384,7 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.end_date && (
-            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm">
               {errors.end_date.join(", ")}
             </p>
           )}
@@ -485,14 +475,13 @@ const AddTaskForm = ({
             </PopoverContent>
           </Popover>
           {errors.project_id && (
-            <p className="text-red-500 text-xs 3xl:!text-sm mt-1">
+            <p className="text-red-500 text-xs 3xl:!text-sm">
               {errors.project_id.join(", ")}
             </p>
           )}
         </div>
       )}
 
-      {/* Assign Users (Create mode only) */}
       {mode === "create" && (
         <div className="flex flex-col gap-2 mb-4">
           <label className={Form_STYLES.label}>Assign Users</label>
@@ -637,5 +626,3 @@ const AddTaskForm = ({
     </div>
   );
 };
-
-export default AddTaskForm;

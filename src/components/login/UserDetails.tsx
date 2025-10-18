@@ -77,6 +77,10 @@ const UserDetails: React.FC = () => {
     navigate({ to: "/" });
   };
 
+  const DROPDOWN_STYLES = {
+    item: "cursor-pointer flex items-center gap-2 text-gray-700 focus:bg-violet-100 focus:text-violet-600 transition-colors" 
+  }
+
   return (
     <div className="flex justify-end w-full pr-6">
       <DropdownMenu>
@@ -119,7 +123,7 @@ const UserDetails: React.FC = () => {
           side="bottom"
         >
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 text-gray-700 focus:bg-violet-100 focus:text-violet-600 transition-colors"
+            className={DROPDOWN_STYLES.item}
             onClick={() => navigate({ to: "/view-profile" })}
           >
             <User size={16} className="hover:text-violet-600" />
@@ -127,7 +131,7 @@ const UserDetails: React.FC = () => {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 text-gray-700 group focus:bg-violet-100 focus:text-violet-600 transition-colors"
+            className={DROPDOWN_STYLES.item}
             onClick={() => {
               setUserToResetPassword(user.id);
               setResetPasswordDialogOpen(true);

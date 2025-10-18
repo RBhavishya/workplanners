@@ -25,6 +25,7 @@ import { ProgressIcon } from "../icons/Dashboard/ProgressIcon";
 import { TotalTaskIcon } from "../icons/Dashboard/TotalTaskIcon";
 import { taskColumns } from "./TaskColumns";
 import { getTaskActions } from "./TaskActions";
+import dayjs from "dayjs";
 
 const Tasks = () => {
   const navigate = useNavigate();
@@ -60,16 +61,14 @@ const Tasks = () => {
   );
   const debouncedSearch = useDebounce(searchString, 500);
 
-  const formatDate = (date: Date) =>
-    date ? date.toLocaleDateString("en-CA") : undefined;
-    const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
   const user_id = user?.id;
 
 
   const {  data, isFetching } = useQuery({
     queryKey: [
-      "tasks",
+      "all-tasks",
       pagination,
       debouncedSearch,
       dateValue,
@@ -86,11 +85,11 @@ const Tasks = () => {
         task_status: selectedStatus,
         from_date:
           dateValue?.length && dateValue[0]
-            ? formatDate(dateValue[0])
+            ? dayjs(dateValue[0]).format("DD-MM-YYYY")
             : undefined,
         to_date:
           dateValue?.length && dateValue[1]
-            ? formatDate(dateValue[1])
+            ? dayjs(dateValue[1]).format("DD-MM-YYYY")
             : undefined,
       });
       return response;
@@ -117,7 +116,7 @@ const Tasks = () => {
     mutationFn: (id: number) => deleteTasksAPI(id),
     onSuccess: (res: any) => {
       toast.success(res?.data?.message || "Task deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {
@@ -186,11 +185,11 @@ const Tasks = () => {
           search: debouncedSearch || undefined,
           from_date:
             dateValue?.length && dateValue[0]
-              ? formatDate(dateValue[0])
+              ? dayjs(dateValue[0]).format("DD-MM-YYYY")
               : undefined,
           to_date:
             dateValue?.length && dateValue[1]
-              ? formatDate(dateValue[1])
+              ? dayjs(dateValue[1]).format("DD-MM-YYYY")
               : undefined,
           task_status: selectedStatus || undefined,
         },
