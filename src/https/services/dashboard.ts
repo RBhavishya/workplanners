@@ -6,7 +6,6 @@ interface GetAllPaginatedUsersPropTypes {
   pageSize: number;
   search_string?: string;
 }
-
 export const getDashboardStatistics = async ({
   pageIndex,
   pageSize,

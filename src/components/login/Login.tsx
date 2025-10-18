@@ -232,7 +232,7 @@ const LoginPage: React.FC = () => {
               <div className="relative w-full">
                 <Input
                   id="password"
-                  placeholder="Password"
+                  placeholder="Enter your Password"
                   // type={passwordVisible ? "text" : "password"}
                   value={loginDetails.password}
                   onChange={(e) =>

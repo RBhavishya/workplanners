@@ -231,7 +231,11 @@ const Dashboard = () => {
               onClick={() => setTodayFilter(item.status)}
             >
               {item.label}
-              <span className="text-[11px] 3xl:!text-xs text-white rounded-lg px-2 py-0.5 bg-neutral-400 font-normal">
+              <span className={`text-[11px] 3xl:!text-xs text-white rounded-lg px-2 py-0.5 font-normal ${
+                todayFilter === item.status
+                  ? "bg-purple-600"
+                  : "bg-neutral-400"
+              }`}>
                 <CountUp end={item.count} duration={1} />
               </span>
             </div>
