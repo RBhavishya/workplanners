@@ -148,6 +148,7 @@ export const AddTaskForm = ({
       toast.success(res?.message || "Task updated successfully!");
       router.history.back();
       await queryClient.refetchQueries({ queryKey: ["all-tasks"] });
+      await queryClient.refetchQueries({ queryKey: ["project", id] });
     },
     onError: (error: any) => {
       setErrors({});
