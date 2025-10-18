@@ -47,14 +47,17 @@ export const Projects = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">(
     search?.viewMode || "grid"
   );
-  const [selectedStatus, setSelectedStatus] = useState(searchParams.get("project_status") || '');
+  const initialStatus = searchParams.get("project_status") || "";
+  const initialSearch = searchParams.get("search") || "";
+  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
+  const [searchString, setSearchString] = useState<any>(initialSearch);
   const [pagination, setPagination] = useState({
     pageIndex: pageIndexParam,
     pageSize: pageSizeParam,
     order_by: orderBY,
   });
-  const [searchString, setSearchString] = useState(searchParams.get("search") || "");
-  const debouncedSearch = useDebounce(searchString, 500);
+    const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+  
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const { isLoading, isError, error, data, isFetching } = useQuery({
@@ -106,6 +109,16 @@ export const Projects = () => {
       setSelectedStatus(newStatus);
     }
   }
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString === "") {
+        setPagination((prev) => ({ ...prev, pageIndex: 1 }));
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchString, selectedStatus]);
 
   useEffect(() => {
     router.navigate({

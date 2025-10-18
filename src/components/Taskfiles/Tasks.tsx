@@ -38,14 +38,13 @@ const Tasks = () => {
   const orderBY = searchParams.get("order_by")
     ? searchParams.get("order_by")
     : "";
+  const initialSearch = searchParams.get("search") || "";
   const initialStartDate = searchParams.get("from_date") || null;
   const initialEndDate = searchParams.get("to_date") || null;
-  const [searchString, setSearchString] = useState(
-    searchParams.get("search") || ""
-  );
-  const [selectedStatus, setSelectedStatus] = useState(
-    searchParams.get("task_status") || ""
-  );
+    const initialStatus = searchParams.get("task_status") || "";
+ const [searchString, setSearchString] = useState<any>(initialSearch);
+    const [debouncedSearch, setDebouncedSearch] = useState(searchString);
+   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [del, setDel] = useState<any>(1);
@@ -59,7 +58,10 @@ const Tasks = () => {
       ? [new Date(initialStartDate), new Date(initialEndDate)]
       : null
   );
-  const debouncedSearch = useDebounce(searchString, 500);
+
+   const formatDate = (date: Date) =>
+    date ? date.toLocaleDateString("en-CA") : undefined;
+  
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -85,11 +87,11 @@ const Tasks = () => {
         task_status: selectedStatus,
         from_date:
           dateValue?.length && dateValue[0]
-            ? dayjs(dateValue[0]).format("DD-MM-YYYY")
+            ? dayjs(dateValue[0]).format("YYYY-MM-DD")
             : undefined,
         to_date:
           dateValue?.length && dateValue[1]
-            ? dayjs(dateValue[1]).format("DD-MM-YYYY")
+            ? dayjs(dateValue[1]).format("YYYY-MM-DD")
             : undefined,
       });
       return response;
@@ -175,6 +177,29 @@ const Tasks = () => {
 
   ]
 
+   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchString);
+      if (searchString || selectedStatus || dateValue) {
+        getAllTasks({
+          pageIndex: 1,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      } else {
+        getAllTasks({
+          pageIndex: pageIndexParam,
+          pageSize: pageSizeParam,
+          order_by: orderBY,
+        });
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchString, selectedStatus, dateValue]);
+
+
   useEffect(() => {
       router.navigate({
         to: "/tasks",
@@ -185,11 +210,11 @@ const Tasks = () => {
           search: debouncedSearch || undefined,
           from_date:
             dateValue?.length && dateValue[0]
-              ? dayjs(dateValue[0]).format("DD-MM-YYYY")
+              ? dayjs(dateValue[0]).format("YYYY-MM-DD")
               : undefined,
           to_date:
             dateValue?.length && dateValue[1]
-              ? dayjs(dateValue[1]).format("DD-MM-YYYY")
+              ? dayjs(dateValue[1]).format("YYYY-MM-DD")
               : undefined,
           task_status: selectedStatus || undefined,
         },
