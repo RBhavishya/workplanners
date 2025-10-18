@@ -113,15 +113,14 @@ const AddProjectForm = ({
         setFormError(message);
       }
     },
-    retry: false,
   });
 
   const updateMutation = useMutation({
     mutationFn: (updatedProject: AddProjectData) =>
       updateProjectAPI(projectId!, updatedProject),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", projectId!] });
+    onSuccess:async  (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({ queryKey: ["project", projectId!] });
       toast.success(data.message || "Project updated successfully");
       onSave?.(data.data);
       navigate({ to: "/projects" });
@@ -138,7 +137,6 @@ const AddProjectForm = ({
         setFormError(message);
       }
     },
-    retry: false,
   });
 
   const clearFieldError = (field: string) => {

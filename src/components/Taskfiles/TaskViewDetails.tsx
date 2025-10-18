@@ -47,7 +47,7 @@ export const TaskViewDetails = () => {
     error,
     isError
   } = useQuery({
-    queryKey: ["project", id],
+    queryKey: ["task", id],
     queryFn: () => getTaskByIdAPI(Number(id)),
   });
 
@@ -60,7 +60,7 @@ export const TaskViewDetails = () => {
       TasksStatusAPI(Number(id), { task_status: newStatus }),
     onSuccess: async () => {
       toast.success("Status updated successfully");
-      await queryClient.refetchQueries({ queryKey: ["project", id] });
+      await queryClient.refetchQueries({ queryKey: ["task", id] });
       await queryClient.refetchQueries({ queryKey: ["all-tasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayTasks"]});
       await queryClient.refetchQueries({ queryKey: ["todayStats"]});
